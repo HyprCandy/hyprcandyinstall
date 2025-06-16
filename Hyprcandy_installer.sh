@@ -1,0 +1,1139 @@
+#!/bin/bash
+
+# HyprCandy Installer Script
+# This script installs Hyprland and related packages from AUR
+
+set -e  # Exit on any error
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
+WHITE='\033[1;37m'
+MAGENTA='\033[1;35m'
+LIGHT_BLUE='\033[1;34m'
+LIGHT_GREEN='\033[1;32m'
+LIGHT_RED='\033[1;31m'
+NC='\033[0m' # No Color
+
+# Global variables
+DISPLAY_MANAGER=""
+DISPLAY_MANAGER_SERVICE=""
+SHELL_CHOICE=""
+
+# Function to display multicolored ASCII art
+show_ascii_art() {
+    clear
+    echo
+    # HyprCandy in gradient colors
+    echo -e "${PURPLE}██╗  ██╗██╗   ██╗██████╗ ██████╗  ${MAGENTA}██████╗ █████╗ ███╗   ██╗██████╗ ██╗   ██╗${NC}"
+    echo -e "${PURPLE}██║  ██║╚██╗ ██╔╝██╔══██╗██╔══██╗${MAGENTA}██╔════╝██╔══██╗████╗  ██║██╔══██╗╚██╗ ██╔╝${NC}"
+    echo -e "${LIGHT_BLUE}███████║ ╚████╔╝ ██████╔╝██████╔╝${CYAN}██║     ███████║██╔██╗ ██║██║  ██║ ╚████╔╝${NC}"
+    echo -e "${BLUE}██╔══██║  ╚██╔╝  ██╔═══╝ ██╔══██╗${CYAN}██║     ██╔══██║██║╚██╗██║██║  ██║  ╚██╔╝${NC}"
+    echo -e "${BLUE}██║  ██║   ██║   ██║     ██║  ██║${LIGHT_GREEN}╚██████╗██║  ██║██║ ╚████║██████╔╝   ██║${NC}"
+    echo -e "${GREEN}╚═╝  ╚═╝   ╚═╝   ╚═╝     ╚═╝  ╚═╝${LIGHT_GREEN} ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝    ╚═╝${NC}"
+    echo
+    # Installer in different colors
+    echo -e "${YELLOW}██╗███╗   ██╗███████╗████████╗ ${LIGHT_RED}█████╗ ██╗     ██╗     ███████╗██████╗${NC}"
+    echo -e "${YELLOW}██║████╗  ██║██╔════╝╚══██╔══╝${LIGHT_RED}██╔══██╗██║     ██║     ██╔════╝██╔══██╗${NC}"
+    echo -e "${RED}██║██╔██╗ ██║███████╗   ██║   ${LIGHT_RED}███████║██║     ██║     █████╗  ██████╔╝${NC}"
+    echo -e "${RED}██║██║╚██╗██║╚════██║   ██║   ${WHITE}██╔══██║██║     ██║     ██╔══╝  ██╔══██╗${NC}"
+    echo -e "${LIGHT_RED}██║██║ ╚████║███████║   ██║   ${WHITE}██║  ██║███████╗███████╗███████╗██║  ██║${NC}"
+    echo -e "${WHITE}╚═╝╚═╝  ╚═══╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝╚═╝  ╚═╝${NC}"
+    echo
+    # Decorative line with gradient
+    echo -e "${PURPLE}════════════════════${MAGENTA}════════════════════${CYAN}════════════════════${YELLOW}═════════${NC}"
+    echo -e "${WHITE}                    Welcome to the HyprCandy Installer!${NC}"
+    echo -e "${PURPLE}════════════════════${MAGENTA}════════════════════${CYAN}════════════════════${YELLOW}═════════${NC}"
+    echo
+}
+
+# Function to print colored output
+print_status() {
+    echo -e "${BLUE}[INFO]${NC} $1"
+}
+
+print_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
+
+print_warning() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
+}
+
+print_error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
+
+# Function to choose display manager
+choose_display_manager() {
+    print_status "Choose your display manager:"
+    echo "1) SDDM with Sugar Candy theme (Recommended for Hyprland)"
+    echo "2) GDM with settings (GNOME Display Manager)"
+    echo
+    
+    while true; do
+        echo -e "${YELLOW}Enter your choice (1 for SDDM, 2 for GDM):${NC}"
+        read -r dm_choice
+        case $dm_choice in
+            1)
+                DISPLAY_MANAGER="sddm"
+                DISPLAY_MANAGER_SERVICE="sddm"
+                print_status "Selected SDDM with Sugar Candy theme"
+                break
+                ;;
+            2)
+                DISPLAY_MANAGER="gdm"
+                DISPLAY_MANAGER_SERVICE="gdm"
+                print_status "Selected GDM with settings"
+                break
+                ;;
+            *)
+                print_error "Invalid choice. Please enter 1 or 2."
+                ;;
+        esac
+    done
+}
+
+# Function to choose shell
+choose_shell() {
+    print_status "Choose your shell:"
+    echo "1) Fish - Modern shell with intelligent autosuggestions and syntax highlighting"
+    echo "2) Zsh - Powerful shell with extensive customization (Oh My Zsh + Powerlevel10k)"
+    echo
+    
+    while true; do
+        echo -e "${YELLOW}Enter your choice (1 for Fish, 2 for Zsh):${NC}"
+        read -r shell_choice
+        case $shell_choice in
+            1)
+                SHELL_CHOICE="fish"
+                print_status "Selected Fish shell with modern configuration"
+                break
+                ;;
+            2)
+                SHELL_CHOICE="zsh"
+                print_status "Selected Zsh with Oh My Zsh and Powerlevel10k"
+                break
+                ;;
+            *)
+                print_error "Invalid choice. Please enter 1 or 2."
+                ;;
+        esac
+    done
+}
+
+# Function to install yay
+install_yay() {
+    print_status "Installing yay..."
+    cd /tmp
+    git clone https://aur.archlinux.org/yay.git
+    cd yay
+    makepkg -si --noconfirm
+    cd /tmp
+    rm -rf yay
+    print_success "yay installed successfully!"
+}
+
+# Function to install paru
+install_paru() {
+    print_status "Installing paru..."
+    cd /tmp
+    git clone https://aur.archlinux.org/paru.git
+    cd paru
+    makepkg -si --noconfirm
+    cd /tmp
+    rm -rf paru
+    print_success "paru installed successfully!"
+}
+
+# Check if AUR helper is installed or install one
+check_or_install_aur_helper() {
+    if command -v yay &> /dev/null; then
+        AUR_HELPER="yay"
+        print_status "Found yay - using as AUR helper"
+    elif command -v paru &> /dev/null; then
+        AUR_HELPER="paru"
+        print_status "Found paru - using as AUR helper"
+    else
+        print_warning "No AUR helper found. You need to install one."
+        echo
+        echo "Available AUR helpers:"
+        echo "1) yay - Yet Another Yogurt (Go-based, fast)"
+        echo "2) paru - Paru is based on yay (Rust-based, feature-rich)"
+        echo
+        while true; do
+            echo -e "${YELLOW}Choose which AUR helper to install (1 for yay, 2 for paru):${NC}"
+            read -r choice
+            case $choice in
+                1)
+                    # Check if base-devel and git are installed
+                    print_status "Ensuring base-devel and git are installed..."
+                    sudo pacman -S --needed --noconfirm base-devel git
+                    install_yay
+                    AUR_HELPER="yay"
+                    break
+                    ;;
+                2)
+                    # Check if base-devel and git are installed
+                    print_status "Ensuring base-devel and git are installed..."
+                    sudo pacman -S --needed --noconfirm base-devel git
+                    install_paru
+                    AUR_HELPER="paru"
+                    break
+                    ;;
+                *)
+                    print_error "Invalid choice. Please enter 1 or 2."
+                    ;;
+            esac
+        done
+    fi
+}
+
+# Function to build package list based on display manager choice
+build_package_list() {
+    packages=(
+        # Hyprland ecosystem
+        "hyprland"
+        "hyprcursor"
+        "hyprgraphics"
+        "hypridle"
+        "hyprland-protocols"
+        "hyprland-qt-support"
+        "hyprland-qtutils"
+        "hyprlang"
+        "hyprlock"
+        "hyprpaper"
+        "hyprpicker"
+        "hyprpolkitagent"
+        "hyprsunset"
+        "hyprsysteminfo"
+        "hyprutils"
+        "hyprwayland-scanner"
+        
+        # GNOME components (always include gnome-control-center and gnome-tweaks)
+        "gnome-control-center"
+        "gnome-tweaks"
+        
+        # Terminal and file manager
+        "kitty"
+        "nautilus"
+        
+        # Qt and GTK theming
+        "qt5ct"
+        "qt6ct"
+        "nwg-look"
+        
+        # System utilities
+        "network-manager-applet"
+        "blueman"
+        "nwg-displays"
+        "nwg-dock-hyprland"
+        "wlogout"
+        "uwsm"
+        
+        # Application launchers and menus
+        "rofi-wayland"
+        "rofi-emoji"
+        "rofi-nerdy"
+        
+        # Wallpaper and screenshot tools
+        "swww"
+        "grimblast-git"
+        "wob"
+        "wf-recorder"
+        "slurp"
+        "swappy"
+        
+        # System tools
+        "gnome-disk-utility"
+        "brightnessctl"
+        "playerctl"
+        
+        # System monitoring
+        "btop"
+        "nvtop"
+        "htop"
+        
+        # Customization and theming
+        "ags-hyprpanel-git"
+        "matugen-bin"
+        "python-pywal"
+        
+        # Applications
+        "gedit"
+        
+        # Utilities
+        "zip"
+        "7zip"
+        "wtype"
+        "cava"
+        "downgrade"
+        "ntfs-3g"
+        "fuse"
+        "video-trimmer"
+        "eog"
+        "pyprland"
+        
+        # Fonts
+        "nerd-fonts"
+        "powerline-fonts"
+        "awesome-terminal-fonts"
+        
+        # Clipboard
+        "cliphist"
+        "python-pywalfox"
+        
+        # Browser and themes
+        "firefox"
+        "adw-gtk-theme"
+        "adwaita-qt6"
+        "adwaita-qt-git"
+        "tela-circle-icon-theme-all"
+        
+        # Cursor themes
+        "qogir-cursor-theme-git"
+        "bibata-cursor-theme"
+        
+        # Package management
+        "octopi"
+        
+        # System info
+        "fastfetch"
+        
+        # GTK development libraries
+        "gtkmm-4.0"
+        "gtksourceview3"
+        "gtksourceview4"
+        "gtksourceview5"
+        
+        # Configuration management
+        "stow"
+    )
+    
+    # Add display manager specific packages
+    if [ "$DISPLAY_MANAGER" = "sddm" ]; then
+        packages+=("sddm" "sddm-sugar-candy-git")
+        print_status "Added SDDM and Sugar Candy theme to package list"
+    elif [ "$DISPLAY_MANAGER" = "gdm" ]; then
+        packages+=("gdm" "gdm-settings")
+        print_status "Added GDM and GDM settings to package list"
+    fi
+    
+    # Add shell specific packages
+    if [ "$SHELL_CHOICE" = "fish" ]; then
+        packages+=(
+            "fish"
+            "fisher"
+            "starship"
+        )
+        print_status "Added Fish shell and modern tools to package list"
+    elif [ "$SHELL_CHOICE" = "zsh" ]; then
+        packages+=(
+            "zsh"
+            "zsh-completions"
+            "zsh-autosuggestions"
+            "zsh-history-substring-search"
+            "zsh-syntax-highlighting"
+            "zsh-theme-powerlevel10k"
+            "oh-my-zsh-git"
+        )
+        print_status "Added Zsh and Oh My Zsh ecosystem to package list"
+    fi
+}
+
+# Function to install packages
+install_packages() {
+    print_status "Starting installation of ${#packages[@]} packages using $AUR_HELPER..."
+    
+    # Install packages in batches to avoid potential issues
+    local batch_size=10
+    local total=${#packages[@]}
+    local installed=0
+    local failed=()
+    
+    for ((i=0; i<total; i+=batch_size)); do
+        local batch=("${packages[@]:i:batch_size}")
+        print_status "Installing batch $((i/batch_size + 1)): ${batch[*]}"
+        
+        if $AUR_HELPER -S --noconfirm --needed "${batch[@]}"; then
+            installed=$((installed + ${#batch[@]}))
+            print_success "Batch $((i/batch_size + 1)) installed successfully"
+        else
+            print_warning "Some packages in batch $((i/batch_size + 1)) failed to install"
+            # Try installing packages individually to identify failures
+            for pkg in "${batch[@]}"; do
+                if ! $AUR_HELPER -S --noconfirm --needed "$pkg"; then
+                    failed+=("$pkg")
+                    print_error "Failed to install: $pkg"
+                else
+                    installed=$((installed + 1))
+                fi
+            done
+        fi
+        
+        # Small delay between batches
+        sleep 2
+    done
+    
+    print_status "Installation completed!"
+    print_success "Successfully installed: $installed packages"
+    
+    if [ ${#failed[@]} -gt 0 ]; then
+        print_warning "Failed to install ${#failed[@]} packages:"
+        printf '%s\n' "${failed[@]}"
+        echo
+        print_status "You can try installing failed packages manually:"
+        echo "$AUR_HELPER -S ${failed[*]}"
+    fi
+}
+
+# Function to automatically setup Hyprcandy configuration
+setup_hyprcandy() {
+    print_status "Setting up Hyprcandy configuration..."
+    
+    # Check if stow is available
+    if ! command -v stow &> /dev/null; then
+        print_error "stow is not installed. Cannot proceed with configuration setup."
+        return 1
+    fi
+    
+    # Create a backup directory for existing configs
+    local backup_dir="$HOME/.config_backup_$(date +%Y%m%d_%H%M%S)"
+    mkdir -p "$backup_dir"
+    
+    # Clone Hyprcandy repository
+    local hyprcandy_dir="$HOME/.hyprcandy"
+    
+    if [ -d "$hyprcandy_dir" ]; then
+        print_warning "Hyprcandy directory already exists. Updating..."
+        cd "$hyprcandy_dir"
+        git pull
+    else
+        print_status "Cloning Hyprcandy repository..."
+        git clone https://github.com/HyprCandy/Hyprcandy.git "$hyprcandy_dir"
+    fi
+    
+    cd "$hyprcandy_dir"
+    
+    # Get all configuration directories (excluding .git and any files)
+    local config_dirs=()
+    for dir in */; do
+        if [ -d "$dir" ] && [ "$dir" != ".git/" ]; then
+            config_dirs+=("${dir%/}")
+        fi
+    done
+    
+    if [ ${#config_dirs[@]} -eq 0 ]; then
+        print_error "No configuration directories found in Hyprcandy repository."
+        return 1
+    fi
+    
+    print_status "Found configuration directories: ${config_dirs[*]}"
+    print_status "Automatically installing all configurations..."
+    
+    # Backup existing configurations that will be replaced
+    local backed_up=false
+    for config_dir in "${config_dirs[@]}"; do
+        # Check if this config directory exists in ~/.config
+        if [ -d "$HOME/.config/$config_dir" ]; then
+            print_status "Backing up existing $config_dir configuration..."
+            cp -r "$HOME/.config/$config_dir" "$backup_dir/"
+            backed_up=true
+        fi
+    done
+    
+    # Stow all configurations automatically
+    local stow_success=0
+    local stow_failed=()
+    
+    for config_dir in "${config_dirs[@]}"; do
+        if [ -d "$config_dir" ]; then
+            print_status "Installing $config_dir configuration..."
+            if stow -v "$config_dir" -t "$HOME" 2>/dev/null; then
+                print_success "Successfully installed $config_dir configuration"
+                stow_success=$((stow_success + 1))
+            else
+                print_warning "Failed to stow $config_dir - there might be conflicts"
+                print_status "Attempting to restow $config_dir..."
+                if stow -R -v "$config_dir" -t "$HOME" 2>/dev/null; then
+                    print_success "Successfully restowed $config_dir configuration"
+                    stow_success=$((stow_success + 1))
+                else
+                    print_error "Failed to install $config_dir configuration"
+                    stow_failed+=("$config_dir")
+                fi
+            fi
+        fi
+    done
+    
+    print_status "Configuration installation completed!"
+    print_success "Successfully installed: $stow_success configurations"
+    
+    if [ ${#stow_failed[@]} -gt 0 ]; then
+        print_warning "Failed to install ${#stow_failed[@]} configurations:"
+        printf '%s\n' "${stow_failed[@]}"
+        echo
+        print_status "You can try installing failed configurations manually:"
+        for failed_config in "${stow_failed[@]}"; do
+            echo "cd $hyprcandy_dir && stow -v $failed_config -t $HOME"
+        done
+    fi
+    
+    if [ "$backed_up" = true ]; then
+        print_status "Your original configurations have been backed up to: $backup_dir"
+    else
+        # Remove empty backup directory if nothing was backed up
+        rmdir "$backup_dir" 2>/dev/null || true
+    fi
+    
+    # Return to home directory
+    cd "$HOME"
+    
+    print_success "Hyprcandy configuration setup completed!"
+}
+
+# Function to setup Fish shell configuration
+setup_fish() {
+    print_status "Setting up Fish shell configuration..."
+    
+    # Set Fish as default shell
+    if command -v fish &> /dev/null; then
+        print_status "Setting Fish as default shell..."
+        chsh -s $(which fish)
+        print_success "Fish set as default shell"
+    else
+        print_error "Fish not found. Please install Fish first."
+        return 1
+    fi
+    
+    # Create Fish config directory
+    mkdir -p "$HOME/.config/fish"
+    
+    # Install Fisher (Fish plugin manager) and popular plugins
+    if command -v fish &> /dev/null; then
+        print_status "Installing Fisher and essential Fish plugins..."
+        
+        # Install Fisher
+        fish -c "curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher"
+        
+        # Install essential plugins
+        fish -c "fisher install jorgebucaran/autopair.fish"
+        fish -c "fisher install franciscolourenco/done"
+        fish -c "fisher install jethrokuan/z"
+        fish -c "fisher install jorgebucaran/nvm.fish"
+        fish -c "fisher install PatrickF1/fzf.fish"
+        
+        print_success "Fisher and plugins installed"
+    fi
+    
+    # Configure Starship prompt
+    if command -v starship &> /dev/null; then
+        print_status "Configuring Starship prompt for Fish..."
+        
+        # Add Starship to Fish config
+        echo 'starship init fish | source' >> "$HOME/.config/fish/config.fish"
+        
+        # Create Starship config
+        mkdir -p "$HOME/.config"
+        cat > "$HOME/.config/starship.toml" << 'EOF'
+# Starship Configuration for HyprCandy
+format = """
+$username\
+$hostname\
+$directory\
+$git_branch\
+$git_state\
+$git_status\
+$git_metrics\
+$fill\
+$nodejs\
+$python\
+$rust\
+$golang\
+$php\
+$java\
+$kotlin\
+$haskell\
+$swift\
+$cmd_duration $jobs $time\
+$line_break\
+$character"""
+
+[directory]
+style = "blue"
+read_only = " 🔒"
+truncation_length = 4
+truncate_to_repo = false
+
+[character]
+success_symbol = "[❯](purple)"
+error_symbol = "[❯](red)"
+vimcmd_symbol = "[❮](green)"
+
+[git_branch]
+symbol = "🌱 "
+truncation_length = 4
+truncation_symbol = ""
+style = "bold green"
+
+[git_status]
+ahead = "⇡${count}"
+diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+behind = "⇣${count}"
+deleted = "x"
+
+[nodejs]
+symbol = " "
+style = "bold green"
+
+[python]
+symbol = " "
+style = "bold yellow"
+
+[rust]
+symbol = " "
+style = "bold red"
+
+[time]
+format = '🕙[\[ $time \]]($style) '
+time_format = "%T"
+disabled = false
+style = "bright-white"
+
+[cmd_duration]
+format = "⏱️ [$duration]($style) "
+style = "yellow"
+
+[jobs]
+symbol = "+ "
+style = "bold blue"
+EOF
+        
+        print_success "Starship configured for Fish"
+    fi
+    
+    # Add useful Fish functions and aliases
+    cat > "$HOME/.config/fish/config.fish" << 'EOF'
+# HyprCandy Fish Configuration
+
+# Initialize Starship prompt
+if type -q starship
+    starship init fish | source
+end
+
+# Set environment variables
+set -x EDITOR nano
+set -x BROWSER firefox
+set -x TERMINAL kitty
+
+# Add local bin to PATH
+if test -d ~/.local/bin
+    set -x PATH ~/.local/bin $PATH
+end
+
+# Aliases
+alias ll="ls -alF"
+alias la="ls -A"
+alias l="ls -CF"
+alias ..="cd .."
+alias ...="cd ../.."
+alias grep="grep --color=auto"
+alias fgrep="fgrep --color=auto"
+alias egrep="egrep --color=auto"
+alias update="sudo pacman -Syu"
+alias install="sudo pacman -S"
+alias search="pacman -Ss"
+alias remove="sudo pacman -R"
+alias autoremove="sudo pacman -Rs (pacman -Qtdq)"
+alias cls="clear"
+alias h="history"
+alias j="jobs -l"
+alias df="df -h"
+alias du="du -h"
+alias mkdir="mkdir -pv"
+alias wget="wget -c"
+
+# Git aliases
+alias g="git"
+alias ga="git add"
+alias gc="git commit"
+alias gp="git push"
+alias gl="git pull"
+alias gs="git status"
+alias gd="git diff"
+alias gco="git checkout"
+alias gb="git branch"
+alias glog="git log --oneline --graph --decorate"
+
+# System information
+alias sysinfo="fastfetch"
+alias weather="curl wttr.in"
+
+# Fun stuff
+alias matrix="cmatrix"
+alias pipes="pipes.sh"
+
+# Welcome message
+function fish_greeting
+    echo
+    set_color purple
+    echo "Welcome to HyprCandy Fish Shell! 🐟"
+    set_color normal
+    echo
+end
+EOF
+    
+    print_success "Fish shell configuration completed!"
+}
+
+# Function to setup Zsh configuration
+setup_zsh() {
+    print_status "Setting up Zsh shell configuration..."
+    
+    # Set Zsh as default shell
+    if command -v zsh &> /dev/null; then
+        print_status "Setting Zsh as default shell..."
+        chsh -s $(which zsh)
+        print_success "Zsh set as default shell"
+    else
+        print_error "Zsh not found. Please install Zsh first."
+        return 1
+    fi
+    
+    # Install Oh My Zsh if not already installed
+    if [ ! -d "$HOME/.oh-my-zsh" ]; then
+        print_status "Installing Oh My Zsh..."
+        RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+        print_success "Oh My Zsh installed"
+    fi
+    
+    # Configure Powerlevel10k theme
+    if [ -f "/usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme" ]; then
+        print_status "Configuring Powerlevel10k theme..."
+        
+        # Create .zshrc with comprehensive configuration
+        cat > "$HOME/.zshrc" << 'EOF'
+# HyprCandy Zsh Configuration with Oh My Zsh and Powerlevel10k
+
+# Enable Powerlevel10k instant prompt
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+# Oh My Zsh configuration
+export ZSH="$HOME/.oh-my-zsh"
+
+# Set theme
+ZSH_THEME="powerlevel10k/powerlevel10k"
+
+# Plugins
+plugins=(
+    git
+    sudo
+    web-search
+    copypath
+    copyfile
+    copybuffer
+    dirhistory
+    history
+    zsh-autosuggestions
+    zsh-syntax-highlighting
+    zsh-history-substring-search
+)
+
+# Load Oh My Zsh
+source $ZSH/oh-my-zsh.sh
+
+# User configuration
+export EDITOR='nano'
+export BROWSER='firefox'
+export TERMINAL='kitty'
+
+# Add local bin to PATH
+if [ -d "$HOME/.local/bin" ]; then
+    export PATH="$HOME/.local/bin:$PATH"
+fi
+
+# Load Powerlevel10k theme
+source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
+
+# Load syntax highlighting and autosuggestions
+source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh 2>/dev/null
+source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh 2>/dev/null
+source /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh 2>/dev/null
+
+# History configuration
+HISTSIZE=10000
+SAVEHIST=10000
+HISTFILE=~/.zsh_history
+setopt SHARE_HISTORY
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_FIND_NO_DUPS
+setopt HIST_SAVE_NO_DUPS
+setopt HIST_REDUCE_BLANKS
+setopt HIST_VERIFY
+
+# Key bindings for history substring search
+bindkey '^[[A' history-substring-search-up
+bindkey '^[[B' history-substring-search-down
+bindkey '^[OA' history-substring-search-up
+bindkey '^[OB' history-substring-search-down
+
+# Aliases
+alias ll="ls -alF"
+alias la="ls -A"
+alias l="ls -CF"
+alias ..="cd .."
+alias ...="cd ../.."
+alias grep="grep --color=auto"
+alias fgrep="fgrep --color=auto"
+alias egrep="egrep --color=auto"
+alias update="sudo pacman -Syu"
+alias install="sudo pacman -S"
+alias search="pacman -Ss"
+alias remove="sudo pacman -R"
+alias autoremove="sudo pacman -Rs $(pacman -Qtdq)"
+alias cls="clear"
+alias h="history"
+alias j="jobs -l"
+alias df="df -h"
+alias du="du -h"
+alias mkdir="mkdir -pv"
+alias wget="wget -c"
+
+# Git aliases
+alias g="git"
+alias ga="git add"
+alias gc="git commit"
+alias gp="git push"
+alias gl="git pull"
+alias gs="git status"
+alias gd="git diff"
+alias gco="git checkout"
+alias gb="git branch"
+alias glog="git log --oneline --graph --decorate"
+
+# System information
+alias sysinfo="fastfetch"
+alias weather="curl wttr.in"
+
+# Fun stuff
+alias matrix="cmatrix"
+alias pipes="pipes.sh"
+
+# Load Powerlevel10k configuration
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+EOF
+        
+        # Create a basic Powerlevel10k configuration
+        cat > "$HOME/.p10k.zsh" << 'EOF'
+# Powerlevel10k configuration for HyprCandy
+
+# Temporarily change options.
+'builtin' 'local' '-a' 'p10k_config_opts'
+[[ ! -o 'aliases'         ]] || p10k_config_opts+=('aliases')
+[[ ! -o 'sh_glob'         ]] || p10k_config_opts+=('sh_glob')
+[[ ! -o 'no_brace_expand' ]] || p10k_config_opts+=('no_brace_expand')
+'builtin' 'setopt' 'no_aliases' 'no_sh_glob' 'brace_expand'
+
+() {
+  emulate -L zsh -o extended_glob
+
+  # Unset all configuration options.
+  unset POWERLEVEL9K_*
+
+  # Left prompt segments.
+  typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
+    os_icon
+    dir
+    vcs
+    prompt_char
+  )
+
+  # Right prompt segments.
+  typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
+    status
+    command_execution_time
+    background_jobs
+    time
+  )
+
+  # Basic style options.
+  typeset -g POWERLEVEL9K_MODE='nerdfont-complete'
+  typeset -g POWERLEVEL9K_ICON_PADDING=moderate
+  typeset -g POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
+  typeset -g POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX=''
+  typeset -g POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_PREFIX=''
+  typeset -g POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX=''
+  typeset -g POWERLEVEL9K_MULTILINE_FIRST_PROMPT_SUFFIX=''
+  typeset -g POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_SUFFIX=''
+  typeset -g POWERLEVEL9K_MULTILINE_LAST_PROMPT_SUFFIX=''
+  typeset -g POWERLEVEL9K_LEFT_SUBSEGMENT_SEPARATOR=''
+  typeset -g POWERLEVEL9K_RIGHT_SUBSEGMENT_SEPARATOR=''
+  typeset -g POWERLEVEL9K_LEFT_SEGMENT_SEPARATOR=''
+  typeset -g POWERLEVEL9K_RIGHT_SEGMENT_SEPARATOR=''
+  typeset -g POWERLEVEL9K_LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL=''
+  typeset -g POWERLEVEL9K_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL=''
+  typeset -g POWERLEVEL9K_LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL=''
+  typeset -g POWERLEVEL9K_RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL=''
+  typeset -g POWERLEVEL9K_EMPTY_LINE_LEFT_PROMPT_FIRST_SEGMENT_END_SYMBOL='%{%G═╮%}'
+  typeset -g POWERLEVEL9K_EMPTY_LINE_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL='%{%G╭═%}'
+  typeset -g POWERLEVEL9K_EMPTY_LINE_LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL='%{%G═╯%}'
+  typeset -g POWERLEVEL9K_EMPTY_LINE_RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL='%{%G╰═%}'
+
+  # OS icon
+  typeset -g POWERLEVEL9K_OS_ICON_FOREGROUND=232
+  typeset -g POWERLEVEL9K_OS_ICON_BACKGROUND=7
+
+  # Directory
+  typeset -g POWERLEVEL9K_DIR_FOREGROUND=232
+  typeset -g POWERLEVEL9K_DIR_BACKGROUND=4
+  typeset -g POWERLEVEL9K_SHORTEN_STRATEGY=truncate_to_last
+  typeset -g POWERLEVEL9K_SHORTEN_DIR_LENGTH=1
+
+  # VCS (Git)
+  typeset -g POWERLEVEL9K_VCS_BRANCH_ICON=''
+  typeset -g POWERLEVEL9K_VCS_UNTRACKED_ICON='?'
+  typeset -g POWERLEVEL9K_VCS_UNSTAGED_ICON='!'
+  typeset -g POWERLEVEL9K_VCS_STAGED_ICON='+'
+  typeset -g POWERLEVEL9K_VCS_INCOMING_CHANGES_ICON='⇣'
+  typeset -g POWERLEVEL9K_VCS_OUTGOING_CHANGES_ICON='⇡'
+  typeset -g POWERLEVEL9K_VCS_COMMIT_ICON=''
+  typeset -g POWERLEVEL9K_VCS_CLEAN_FOREGROUND=232
+  typeset -g POWERLEVEL9K_VCS_CLEAN_BACKGROUND=2
+  typeset -g POWERLEVEL9K_VCS_MODIFIED_FOREGROUND=232
+  typeset -g POWERLEVEL9K_VCS_MODIFIED_BACKGROUND=3
+  typeset -g POWERLEVEL9K_VCS_UNTRACKED_FOREGROUND=232
+  typeset -g POWERLEVEL9K_VCS_UNTRACKED_BACKGROUND=1
+
+  # Prompt character
+  typeset -g POWERLEVEL9K_PROMPT_CHAR_OK_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND=76
+  typeset -g POWERLEVEL9K_PROMPT_CHAR_ERROR_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND=196
+  typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VIINS_CONTENT_EXPANSION='❯'
+  typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VICMD_CONTENT_EXPANSION='❮'
+  typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VIVIS_CONTENT_EXPANSION='V'
+  typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VIOWR_CONTENT_EXPANSION='▶'
+  typeset -g POWERLEVEL9K_PROMPT_CHAR_BACKGROUND=''
+  typeset -g POWERLEVEL9K_PROMPT_CHAR_LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL=''
+  typeset -g POWERLEVEL9K_PROMPT_CHAR_LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL=''
+
+  # Command execution time
+  typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD=3
+  typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION=0
+  typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_FOREGROUND=232
+  typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_BACKGROUND=3
+
+  # Time
+  typeset -g POWERLEVEL9K_TIME_FOREGROUND=232
+  typeset -g POWERLEVEL9K_TIME_BACKGROUND=7
+  typeset -g POWERLEVEL9K_TIME_FORMAT='%D{%H:%M:%S}'
+
+  # Status
+  typeset -g POWERLEVEL9K_STATUS_EXTENDED_STATES=true
+  typeset -g POWERLEVEL9K_STATUS_OK=false
+  typeset -g POWERLEVEL9K_STATUS_OK_FOREGROUND=2
+  typeset -g POWERLEVEL9K_STATUS_OK_BACKGROUND=''
+  typeset -g POWERLEVEL9K_STATUS_OK_VISUAL_IDENTIFIER_EXPANSION='✓'
+  typeset -g POWERLEVEL9K_STATUS_ERROR_FOREGROUND=9
+  typeset -g POWERLEVEL9K_STATUS_ERROR_BACKGROUND=''
+  typeset -g POWERLEVEL9K_STATUS_ERROR_VISUAL_IDENTIFIER_EXPANSION='✗'
+
+  # Background jobs
+  typeset -g POWERLEVEL9K_BACKGROUND_JOBS_FOREGROUND=6
+  typeset -g POWERLEVEL9K_BACKGROUND_JOBS_BACKGROUND=''
+  typeset -g POWERLEVEL9K_BACKGROUND_JOBS_VISUAL_IDENTIFIER_EXPANSION='⚙'
+
+  # Instant prompt mode.
+  typeset -g POWERLEVEL9K_INSTANT_PROMPT=verbose
+
+  # Hot reload.
+  typeset -g POWERLEVEL9K_DISABLE_HOT_RELOAD=true
+
+  # If p10k is already loaded, reload configuration.
+  (( ! $+functions[p10k] )) || p10k reload
+}
+
+# Restore options.
+(( ${#p10k_config_opts} )) && setopt ${p10k_config_opts[@]}
+'builtin' 'unset' 'p10k_config_opts'
+EOF
+        
+        print_success "Powerlevel10k configured"
+    fi
+    
+    print_success "Zsh shell configuration completed!"
+}
+
+# Function to enable display manager and prompt for reboot
+enable_display_manager() {
+    print_status "Enabling $DISPLAY_MANAGER display manager..."
+    
+    # Disable other display managers first
+    print_status "Disabling other display managers..."
+    sudo systemctl disable lightdm 2>/dev/null || true
+    sudo systemctl disable lxdm 2>/dev/null || true
+    if [ "$DISPLAY_MANAGER" != "sddm" ]; then
+        sudo systemctl disable sddm 2>/dev/null || true
+    fi
+    if [ "$DISPLAY_MANAGER" != "gdm" ]; then
+        sudo systemctl disable gdm 2>/dev/null || true
+    fi
+    
+    # Enable the selected display manager
+    if sudo systemctl enable "$DISPLAY_MANAGER_SERVICE"; then
+        print_success "$DISPLAY_MANAGER has been enabled successfully!"
+    else
+        print_error "Failed to enable $DISPLAY_MANAGER. You may need to enable it manually."
+        print_status "Run: sudo systemctl enable $DISPLAY_MANAGER_SERVICE"
+    fi
+    
+    # Additional SDDM configuration if selected
+    if [ "$DISPLAY_MANAGER" = "sddm" ]; then
+        print_status "Configuring SDDM with Sugar Candy theme..."
+        
+        # Create SDDM config directory if it doesn't exist
+        sudo mkdir -p /etc/sddm.conf.d/
+        
+        # Configure SDDM to use Sugar Candy theme
+        if [ -d "/usr/share/sddm/themes/sugar-candy" ]; then
+            sudo tee /etc/sddm.conf.d/sugar-candy.conf > /dev/null << EOF
+[Theme]
+Current=sugar-candy
+EOF
+            print_success "SDDM configured to use Sugar Candy theme"
+        else
+            print_warning "Sugar Candy theme not found. SDDM will use default theme."
+        fi
+    fi
+}
+
+# Function to prompt for reboot
+prompt_reboot() {
+    echo
+    print_success "Installation and configuration completed!"
+    print_status "All packages have been installed and Hyprcandy configurations have been deployed."
+    print_status "The $DISPLAY_MANAGER display manager has been enabled."
+    echo
+    print_warning "A reboot is recommended to ensure all changes take effect properly."
+    echo
+    echo -e "${YELLOW}Would you like to reboot now? (y/N)${NC}"
+    read -r reboot_choice
+    case "$reboot_choice" in
+        [yY][eE][sS]|[yY])
+            print_status "Rebooting system..."
+            sudo reboot
+            ;;
+        *)
+            print_status "Reboot skipped. Please reboot manually when convenient."
+            print_status "Run: sudo reboot"
+            ;;
+    esac
+}
+
+# Main execution
+main() {
+    # Show multicolored ASCII art
+    show_ascii_art
+    
+    print_status "This installer will set up a complete Hyprland environment with:"
+    echo "  • Hyprland window manager and ecosystem"
+    echo "  • Essential applications and utilities"
+    echo "  • Beautiful themes and customizations"
+    echo "  • Pre-configured Hyprcandy dotfiles"
+    echo "  • Your choice of display manager (SDDM or GDM)"
+    echo "  • Your choice of shell (Fish or Zsh) with comprehensive configuration"
+    echo
+    
+    # Choose display manager first
+    choose_display_manager
+    echo
+    
+    # Choose shell
+    choose_shell
+    echo
+    
+    # Check for AUR helper or install one
+    check_or_install_aur_helper
+    
+    echo
+    print_status "Using $AUR_HELPER as AUR helper"
+    
+    # Build package list based on display manager and shell choice
+    build_package_list
+    
+    # Ask for confirmation
+    echo -e "${YELLOW}This will install ${#packages[@]} packages and setup Hyprcandy configuration. Continue? (y/N)${NC}"
+    read -r response
+    case "$response" in
+        [yY][eE][sS]|[yY])
+            install_packages
+            ;;
+        *)
+            print_status "Installation cancelled."
+            exit 0
+            ;;
+    esac
+    
+    echo
+    print_status "Package installation completed!"
+    
+    # Automatically setup Hyprcandy configuration
+    print_status "Proceeding with Hyprcandy configuration setup..."
+    setup_hyprcandy
+    
+    # Setup shell configuration
+    echo
+    print_status "Setting up shell configuration..."
+    if [ "$SHELL_CHOICE" = "fish" ]; then
+        setup_fish
+    elif [ "$SHELL_CHOICE" = "zsh" ]; then
+        setup_zsh
+    fi
+    
+    # Enable display manager
+    enable_display_manager
+    
+    # Configuration management tips
+    echo
+    print_status "Configuration management tips:"
+    print_status "• Your Hyprcandy configs are in: ~/.hyprcandy/"
+    print_status "• To update configs: cd ~/.hyprcandy && git pull && stow */"
+    print_status "• To remove a config: cd ~/.hyprcandy && stow -D <config_name> -t $HOME"
+    print_status "• To reinstall a config: cd ~/.hyprcandy && stow -R <config_name> -t $HOME"
+    
+    # Display and wallpaper configuration notes
+    echo
+    echo -e "${CYAN}══════════════════════════════════════════════════════════════════════════════${NC}"
+    echo -e "${WHITE}                        🖥️  Post-Installation Configuration  🖼️${NC}"
+    echo -e "${CYAN}══════════════════════════════════════════════════════════════════════════════${NC}"
+    echo
+    print_status "After rebooting, you may want to configure the following:"
+    echo
+    echo -e "${PURPLE}📱 Display Configuration:${NC}"
+    print_status "• Use ${YELLOW}nwg-displays${NC} to configure monitor scaling, resolution, and positioning"
+    print_status "• Launch it from the application menu or run: ${CYAN}nwg-displays${NC}"
+    print_status "• Adjust scaling for HiDPI displays if needed"
+    echo
+    echo -e "${PURPLE}🖼️  Wallpaper Setup:${NC}"
+    print_status "• Set your wallpaper through ${YELLOW}HyprPanel${NC} (AGS-based panel)"
+    print_status "• Access wallpaper settings directly from the panel interface"
+    echo
+    echo -e "${PURPLE}🎨 Additional Theming:${NC}"
+    print_status "• Use ${YELLOW}nwg-look${NC} to configure GTK themes and cursor themes"
+    print_status "• Cursor themes: Qogir and Bibata Modern Classic are installed"
+    print_status "• Qt theming can be configured with ${CYAN}qt5ct${NC} and ${CYAN}qt6ct${NC}"
+    echo
+    echo -e "${CYAN}══════════════════════════════════════════════════════════════════════════════${NC}"
+    
+    # Prompt for reboot
+    prompt_reboot
+}
+
+# Run main function
+main "$@"
+
