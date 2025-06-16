@@ -4,5 +4,5 @@ git clone https://github.com/HyprCandy/hyprcandyinstall.git && cd hyprcandyinsta
 ```
 followed by
 ```shell
-./Hyprcandy_installer.sh
+chmod +x Hyprcandy_installer.sh && ./Hyprcandy_installer.sh
 ```
