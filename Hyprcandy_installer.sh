@@ -390,6 +390,15 @@ install_packages() {
     fi
 }
 
+ # Setup shell configuration
+    echo
+    print_status "Setting up shell configuration..."
+    if [ "$SHELL_CHOICE" = "fish" ]; then
+        setup_fish
+    elif [ "$SHELL_CHOICE" = "zsh" ]; then
+        setup_zsh
+    fi
+
 # Function to setup Fish shell configuration
 setup_fish() {
     print_status "Setting up Fish shell configuration..."
@@ -1145,15 +1154,6 @@ main() {
     # Automatically setup Hyprcandy configuration
     print_status "Proceeding with Hyprcandy configuration setup..."
     setup_hyprcandy
-    
-    # Setup shell configuration
-    echo
-    print_status "Setting up shell configuration..."
-    if [ "$SHELL_CHOICE" = "fish" ]; then
-        setup_fish
-    elif [ "$SHELL_CHOICE" = "zsh" ]; then
-        setup_zsh
-    fi
     
     # Enable display manager
     enable_display_manager
