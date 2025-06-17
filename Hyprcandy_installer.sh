@@ -487,28 +487,7 @@ setup_hyprcandy() {
     if [ ${#stow_failed[@]} -ne 0 ]; then
         echo "❌ Failed to install: ${stow_failed[*]}"
     fi
-    
-    if [ "$backed_up" = true ]; then
-        print_status "Your original configurations have been backed up to: $backup_dir"
-    else
-        # Remove empty backup directory if nothing was backed up
-        rmdir "$backup_dir" 2>/dev/null || true
-    fi
-    
-    # 📁 Copy HyprCandy-Images to ~/Pictures
-    echo
-    echo "📁 Attempting to copy 'HyprCandy-Images' to ~/Pictures..."
-    if [ -d "$hyprcandy_dir/HyprCandy-Images" ]; then
-        if [ -d "$HOME/Pictures" ]; then
-            cp -r "$hyprcandy_dir/HyprCandy-Images" "$HOME/Pictures/"
-            echo "✅ 'HyprCandy-Images' copied successfully to ~/Pictures"
-        else
-            echo "⚠️  Skipped copy: '$HOME/Pictures' directory does not exist."
-        fi
-    else
-        echo "⚠️  'HyprCandy-Images' folder not found in $hyprcandy_dir"
-    fi
-    
+
     # 🔄 Reload Hyprland
     echo
     echo "🔄 Reloading Hyprland with 'hyprctl reload'..."
@@ -516,6 +495,17 @@ setup_hyprcandy() {
         hyprctl reload && echo "✅ Hyprland reloaded successfully." || echo "❌ Failed to reload Hyprland."
     else
         echo "⚠️  'hyprctl' not found. Skipping Hyprland reload."
+    fi
+
+    # 🚀 Start Hyprpanel in the background
+    echo
+    echo "🚀 Starting Hyprpanel..."
+    if command -v hyprpanel >/dev/null 2>&1; then
+        hyprpanel & disown
+        echo "✅ Hyprpanel started in the background."
+        sleep 2  # ⏳ Small delay to ensure Hyprpanel initializes before setting wallpaper
+    else
+        echo "⚠️  'hyprpanel' not found. Skipping Hyprpanel startup."
     fi
 
     # 🎨 Set wallpaper with Matugen
@@ -532,6 +522,20 @@ setup_hyprcandy() {
         fi
     else
         echo "⚠️  'matugen' not found. Skipping wallpaper setting."
+    fi
+    
+    # 📁 Copy HyprCandy-Images to ~/Pictures
+    echo
+    echo "📁 Attempting to copy 'HyprCandy-Images' to ~/Pictures..."
+    if [ -d "$hyprcandy_dir/HyprCandy-Images" ]; then
+        if [ -d "$HOME/Pictures" ]; then
+            cp -r "$hyprcandy_dir/HyprCandy-Images" "$HOME/Pictures/"
+            echo "✅ 'HyprCandy-Images' copied successfully to ~/Pictures"
+        else
+            echo "⚠️  Skipped copy: '$HOME/Pictures' directory does not exist."
+        fi
+    else
+        echo "⚠️  'HyprCandy-Images' folder not found in $hyprcandy_dir"
     fi
 
     print_success "Hyprcandy configuration setup completed!"
