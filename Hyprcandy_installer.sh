@@ -873,10 +873,6 @@ setup_hyprcandy() {
         return 1
     fi
     
-    # Create a backup directory for existing configs
-    local backup_dir="$HOME/.config_backup_$(date +%Y%m%d_%H%M%S)"
-    mkdir -p "$backup_dir"
-    
     # Clone Hyprcandy repository
     local hyprcandy_dir="$HOME/.hyprcandy"
     
