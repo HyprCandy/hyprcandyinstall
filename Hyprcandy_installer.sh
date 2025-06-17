@@ -415,6 +415,19 @@ setup_hyprcandy() {
         print_status "Cloning Hyprcandy repository..."
         git clone https://github.com/HyprCandy/Hyprcandy.git "$hyprcandy_dir"
     fi
+
+    # Go to the home directory
+    cd "$HOME"
+
+    # Remove present .zshrc file 
+    rm -rf .zshrc
+
+     # Remove specified config directories from ~/.config
+    cd ~/.config || exit 1
+    rm -rf btop cava gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct rofi uwsmm wlogout xsettingsd
+
+    # Return to the home directory
+    cd "$HOME"
         
     cd "$hyprcandy_dir"
     
@@ -489,19 +502,12 @@ setup_hyprcandy() {
         rmdir "$backup_dir" 2>/dev/null || true
     fi
     
-    # Go to the home directory
-    cd "$HOME"
-
-    # Remove specified config directories from ~/.config
-    cd ~/.config || exit 1
-    rm -rf btop cava gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct rofi uwsmm wlogout xsettingsd
-
     # Go to the .hyprcandy directory and stow configs
-    cd "$hyprcandy_dir" || exit 1
-    stow .
+    #cd "$hyprcandy_dir" || exit 1
+    #stow .
 
     # Return to home directory
-    cd "$HOME"
+    #cd "$HOME"
 
     #Update firefox
     pywalfox update
