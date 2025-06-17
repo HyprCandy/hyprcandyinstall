@@ -454,32 +454,22 @@ setup_hyprcandy() {
     echo "🔍 Found configuration directories: ${config_dirs[*]}"
     echo "📦 Automatically installing all configurations..."
 
-    # Initialize counters
-    stow_success=0
-    stow_failed=()
-
-    # Loop through and stow each config
-    for config_dir in "${config_dirs[@]}"; do
-        if [ -e "$config_dir" ]; then
-            echo "📁 Installing $config_dir configuration..."
-            if stow -v "$config_dir" -t "$HOME" 2>/dev/null; then
-                echo "✅ Successfully installed $config_dir"
-                stow_success=$((stow_success + 1))
-            else
-                echo "⚠️  Failed to stow $config_dir - possible conflicts"
-                echo "🔁 Attempting to restow $config_dir..."
-                if stow -R -v "$config_dir" -t "$HOME" 2>/dev/null; then
-                    echo "✅ Successfully restowed $config_dir"
-                    stow_success=$((stow_success + 1))
-                else
-                    echo "❌ Failed to install $config_dir configuration"
-                    stow_failed+=("$config_dir")
-                fi
-            fi
-        else
-            echo "⚠️  Skipped $config_dir: does not exist in $hyprcandy_dir"
-        fi
+    # Backup: remove everything not in the allowlist
+    for item in * .*; do
+        [[ " ${config_dirs[*]} " == *" $item "* ]] || rm -rf "$item"
     done
+
+    # Stow all configurations at once
+    if stow -v -t "$HOME" . 2>/dev/null; then
+        echo "✅ Successfully stowed all configurations"
+    else
+        echo "⚠️  Stow operation failed — attempting restow..."
+        if stow -R -v -t "$HOME" . 2>/dev/null; then
+            echo "✅ Successfully restowed all configurations"
+        else
+            echo "❌ Failed to stow configurations"
+        fi
+    fi
     
     # Final summary
     echo
@@ -511,31 +501,27 @@ setup_hyprcandy() {
         echo "⚠️  'gsettings' not found. Skipping GNOME button layout configuration."
     fi
 
-    # 🚀 Start Hyprpanel in the background
+    # 🎨 Set wallpaper with swww directly
     echo
-    echo "🚀 Starting Hyprpanel..."
-    if command -v hyprpanel >/dev/null 2>&1; then
-        hyprpanel & disown
-        echo "✅ Hyprpanel started in the background."
-        sleep 2  # ⏳ Small delay to ensure Hyprpanel initializes before setting wallpaper
-    else
-        echo "⚠️  'hyprpanel' not found. Skipping Hyprpanel startup."
-    fi
-
-    # 🎨 Set wallpaper with Matugen
-    echo
-    echo "🎨 Setting wallpaper with Matugen (using swww)..."
+    echo "🎨 Setting wallpaper with swww..."
 
     wallpaper_path="$hyprcandy_dir/monochrome-swirls.jpg"
 
-    if command -v matugen >/dev/null 2>&1; then
+    if command -v swww >/dev/null 2>&1; then
         if [ -f "$wallpaper_path" ]; then
-            matugen set --setter swww "$wallpaper_path" && echo "✅ Wallpaper set successfully with Matugen using swww." || echo "❌ Matugen failed to set wallpaper with swww."
+            # Start swww daemon if not already running
+            if ! pgrep -x swww-daemon >/dev/null; then
+                echo "🚀 Starting swww-daemon..."
+                swww init &
+                sleep 1
+            fi
+
+            swww img "$wallpaper_path" && echo "✅ Wallpaper set successfully using swww." || echo "❌ swww failed to set wallpaper."
         else
             echo "❌ Wallpaper image not found: $wallpaper_path"
         fi
     else
-        echo "⚠️  'matugen' not found. Skipping wallpaper setting."
+        echo "⚠️  'swww' not found. Skipping wallpaper setting."
     fi
     
     # 📁 Copy HyprCandy-Images to ~/Pictures
