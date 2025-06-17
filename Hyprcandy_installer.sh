@@ -390,8 +390,6 @@ install_packages() {
     fi
 }
     
-    mkdir -p ~/.config
-    
 # Function to automatically setup Hyprcandy configuration
 setup_hyprcandy() {
     print_status "Setting up Hyprcandy configuration..."
@@ -417,12 +415,6 @@ setup_hyprcandy() {
         print_status "Cloning Hyprcandy repository..."
         git clone https://github.com/HyprCandy/Hyprcandy.git "$hyprcandy_dir"
     fi
-    
-    # Remove any original files
-    cd ~/.config || exit 1
-    
-    rm -rf btop cava gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct rofi uwsmm wlogout xsettingsd
-    cd
         
     cd "$hyprcandy_dir"
     
@@ -497,8 +489,22 @@ setup_hyprcandy() {
         rmdir "$backup_dir" 2>/dev/null || true
     fi
     
+    # Go to the home directory
+    cd "$HOME"
+
+    # Remove specified config directories from ~/.config
+    cd ~/.config || exit 1
+    rm -rf btop cava gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct rofi uwsmm wlogout xsettingsd
+
+    # Go to the .hyprcandy directory and stow configs
+    cd "$hyprcandy_dir" || exit 1
+    stow .
+
     # Return to home directory
     cd "$HOME"
+
+    # Reload Hyprland
+    hyprctl reload
     
     print_success "Hyprcandy configuration setup completed!"
 }
@@ -1101,23 +1107,6 @@ main() {
     elif [ "$SHELL_CHOICE" = "zsh" ]; then
         setup_zsh
     fi
-
-    # Go to the home directory
-    cd
-
-    # Remove specified config directories from ~/.config
-    cd ~/.config || exit 1
-    rm -rf btop cava gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct rofi uwsmm wlogout xsettingsd
-
-    # Go to the .hyprcandy directory and stow configs
-    cd ~/.hyprcandy || exit 1
-    stow .
-
-    # Return to home directory
-    cd 
-
-    # Reload Hyprland
-    hyprctl reload
     
     # Enable display manager
     enable_display_manager
