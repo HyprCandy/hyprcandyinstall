@@ -389,157 +389,6 @@ install_packages() {
         echo "$AUR_HELPER -S ${failed[*]}"
     fi
 }
-    
-# Function to automatically setup Hyprcandy configuration
-setup_hyprcandy() {
-    print_status "Setting up Hyprcandy configuration..."
-    
-    # Check if stow is available
-    if ! command -v stow &> /dev/null; then
-        print_error "stow is not installed. Cannot proceed with configuration setup."
-        return 1
-    fi
-    
-    # Create a backup directory for existing configs
-    local backup_dir="$HOME/.config_backup_$(date +%Y%m%d_%H%M%S)"
-    mkdir -p "$backup_dir"
-    
-    # Clone Hyprcandy repository
-    local hyprcandy_dir="$HOME/.hyprcandy"
-    
-    if [ -d "$hyprcandy_dir" ]; then
-        print_warning "Hyprcandy directory already exists. Updating..."
-        cd "$hyprcandy_dir"
-        git pull
-    else
-        print_status "Cloning Hyprcandy repository..."
-        git clone https://github.com/HyprCandy/Hyprcandy.git "$hyprcandy_dir"
-    fi
-
-    # Go to the home directory
-    cd "$HOME"
-
-    # Remove present .zshrc file 
-    rm -rf .zshrc
-
-     # Remove specified config directories from ~/.config
-    cd ~/.config || exit 1
-    rm -rf btop cava gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct rofi uwsmm wlogout xsettingsd
-
-    # Go to the home directory
-    cd "$HOME"
-
-    # Safely remove existing .zshrc file (only if it exists)
-    [ -f "$HOME/.zshrc" ] && rm -f "$HOME/.zshrc"
-
-    # Ensure ~/.config exists, then remove specified subdirectories
-    [ -d "$HOME/.config" ] || mkdir -p "$HOME/.config"
-    cd "$HOME/.config" || exit 1
-    rm -rf btop cava gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct rofi uwsmm wlogout xsettingsd
-
-    # Return to the home directory
-    cd "$HOME"
-    
-    # Change to the hyprcandy dotfiles directory
-    cd "$hyprcandy_dir" || { echo "❌ Error: Could not find Hyprcandy directory"; exit 1; }
-
-    # Define only the configs to be stowed
-    config_dirs=(".config" ".icons" ".zshrc" ".hyprcandy-zsh.zsh")
-
-    if [ ${#config_dirs[@]} -eq 0 ]; then
-        echo "❌ No configuration directories specified."
-        exit 1
-    fi
-
-    echo "🔍 Found configuration directories: ${config_dirs[*]}"
-    echo "📦 Automatically installing all configurations..."
-
-    # Backup: remove everything not in the allowlist
-    for item in * .*; do
-        [[ " ${config_dirs[*]} " == *" $item "* ]] || rm -rf "$item"
-    done
-
-    # Stow all configurations at once
-    if stow -v -t "$HOME" . 2>/dev/null; then
-        echo "✅ Successfully stowed all configurations"
-    else
-        echo "⚠️  Stow operation failed — attempting restow..."
-        if stow -R -v -t "$HOME" . 2>/dev/null; then
-            echo "✅ Successfully restowed all configurations"
-        else
-            echo "❌ Failed to stow configurations"
-        fi
-    fi
-    
-    # Final summary
-    echo
-    echo "✅ Installation completed. Successfully installed: $stow_success"
-    if [ ${#stow_failed[@]} -ne 0 ]; then
-        echo "❌ Failed to install: ${stow_failed[*]}"
-    fi
-
-    # 🔄 Reload Hyprland
-    echo
-    echo "🔄 Reloading Hyprland with 'hyprctl reload'..."
-    if command -v hyprctl >/dev/null 2>&1; then
-        hyprctl reload && echo "✅ Hyprland reloaded successfully." || echo "❌ Failed to reload Hyprland."
-    else
-        echo "⚠️  'hyprctl' not found. Skipping Hyprland reload."
-    fi
-
-    # 🛠️ GNOME Window Button Layout Adjustment
-    echo
-    echo "🛠️ Disabling GNOME titlebar buttons..."
-
-    # Check if 'gsettings' is available on the system
-    if command -v gsettings >/dev/null 2>&1; then
-        # Run the command to change the window button layout (e.g., remove minimize/maximize/close buttons)
-        gsettings set org.gnome.desktop.wm.preferences button-layout "" \
-            && echo "✅ GNOME button layout updated." \
-            || echo "❌ Failed to update GNOME button layout."
-    else
-        echo "⚠️  'gsettings' not found. Skipping GNOME button layout configuration."
-    fi
-
-    # 🎨 Set wallpaper with swww directly
-    echo
-    echo "🎨 Setting wallpaper with swww..."
-
-    wallpaper_path="$hyprcandy_dir/monochrome-swirls.jpg"
-
-    if command -v swww >/dev/null 2>&1; then
-        if [ -f "$wallpaper_path" ]; then
-            # Start swww daemon if not already running
-            if ! pgrep -x swww-daemon >/dev/null; then
-                echo "🚀 Starting swww-daemon..."
-                swww init &
-                sleep 1
-            fi
-
-            swww img "$wallpaper_path" && echo "✅ Wallpaper set successfully using swww." || echo "❌ swww failed to set wallpaper."
-        else
-            echo "❌ Wallpaper image not found: $wallpaper_path"
-        fi
-    else
-        echo "⚠️  'swww' not found. Skipping wallpaper setting."
-    fi
-    
-    # 📁 Copy HyprCandy-Images to ~/Pictures
-    echo
-    echo "📁 Attempting to copy 'HyprCandy-Images' to ~/Pictures..."
-    if [ -d "$hyprcandy_dir/HyprCandy-Images" ]; then
-        if [ -d "$HOME/Pictures" ]; then
-            cp -r "$hyprcandy_dir/HyprCandy-Images" "$HOME/Pictures/"
-            echo "✅ 'HyprCandy-Images' copied successfully to ~/Pictures"
-        else
-            echo "⚠️  Skipped copy: '$HOME/Pictures' directory does not exist."
-        fi
-    else
-        echo "⚠️  'HyprCandy-Images' folder not found in $hyprcandy_dir"
-    fi
-
-    print_success "Hyprcandy configuration setup completed!"
-}
 
 # Function to setup Fish shell configuration
 setup_fish() {
@@ -1012,6 +861,176 @@ EOF
     fi
     
     print_success "Zsh shell configuration completed!"
+}
+    
+# Function to automatically setup Hyprcandy configuration
+setup_hyprcandy() {
+    print_status "Setting up Hyprcandy configuration..."
+    
+    # Check if stow is available
+    if ! command -v stow &> /dev/null; then
+        print_error "stow is not installed. Cannot proceed with configuration setup."
+        return 1
+    fi
+    
+    # Create a backup directory for existing configs
+    local backup_dir="$HOME/.config_backup_$(date +%Y%m%d_%H%M%S)"
+    mkdir -p "$backup_dir"
+    
+    # Clone Hyprcandy repository
+    local hyprcandy_dir="$HOME/.hyprcandy"
+    
+    if [ -d "$hyprcandy_dir" ]; then
+        print_warning "Hyprcandy directory already exists. Updating..."
+        cd "$hyprcandy_dir"
+        git pull
+    else
+        print_status "Cloning Hyprcandy repository..."
+        git clone https://github.com/HyprCandy/Hyprcandy.git "$hyprcandy_dir"
+    fi
+
+    # Go to the home directory
+    cd "$HOME"
+
+    # Remove present .zshrc file 
+    rm -rf .zshrc
+
+     # Remove specified config directories from ~/.config
+    cd ~/.config || exit 1
+    rm -rf btop cava gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct rofi uwsmm wlogout xsettingsd
+
+    # Go to the home directory
+    cd "$HOME"
+
+    # Safely remove existing .zshrc file (only if it exists)
+    [ -f "$HOME/.zshrc" ] && rm -f "$HOME/.zshrc"
+
+    # Ensure ~/.config exists, then remove specified subdirectories
+    [ -d "$HOME/.config" ] || mkdir -p "$HOME/.config"
+    cd "$HOME/.config" || exit 1
+    rm -rf btop cava gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct rofi uwsmm wlogout xsettingsd
+
+    # Return to the home directory
+    cd "$HOME"
+    
+    # Change to the hyprcandy dotfiles directory
+    cd "$hyprcandy_dir" || { echo "❌ Error: Could not find Hyprcandy directory"; exit 1; }
+
+    # Define only the configs to be stowed
+    config_dirs=(".config" ".icons" ".zshrc" ".hyprcandy-zsh.zsh")
+
+    # Add files/folders to exclude from deletion
+    preserve_items=("HyprCandy-Images" "monochrome-swirls.jpg")
+
+    if [ ${#config_dirs[@]} -eq 0 ]; then
+        echo "❌ No configuration directories specified."
+        exit 1
+    fi
+
+    echo "🔍 Found configuration directories: ${config_dirs[*]}"
+    echo "📦 Automatically installing all configurations..."
+
+    # Backup: remove everything not in the allowlist
+    for item in * .*; do
+        # Skip special entries
+        [[ "$item" == "." || "$item" == ".." ]] && continue
+
+        # Skip allowed config items
+        if [[ " ${config_dirs[*]} " == *" $item "* ]]; then
+            continue
+        fi
+
+        # Skip explicitly preserved items
+        if [[ " ${preserve_items[*]} " == *" $item "* ]]; then
+            echo "❎ Preserving: $item"
+            continue
+        fi
+
+        echo "🗑️  Removing: $item"
+        rm -rf "$item"
+    done
+
+    # Stow all configurations at once
+    if stow -v -t "$HOME" . 2>/dev/null; then
+        echo "✅ Successfully stowed all configurations"
+    else
+        echo "⚠️  Stow operation failed — attempting restow..."
+        if stow -R -v -t "$HOME" . 2>/dev/null; then
+            echo "✅ Successfully restowed all configurations"
+        else
+            echo "❌ Failed to stow configurations"
+        fi
+    fi
+
+    
+    # Final summary
+    echo
+    echo "✅ Installation completed. Successfully installed: $stow_success"
+    if [ ${#stow_failed[@]} -ne 0 ]; then
+        echo "❌ Failed to install: ${stow_failed[*]}"
+    fi
+
+    # 🔄 Reload Hyprland
+    echo
+    echo "🔄 Reloading Hyprland with 'hyprctl reload'..."
+    if command -v hyprctl >/dev/null 2>&1; then
+        hyprctl reload && echo "✅ Hyprland reloaded successfully." || echo "❌ Failed to reload Hyprland."
+    else
+        echo "⚠️  'hyprctl' not found. Skipping Hyprland reload."
+    fi
+
+    # 🛠️ GNOME Window Button Layout Adjustment
+    echo
+    echo "🛠️ Disabling GNOME titlebar buttons..."
+
+    # Check if 'gsettings' is available on the system
+    if command -v gsettings >/dev/null 2>&1; then
+        # Run the command to change the window button layout (e.g., remove minimize/maximize/close buttons)
+        gsettings set org.gnome.desktop.wm.preferences button-layout "" \
+            && echo "✅ GNOME button layout updated." \
+            || echo "❌ Failed to update GNOME button layout."
+    else
+        echo "⚠️  'gsettings' not found. Skipping GNOME button layout configuration."
+    fi
+
+    # 🎨 Set wallpaper with swww directly
+    echo
+    echo "🎨 Setting wallpaper with swww..."
+
+    wallpaper_path="$hyprcandy_dir/monochrome-swirls.jpg"
+
+    if command -v swww >/dev/null 2>&1; then
+        if [ -f "$wallpaper_path" ]; then
+            # Start swww daemon if not already running
+            if ! pgrep -x swww-daemon >/dev/null; then
+                echo "🚀 Starting swww-daemon..."
+                swww init &
+                sleep 1
+            fi
+
+            swww img "$wallpaper_path" && echo "✅ Wallpaper set successfully using swww." || echo "❌ swww failed to set wallpaper."
+        else
+            echo "❌ Wallpaper image not found: $wallpaper_path"
+        fi
+    else
+        echo "⚠️  'swww' not found. Skipping wallpaper setting."
+    fi
+    
+    # 📁 Copy HyprCandy-Images to ~/Pictures
+    echo
+    echo "📁 Attempting to copy 'HyprCandy-Images' to ~/Pictures..."
+    if [ -d "$hyprcandy_dir/HyprCandy-Images" ]; then
+        if [ -d "$HOME/Pictures" ]; then
+            cp -r "$hyprcandy_dir/HyprCandy-Images" "$HOME/Pictures/"
+            echo "✅ 'HyprCandy-Images' copied successfully to ~/Pictures"
+        else
+            echo "⚠️  Skipped copy: '$HOME/Pictures' directory does not exist."
+        fi
+    else
+        echo "⚠️  'HyprCandy-Images' folder not found in $hyprcandy_dir"
+    fi
+
+    print_success "Hyprcandy configuration setup completed!"
 }
 
 # Function to enable display manager and prompt for reboot
