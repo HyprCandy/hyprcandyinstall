@@ -295,7 +295,6 @@ build_package_list() {
         "tela-circle-icon-theme-all"
         
         # Cursor themes
-        "qogir-cursor-theme-git"
         "bibata-cursor-theme"
         
         # Package management
