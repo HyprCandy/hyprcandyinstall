@@ -389,7 +389,9 @@ install_packages() {
         echo "$AUR_HELPER -S ${failed[*]}"
     fi
 }
-
+    
+    mkdir -p ~/.config
+    
 # Function to automatically setup Hyprcandy configuration
 setup_hyprcandy() {
     print_status "Setting up Hyprcandy configuration..."
@@ -416,6 +418,12 @@ setup_hyprcandy() {
         git clone https://github.com/HyprCandy/Hyprcandy.git "$hyprcandy_dir"
     fi
     
+    # Remove any original files
+    cd ~/.config || exit 1
+    
+    rm -rf btop cava gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct rofi uwsmm wlogout xsettingsd
+    cd
+        
     cd "$hyprcandy_dir"
     
     # Get all configuration directories (excluding .git and any files)
@@ -1094,6 +1102,9 @@ main() {
         setup_zsh
     fi
     
+    # Roload hyprland
+    hyprctl reload
+    
     # Enable display manager
     enable_display_manager
     
@@ -1135,4 +1146,3 @@ main() {
 
 # Run main function
 main "$@"
-
