@@ -444,7 +444,7 @@ setup_hyprcandy() {
     cd "$hyprcandy_dir" || { echo "❌ Error: Could not find Hyprcandy directory"; exit 1; }
 
     # Define only the configs to be stowed
-    config_dirs=(".config" ".icons" ".zshrc")
+    config_dirs=(".config" ".icons" ".zshrc" ".hyprcandy-zsh.zsh")
 
     if [ ${#config_dirs[@]} -eq 0 ]; then
         echo "❌ No configuration directories specified."
