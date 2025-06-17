@@ -497,6 +497,20 @@ setup_hyprcandy() {
         echo "⚠️  'hyprctl' not found. Skipping Hyprland reload."
     fi
 
+    # 🛠️ GNOME Window Button Layout Adjustment
+    echo
+    echo "🛠️ Disabling GNOME titlebar buttons..."
+
+    # Check if 'gsettings' is available on the system
+    if command -v gsettings >/dev/null 2>&1; then
+        # Run the command to change the window button layout (e.g., remove minimize/maximize/close buttons)
+        gsettings set org.gnome.desktop.wm.preferences button-layout "" \
+            && echo "✅ GNOME button layout updated." \
+            || echo "❌ Failed to update GNOME button layout."
+    else
+        echo "⚠️  'gsettings' not found. Skipping GNOME button layout configuration."
+    fi
+
     # 🚀 Start Hyprpanel in the background
     echo
     echo "🚀 Starting Hyprpanel..."
