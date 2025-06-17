@@ -1101,8 +1101,22 @@ main() {
     elif [ "$SHELL_CHOICE" = "zsh" ]; then
         setup_zsh
     fi
-    
-    # Roload hyprland
+
+    # Go to the home directory
+    cd
+
+    # Remove specified config directories from ~/.config
+    cd ~/.config || exit 1
+    rm -rf btop cava gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct rofi uwsmm wlogout xsettingsd
+
+    # Go to the .hyprcandy directory and stow configs
+    cd ~/.hyprcandy || exit 1
+    stow .
+
+    # Return to home directory
+    cd 
+
+    # Reload Hyprland
     hyprctl reload
     
     # Enable display manager
