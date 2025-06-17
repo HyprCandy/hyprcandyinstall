@@ -503,9 +503,12 @@ setup_hyprcandy() {
     # Return to home directory
     cd "$HOME"
 
+    #Update firefox
+    pywalfox update
+
     # Reload Hyprland
     hyprctl reload
-    
+
     print_success "Hyprcandy configuration setup completed!"
 }
 
