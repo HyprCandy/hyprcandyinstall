@@ -518,6 +518,22 @@ setup_hyprcandy() {
         echo "⚠️  'hyprctl' not found. Skipping Hyprland reload."
     fi
 
+    # 🎨 Set wallpaper with Matugen
+    echo
+    echo "🎨 Setting wallpaper with Matugen (using swww)..."
+
+    wallpaper_path="$hyprcandy_dir/monochrome-swirls.jpg"
+
+    if command -v matugen >/dev/null 2>&1; then
+        if [ -f "$wallpaper_path" ]; then
+            matugen set --setter swww "$wallpaper_path" && echo "✅ Wallpaper set successfully with Matugen using swww." || echo "❌ Matugen failed to set wallpaper with swww."
+        else
+            echo "❌ Wallpaper image not found: $wallpaper_path"
+        fi
+    else
+        echo "⚠️  'matugen' not found. Skipping wallpaper setting."
+    fi
+
     print_success "Hyprcandy configuration setup completed!"
 }
 
@@ -1145,8 +1161,9 @@ main() {
     print_status "• Adjust scaling for HiDPI displays if needed"
     echo
     echo -e "${PURPLE}🖼️  Wallpaper Setup:${NC}"
-    print_status "• Set your wallpaper through ${YELLOW}HyprPanel${NC} (AGS-based panel)"
-    print_status "• Access wallpaper settings directly from the panel interface"
+    print_status "• Set your wallpaper only through ${YELLOW}HyprPanel${NC} (AGS-based panel)"
+    print_status "• Find default wallpapers in the ${YELLOW}Pictures ${NC} folder"
+    print_status "• Access wallpaper settings directly from the panel configuration interface"
     echo
     echo -e "${PURPLE}🎨 Additional Theming:${NC}"
     print_status "• Use ${YELLOW}nwg-look${NC} to configure GTK themes and cursor themes"
