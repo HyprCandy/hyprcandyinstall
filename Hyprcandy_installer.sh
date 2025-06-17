@@ -426,73 +426,66 @@ setup_hyprcandy() {
     cd ~/.config || exit 1
     rm -rf btop cava gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct rofi uwsmm wlogout xsettingsd
 
+    # Go to the home directory
+    cd "$HOME"
+
+    # Safely remove existing .zshrc file (only if it exists)
+    [ -f "$HOME/.zshrc" ] && rm -f "$HOME/.zshrc"
+
+    # Ensure ~/.config exists, then remove specified subdirectories
+    [ -d "$HOME/.config" ] || mkdir -p "$HOME/.config"
+    cd "$HOME/.config" || exit 1
+    rm -rf btop cava gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct rofi uwsmm wlogout xsettingsd
+
     # Return to the home directory
     cd "$HOME"
-        
-    cd "$hyprcandy_dir"
     
-    # Get all configuration directories (excluding .git and any files)
-    local config_dirs=()
-    for dir in */; do
-        if [ -d "$dir" ] && [ "$dir" != ".git/" ]; then
-            config_dirs+=("${dir%/}")
-        fi
-    done
-    
+    # Change to the hyprcandy dotfiles directory
+    cd "$hyprcandy_dir" || { echo "❌ Error: Could not find Hyprcandy directory"; exit 1; }
+
+    # Define only the configs to be stowed
+    config_dirs=(".config" ".icons" ".zshrc")
+
     if [ ${#config_dirs[@]} -eq 0 ]; then
-        print_error "No configuration directories found in Hyprcandy repository."
-        return 1
+        echo "❌ No configuration directories specified."
+        exit 1
     fi
-    
-    print_status "Found configuration directories: ${config_dirs[*]}"
-    print_status "Automatically installing all configurations..."
-    
-    # Backup existing configurations that will be replaced
-    local backed_up=false
+
+    echo "🔍 Found configuration directories: ${config_dirs[*]}"
+    echo "📦 Automatically installing all configurations..."
+
+    # Initialize counters
+    stow_success=0
+    stow_failed=()
+
+    # Loop through and stow each config
     for config_dir in "${config_dirs[@]}"; do
-        # Check if this config directory exists in ~/.config
-        if [ -d "$HOME/.config/$config_dir" ]; then
-            print_status "Backing up existing $config_dir configuration..."
-            cp -r "$HOME/.config/$config_dir" "$backup_dir/"
-            backed_up=true
-        fi
-    done
-    
-    # Stow all configurations automatically
-    local stow_success=0
-    local stow_failed=()
-    
-    for config_dir in "${config_dirs[@]}"; do
-        if [ -d "$config_dir" ]; then
-            print_status "Installing $config_dir configuration..."
+        if [ -e "$config_dir" ]; then
+            echo "📁 Installing $config_dir configuration..."
             if stow -v "$config_dir" -t "$HOME" 2>/dev/null; then
-                print_success "Successfully installed $config_dir configuration"
+                echo "✅ Successfully installed $config_dir"
                 stow_success=$((stow_success + 1))
             else
-                print_warning "Failed to stow $config_dir - there might be conflicts"
-                print_status "Attempting to restow $config_dir..."
+                echo "⚠️  Failed to stow $config_dir - possible conflicts"
+                echo "🔁 Attempting to restow $config_dir..."
                 if stow -R -v "$config_dir" -t "$HOME" 2>/dev/null; then
-                    print_success "Successfully restowed $config_dir configuration"
+                    echo "✅ Successfully restowed $config_dir"
                     stow_success=$((stow_success + 1))
                 else
-                    print_error "Failed to install $config_dir configuration"
+                    echo "❌ Failed to install $config_dir configuration"
                     stow_failed+=("$config_dir")
                 fi
             fi
+        else
+            echo "⚠️  Skipped $config_dir: does not exist in $hyprcandy_dir"
         fi
     done
     
-    print_status "Configuration installation completed!"
-    print_success "Successfully installed: $stow_success configurations"
-    
-    if [ ${#stow_failed[@]} -gt 0 ]; then
-        print_warning "Failed to install ${#stow_failed[@]} configurations:"
-        printf '%s\n' "${stow_failed[@]}"
-        echo
-        print_status "You can try installing failed configurations manually:"
-        for failed_config in "${stow_failed[@]}"; do
-            echo "cd $hyprcandy_dir && stow -v $failed_config -t $HOME"
-        done
+    # Final summary
+    echo
+    echo "✅ Installation completed. Successfully installed: $stow_success"
+    if [ ${#stow_failed[@]} -ne 0 ]; then
+        echo "❌ Failed to install: ${stow_failed[*]}"
     fi
     
     if [ "$backed_up" = true ]; then
@@ -502,18 +495,28 @@ setup_hyprcandy() {
         rmdir "$backup_dir" 2>/dev/null || true
     fi
     
-    # Go to the .hyprcandy directory and stow configs
-    #cd "$hyprcandy_dir" || exit 1
-    #stow .
-
-    # Return to home directory
-    #cd "$HOME"
-
-    #Update firefox
-    pywalfox update
-
-    # Reload Hyprland
-    hyprctl reload
+    # 📁 Copy HyprCandy-Images to ~/Pictures
+    echo
+    echo "📁 Attempting to copy 'HyprCandy-Images' to ~/Pictures..."
+    if [ -d "$hyprcandy_dir/HyprCandy-Images" ]; then
+        if [ -d "$HOME/Pictures" ]; then
+            cp -r "$hyprcandy_dir/HyprCandy-Images" "$HOME/Pictures/"
+            echo "✅ 'HyprCandy-Images' copied successfully to ~/Pictures"
+        else
+            echo "⚠️  Skipped copy: '$HOME/Pictures' directory does not exist."
+        fi
+    else
+        echo "⚠️  'HyprCandy-Images' folder not found in $hyprcandy_dir"
+    fi
+    
+    # 🔄 Reload Hyprland
+    echo
+    echo "🔄 Reloading Hyprland with 'hyprctl reload'..."
+    if command -v hyprctl >/dev/null 2>&1; then
+        hyprctl reload && echo "✅ Hyprland reloaded successfully." || echo "❌ Failed to reload Hyprland."
+    else
+        echo "⚠️  'hyprctl' not found. Skipping Hyprland reload."
+    fi
 
     print_success "Hyprcandy configuration setup completed!"
 }
