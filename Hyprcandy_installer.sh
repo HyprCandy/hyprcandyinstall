@@ -901,6 +901,11 @@ setup_hyprcandy() {
     # Safely remove existing .zshrc file (only if it exists)
     [ -f "$HOME/.zshrc" ] && rm -f "$HOME/.zshrc"
 
+    # 📁 Create Screenshots and Recordings directories if they don't exist
+    echo "📁 Ensuring directories for screenshots and recordings exist..."
+    mkdir -p "$HOME/Pictures/Screenshots" "$HOME/Videos/Recordings"
+    echo "✅ Created ~/Pictures/Screenshots and ~/Videos/Recordings (if missing)"
+
     # Ensure ~/.config exists, then remove specified subdirectories
     [ -d "$HOME/.config" ] || mkdir -p "$HOME/.config"
     cd "$HOME/.config" || exit 1
