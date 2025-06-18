@@ -1,4 +1,4 @@
-Run the commad below or if you wish to keep the "hyprcandyinstall" folder away from your Home directory, first "cd" into directory of choice eg. "cd ~/Downloads" or "cd ~/Documents" and then run
+Run the commad below
 ```shell
 git clone https://github.com/HyprCandy/hyprcandyinstall.git && cd hyprcandyinstall
 ```
