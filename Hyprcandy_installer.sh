@@ -1008,29 +1008,6 @@ setup_hyprcandy() {
     else
         echo "⚠️  'HyprCandy' folder not found in $hyprcandy_dir"
     fi
-    
-    # 🎨 Set wallpaper with swww directly
-    echo
-    echo "🎨 Setting wallpaper with swww..."
-
-    wallpaper_path="$HOME/Pictures/HyprCandy/Candy-Images/All-Fluid/graphite-window.jpg"
-
-    if command -v swww >/dev/null 2>&1; then
-        if [ -f "$wallpaper_path" ]; then
-            # Start swww daemon if not already running
-            if ! pgrep -x swww-daemon >/dev/null; then
-                echo "🚀 Starting swww-daemon..."
-                swww init &
-                sleep 1
-            fi
-
-            swww img "$wallpaper_path" && echo "✅ Wallpaper set successfully using swww." || echo "❌ swww failed to set wallpaper."
-        else
-            echo "❌ Wallpaper image not found: $wallpaper_path"
-        fi
-    else
-        echo "⚠️  'swww' not found. Skipping wallpaper setting."
-    fi
 
     print_success "HyprCandy configuration setup completed!"
 }
