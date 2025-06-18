@@ -889,7 +889,7 @@ setup_hyprcandy() {
     cd "$HOME"
 
     # Remove present .zshrc file 
-    rm -rf .zshrc .hyprcandy-zsh.zsh .icons
+    rm -rf .zshrc .hyprcandy-zsh.zsh .icons HyprCandy
 
      # Remove specified config directories from ~/.config
     cd ~/.config || exit 1
@@ -902,6 +902,7 @@ setup_hyprcandy() {
     [ -f "$HOME/.zshrc" ] && rm -f "$HOME/.zshrc"
     [ -f "$HOME/.hyprcandy-zsh.zsh" ] && rm -f "$HOME/.hyprcandy-zsh.zsh"
     [ -f "$HOME/.icons" ] && rm -f "$HOME/.icons"
+    [ -f "$HOME/HyprCandy" ] && rm -f "$HOME/HyprCandy"
 
     # 📁 Create Screenshots and Recordings directories if they don't exist
     echo "📁 Ensuring directories for screenshots and recordings exist..."
