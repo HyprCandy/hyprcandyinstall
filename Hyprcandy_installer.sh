@@ -889,17 +889,19 @@ setup_hyprcandy() {
     cd "$HOME"
 
     # Remove present .zshrc file 
-    rm -rf .zshrc
+    rm -rf .zshrc .hyprcandy-zsh.zsh .icons
 
      # Remove specified config directories from ~/.config
     cd ~/.config || exit 1
-    rm -rf btop cava gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct rofi uwsmm wlogout xsettingsd
+    rm -rf btop cava fastfetch gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct rofi uwsmm wlogout xsettingsd
 
     # Go to the home directory
     cd "$HOME"
 
-    # Safely remove existing .zshrc file (only if it exists)
+    # Safely remove existing .zshrc, .hyprcandy-zsh.zsh and .icons files (only if they exist)
     [ -f "$HOME/.zshrc" ] && rm -f "$HOME/.zshrc"
+    [ -f "$HOME/.hyprcandy-zsh.zsh" ] && rm -f "$HOME/.hyprcandy-zsh.zsh"
+    [ -f "$HOME/.icons" ] && rm -f "$HOME/.icons"
 
     # 📁 Create Screenshots and Recordings directories if they don't exist
     echo "📁 Ensuring directories for screenshots and recordings exist..."
@@ -963,7 +965,6 @@ setup_hyprcandy() {
         fi
     fi
 
-    
     # Final summary
     echo
     echo "✅ Installation completed. Successfully installed: $stow_success"
@@ -993,7 +994,21 @@ setup_hyprcandy() {
     else
         echo "⚠️  'gsettings' not found. Skipping GNOME button layout configuration."
     fi
-
+    
+    # 📁 Copy HyprCandy folder to ~/Pictures
+    echo
+    echo "📁 Attempting to copy 'HyprCandy' images folder to ~/Pictures..."
+    if [ -d "$hyprcandy_dir/HyprCandy" ]; then
+        if [ -d "$HOME/Pictures" ]; then
+            cp -r "$hyprcandy_dir/HyprCandy" "$HOME/Pictures/"
+            echo "✅ 'HyprCandy' copied successfully to ~/Pictures"
+        else
+            echo "⚠️  Skipped copy: '$HOME/Pictures' directory does not exist."
+        fi
+    else
+        echo "⚠️  'HyprCandy' folder not found in $hyprcandy_dir"
+    fi
+    
     # 🎨 Set wallpaper with swww directly
     echo
     echo "🎨 Setting wallpaper with swww..."
@@ -1015,20 +1030,6 @@ setup_hyprcandy() {
         fi
     else
         echo "⚠️  'swww' not found. Skipping wallpaper setting."
-    fi
-    
-    # 📁 Copy HyprCandy folder to ~/Pictures
-    echo
-    echo "📁 Attempting to copy 'HyprCandy' images folder to ~/Pictures..."
-    if [ -d "$hyprcandy_dir/HyprCandy" ]; then
-        if [ -d "$HOME/Pictures" ]; then
-            cp -r "$hyprcandy_dir/HyprCandy" "$HOME/Pictures/"
-            echo "✅ 'HyprCandy' copied successfully to ~/Pictures"
-        else
-            echo "⚠️  Skipped copy: '$HOME/Pictures' directory does not exist."
-        fi
-    else
-        echo "⚠️  'HyprCandy' folder not found in $hyprcandy_dir"
     fi
 
     print_success "HyprCandy configuration setup completed!"
