@@ -1207,6 +1207,7 @@ main() {
     print_status "• Set your prefence at the very end it will ask whether to "
     print_status "• At the end when asked to ${CYAN}Apply changes to ~/.zshrc?${NC} type ${CYAN}n${NC}"
     print_status "• Also always keep a copy of ${YELLOW}.zshrc${NC} incase you have to rerun the script later"
+    print_status "• Otherwise delete ${CYAN}.hyprcandy${NC} and rrerun the script to reload HyprCandy's ${CYAN}.zshr${NC} file"
     echo
     echo -e "${PURPLE}🏠 Clean Home Directory:${NC}"
     print_status "• You can delete the ${CYAN}HyprCandy${NC} images folder since it's copied into ${CYAN}Pictures${NC}"
