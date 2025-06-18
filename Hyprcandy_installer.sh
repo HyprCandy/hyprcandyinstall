@@ -1202,11 +1202,15 @@ main() {
     print_status "• In the ${CYAN}window section${NC}, change the word ${CYAN}USERNAME${NC} to your username"
     print_status "• Otherwise don't edit it if you prefer the blurred transparent background"
     echo
-    echo -e "${PURPLE}🪄 ZSH Configuration :${NC}"
+    echo -e "${PURPLE}🪄 ZSH Configuration:${NC}"
     print_status "• If ZSH was chosen instead Of Fish, run ${YELLOW}p10k configure${NC} in the terminal"
     print_status "• Set your prefence at the very end it will ask whether to "
     print_status "• At the end when asked to ${CYAN}Apply changes to ~/.zshrc?${NC} type ${CYAN}n${NC}"
     print_status "• Also always keep a copy of ${YELLOW}.zshrc${NC} incase you have to rerun the script later"
+    echo
+    echo -e "${PURPLE}🏠 Clean Home Directory:${NC}"
+    print_status "• You can delete the ${CYAN}HyprCandy${NC} images folder since it's copied into ${CYAN}Pictures${NC}"
+    print_status "• ${YELLOW}hyprcandyinstall${NC} can also be deleted "
     echo
     echo -e "${CYAN}══════════════════════════════════════════════════════════════════════════════${NC}"
     
