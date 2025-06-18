@@ -3,7 +3,7 @@
 # HyprCandy Installer Script
 # This script installs Hyprland and related packages from AUR
 
-set -e  # Exit on any error
+#set -e  # Exit on any error
 
 # Colors for output
 RED='\033[0;31m'
