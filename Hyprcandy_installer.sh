@@ -1017,18 +1017,18 @@ setup_hyprcandy() {
         echo "⚠️  'swww' not found. Skipping wallpaper setting."
     fi
     
-    # 📁 Copy HyprCandy-Images to ~/Pictures
+    # 📁 Copy HyprCandy folder to ~/Pictures
     echo
-    echo "📁 Attempting to copy 'HyprCandy-Images' to ~/Pictures..."
-    if [ -d "$hyprcandy_dir/HyprCandy-Images" ]; then
+    echo "📁 Attempting to copy 'HyprCandy' images folder to ~/Pictures..."
+    if [ -d "$hyprcandy_dir/HyprCandy" ]; then
         if [ -d "$HOME/Pictures" ]; then
-            cp -r "$hyprcandy_dir/HyprCandy-Images" "$HOME/Pictures/"
-            echo "✅ 'HyprCandy-Images' copied successfully to ~/Pictures"
+            cp -r "$hyprcandy_dir/HyprCandy" "$HOME/Pictures/"
+            echo "✅ 'HyprCandy' copied successfully to ~/Pictures"
         else
             echo "⚠️  Skipped copy: '$HOME/Pictures' directory does not exist."
         fi
     else
-        echo "⚠️  'HyprCandy-Images' folder not found in $hyprcandy_dir"
+        echo "⚠️  'HyprCandy' folder not found in $hyprcandy_dir"
     fi
 
     print_success "HyprCandy configuration setup completed!"
