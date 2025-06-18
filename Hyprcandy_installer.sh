@@ -390,15 +390,6 @@ install_packages() {
     fi
 }
 
- # Setup shell configuration
-    echo
-    print_status "Setting up shell configuration..."
-    if [ "$SHELL_CHOICE" = "fish" ]; then
-        setup_fish
-    elif [ "$SHELL_CHOICE" = "zsh" ]; then
-        setup_zsh
-    fi
-
 # Function to setup Fish shell configuration
 setup_fish() {
     print_status "Setting up Fish shell configuration..."
@@ -1035,7 +1026,7 @@ setup_hyprcandy() {
         echo "⚠️  'HyprCandy-Images' folder not found in $hyprcandy_dir"
     fi
 
-    print_success "Hyprcandy configuration setup completed!"
+    print_success "HyprCandy configuration setup completed!"
 }
 
 # Function to enable display manager and prompt for reboot
@@ -1150,6 +1141,15 @@ main() {
     
     echo
     print_status "Package installation completed!"
+
+     # Setup shell configuration
+    echo
+    print_status "Setting up shell configuration..."
+    if [ "$SHELL_CHOICE" = "fish" ]; then
+        setup_fish
+    elif [ "$SHELL_CHOICE" = "zsh" ]; then
+        setup_zsh
+    fi
     
     # Automatically setup Hyprcandy configuration
     print_status "Proceeding with Hyprcandy configuration setup..."
@@ -1188,6 +1188,11 @@ main() {
     print_status "• Use ${YELLOW}nwg-look${NC} to configure GTK themes and cursor themes"
     print_status "• Cursor themes: Qogir and Bibata Modern Classic are installed"
     print_status "• Qt theming can be configured with ${CYAN}qt5ct${NC} and ${CYAN}qt6ct${NC}"
+    echo
+    echo -e "${PURPLE}🎨 Wlogout window background (Optional):${NC}"
+    print_status "• Open the ${YELLOW}style.css${NC} file in ${YELLOW}~/.config/wlogout${NC} in a text editor"
+    print_status "• In the ${CYAN}window section${NC}, change the word ${CYAN}USERNAME${NC} to your username"
+    print_status "• Otherwise don't edit it if you prefer the blurred transparent background"
     echo
     echo -e "${CYAN}══════════════════════════════════════════════════════════════════════════════${NC}"
     
