@@ -1168,14 +1168,18 @@ main() {
     print_status "• Access wallpaper settings directly from the panel configuration interface"
     echo
     echo -e "${PURPLE}🎨 Additional Theming:${NC}"
-    print_status "• Use ${YELLOW}nwg-look${NC} to configure GTK themes and cursor themes"
-    print_status "• Cursor themes: Qogir and Bibata Modern Classic are installed"
-    print_status "• Qt theming can be configured with ${CYAN}qt5ct${NC} and ${CYAN}qt6ct${NC}"
+    print_status "• Use ${YELLOW}nwg-look${NC} to configure the system-font, tela-icons and cursor themes"
+    print_status "• Cursor themes: Adwaita, Miku, Qogir and Bibata Modern Classic are installed"
     echo
-    echo -e "${PURPLE}🎨 Wlogout window background (Optional):${NC}"
+    echo -e "${PURPLE}🎨 Wlogout Window Background (Optional):${NC}"
     print_status "• Open the ${YELLOW}style.css${NC} file in ${YELLOW}~/.config/wlogout${NC} in a text editor"
     print_status "• In the ${CYAN}window section${NC}, change the word ${CYAN}USERNAME${NC} to your username"
     print_status "• Otherwise don't edit it if you prefer the blurred transparent background"
+    echo
+    echo -e "${PURPLE}🎨 ZSH Configuration :${NC}"
+    print_status "• If ZSH was chosen instead Of Fish, run ${YELLOW}p10k configure${NC} in the terminal"
+    print_status "• Set your prefence at the very end it will ask whether to "
+    print_status "• At the end when asked to ${YELLOW}Apply changes to ~/.zshrc?${NC} type ${YELLOW}n${NC}"
     echo
     echo -e "${CYAN}══════════════════════════════════════════════════════════════════════════════${NC}"
     
