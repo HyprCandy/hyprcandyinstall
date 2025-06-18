@@ -921,7 +921,7 @@ setup_hyprcandy() {
     config_dirs=(".config" ".icons" ".zshrc" ".hyprcandy-zsh.zsh")
 
     # Add files/folders to exclude from deletion
-    preserve_items=("HyprCandy-Images" "monochrome-swirls.jpg")
+    preserve_items=("HyprCandy-Images")
 
     if [ ${#config_dirs[@]} -eq 0 ]; then
         echo "❌ No configuration directories specified."
@@ -998,7 +998,7 @@ setup_hyprcandy() {
     echo
     echo "🎨 Setting wallpaper with swww..."
 
-    wallpaper_path="$hyprcandy_dir/monochrome-swirls.jpg"
+    wallpaper_path="$HOME/Pictures/HyprCandy/Candy-Images/All-Fluid/graphite-window.jpg"
 
     if command -v swww >/dev/null 2>&1; then
         if [ -f "$wallpaper_path" ]; then
