@@ -796,7 +796,7 @@ setup_hyprcandy() {
     cd "$HOME"
 
     # Remove present .zshrc file (removed .zshrc from list since it's now handled by the script) 
-    rm -rf .hyprcandy-zsh.zsh .icons HyprCandy
+    rm -rf .face.icon .hyprcandy-zsh.zsh .icons HyprCandy
 
      # Remove specified config directories from ~/.config
     cd ~/.config || exit 1
@@ -807,6 +807,7 @@ setup_hyprcandy() {
 
     # Safely remove existing .zshrc, .hyprcandy-zsh.zsh and .icons files (only if they exist)
     # [ -f "$HOME/.zshrc" ] && rm -f "$HOME/.zshrc"
+    [ -f "$HOME/.face.icon" ] && rm -f "$HOME/.face.icon"
     [ -f "$HOME/.hyprcandy-zsh.zsh" ] && rm -f "$HOME/.hyprcandy-zsh.zsh"
     [ -f "$HOME/.icons" ] && rm -f "$HOME/.icons"
     [ -f "$HOME/HyprCandy" ] && rm -f "$HOME/HyprCandy"
@@ -828,7 +829,7 @@ setup_hyprcandy() {
     cd "$hyprcandy_dir" || { echo "❌ Error: Could not find Hyprcandy directory"; exit 1; }
 
     # Define only the configs to be stowed
-    config_dirs=(".config" ".icons" ".hyprcandy-zsh.zsh")
+    config_dirs=(".face.icon" ".config" ".icons" ".hyprcandy-zsh.zsh")
 
     # Add files/folders to exclude from deletion
     preserve_items=("HyprCandy")
