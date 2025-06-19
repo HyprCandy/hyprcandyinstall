@@ -464,8 +464,8 @@ truncation_length = 4
 truncate_to_repo = false
 
 [character]
-success_symbol = "[❯](purple)"
-error_symbol = "[❯](red)"
+success_symbol = "[✔](green)"
+error_symbol = "[x](red)"
 vimcmd_symbol = "[❮](green)"
 
 [git_branch]
@@ -571,6 +571,9 @@ alias weather="curl wttr.in"
 alias matrix="cmatrix"
 alias pipes="pipes.sh"
 
+# Start HyprCandy fastfetch
+fastfetch
+
 # Welcome message
 function fish_greeting
     echo
@@ -579,6 +582,7 @@ function fish_greeting
     set_color normal
     echo
 end
+
 EOF
     
     print_success "Fish shell configuration completed!"
@@ -613,115 +617,17 @@ setup_zsh() {
         cat > "$HOME/.zshrc" << 'EOF'
 # HyprCandy Zsh Configuration with Oh My Zsh and Powerlevel10k
 
-# Enable Powerlevel10k instant prompt
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
-
 # Oh My Zsh configuration
 export ZSH="$HOME/.oh-my-zsh"
 
 # Set theme
 ZSH_THEME="powerlevel10k/powerlevel10k"
 
-# Plugins
-plugins=(
-    git
-    sudo
-    web-search
-    copypath
-    copyfile
-    copybuffer
-    dirhistory
-    history
-    zsh-autosuggestions
-    zsh-syntax-highlighting
-    zsh-history-substring-search
-)
+# Source HyprCandy Zsh setup
+source ~/.hyprcandy-zsh.zsh
 
-# Load Oh My Zsh
-source $ZSH/oh-my-zsh.sh
-
-# User configuration
-export EDITOR='nano'
-export BROWSER='firefox'
-export TERMINAL='kitty'
-
-# Add local bin to PATH
-if [ -d "$HOME/.local/bin" ]; then
-    export PATH="$HOME/.local/bin:$PATH"
-fi
-
-# Load Powerlevel10k theme
-source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
-
-# Load syntax highlighting and autosuggestions
-source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh 2>/dev/null
-source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh 2>/dev/null
-source /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh 2>/dev/null
-
-# History configuration
-HISTSIZE=10000
-SAVEHIST=10000
-HISTFILE=~/.zsh_history
-setopt SHARE_HISTORY
-setopt HIST_IGNORE_DUPS
-setopt HIST_IGNORE_ALL_DUPS
-setopt HIST_FIND_NO_DUPS
-setopt HIST_SAVE_NO_DUPS
-setopt HIST_REDUCE_BLANKS
-setopt HIST_VERIFY
-
-# Key bindings for history substring search
-bindkey '^[[A' history-substring-search-up
-bindkey '^[[B' history-substring-search-down
-bindkey '^[OA' history-substring-search-up
-bindkey '^[OB' history-substring-search-down
-
-# Aliases
-alias ll="ls -alF"
-alias la="ls -A"
-alias l="ls -CF"
-alias ..="cd .."
-alias ...="cd ../.."
-alias grep="grep --color=auto"
-alias fgrep="fgrep --color=auto"
-alias egrep="egrep --color=auto"
-alias update="sudo pacman -Syu"
-alias install="sudo pacman -S"
-alias search="pacman -Ss"
-alias remove="sudo pacman -R"
-alias autoremove="sudo pacman -Rs $(pacman -Qtdq)"
-alias cls="clear"
-alias h="history"
-alias j="jobs -l"
-alias df="df -h"
-alias du="du -h"
-alias mkdir="mkdir -pv"
-alias wget="wget -c"
-
-# Git aliases
-alias g="git"
-alias ga="git add"
-alias gc="git commit"
-alias gp="git push"
-alias gl="git pull"
-alias gs="git status"
-alias gd="git diff"
-alias gco="git checkout"
-alias gb="git branch"
-alias glog="git log --oneline --graph --decorate"
-
-# System information
-alias sysinfo="fastfetch"
-alias weather="curl wttr.in"
-
-# Fun stuff
-alias matrix="cmatrix"
-alias pipes="pipes.sh"
-
-# Load Powerlevel10k configuration
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+# Start fastfetch
+fastfetch
 EOF
         
         # Create a basic Powerlevel10k configuration
@@ -1196,13 +1102,6 @@ main() {
     echo -e "${PURPLE}🎨 Additional Theming:${NC}"
     print_status "• Use ${YELLOW}nwg-look${NC} to configure the system-font, tela-icons and cursor themes"
     print_status "• Cursor themes: Adwaita, Miku, Qogir and Bibata Modern Classic are installed"
-    echo
-    echo -e "${PURPLE}🪄 ZSH Configuration:${NC}"
-    print_status "• If ZSH was chosen instead Of Fish, run ${YELLOW}p10k configure${NC} in the terminal"
-    print_status "• Set your prefence at the very end it will ask whether to "
-    print_status "• At the end when asked to ${CYAN}Apply changes to ~/.zshrc?${NC} type ${CYAN}n${NC}"
-    print_status "• Also always keep a copy of ${YELLOW}.zshrc${NC} incase you have to rerun the script later"
-    print_status "• Otherwise delete ${CYAN}.hyprcandy${NC} and rrerun the script to reload HyprCandy's ${CYAN}.zshr${NC} file"
     echo
     echo -e "${PURPLE}🏠 Clean Home Directory:${NC}"
     print_status "• You can delete the ${CYAN}HyprCandy${NC} images folder since it's copied into ${CYAN}Pictures${NC}"
