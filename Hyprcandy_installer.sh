@@ -481,15 +481,15 @@ behind = "⇣${count}"
 deleted = "x"
 
 [nodejs]
-symbol = " "
+symbol = "💠 "
 style = "bold green"
 
 [python]
-symbol = " "
+symbol = "🐍 "
 style = "bold yellow"
 
 [rust]
-symbol = " "
+symbol = "⚙️ "
 style = "bold red"
 
 [time]
