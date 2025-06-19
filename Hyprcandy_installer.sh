@@ -1097,7 +1097,7 @@ main() {
     print_status "• To configure Zsh, in the ${CYAN}Home${NC} directory edit ${CYAN}.hyprcandy-zsh.zsh${NC} or ${CYAN}.zshrc${NC}"
     print_status "• You can also rerun the script to switch from either one or regenerate HyprCandy's default shell setup"
     echo
-    echo -e "${PURPLE}🖼️  Wallpaper Setup:${NC}"
+    echo -e "${PURPLE}🖼️ Wallpaper Setup:${NC}"
     print_status "• On the firt login post reboot after running the script, use the keybind ${YELLOW}SUPER + H${NC}"
     print_status "• This will reload Hyprpanel and SWWW for fluid wallpaper application"
     print_status "• Then through Hyprpanel's configuration interface in the ${CYAN}Theming${NC} section do the following:"
