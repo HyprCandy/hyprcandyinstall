@@ -1,3 +1,4 @@
+Needed packages: git, hyprland, kitty and a browser.
 Run the commad below
 ```shell
 git clone https://github.com/HyprCandy/hyprcandyinstall.git && cd hyprcandyinstall
