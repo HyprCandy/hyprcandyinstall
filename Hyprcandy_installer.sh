@@ -1020,8 +1020,8 @@ main() {
     print_status "This installer will set up a complete Hyprland environment with:"
     echo "  • Hyprland window manager and ecosystem"
     echo "  • Essential applications and utilities"
-    echo "  • Beautiful themes and customizations"
     echo "  • Pre-configured Hyprcandy dotfiles"
+    echo "  • Dynamically colored Hyprland environment"
     echo "  • Your choice of display manager (SDDM or GDM)"
     echo "  • Your choice of shell (Fish or Zsh) with comprehensive configuration"
     echo
