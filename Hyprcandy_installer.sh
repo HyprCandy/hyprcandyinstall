@@ -576,9 +576,6 @@ fastfetch
 
 # Welcome message
 function fish_greeting
-    echo
-    echo ""
-    echo
 end
 
 EOF
