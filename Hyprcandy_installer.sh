@@ -1085,9 +1085,9 @@ main() {
     
     # Display and wallpaper configuration notes
     echo
-    echo -e "${CYAN}══════════════════════════════════════════════════════════════════════════════${NC}"
-    echo -e "${WHITE}                        🖥️  Post-Installation Configuration  🖼️${NC}"
-    echo -e "${CYAN}══════════════════════════════════════════════════════════════════════════════${NC}"
+    echo -e "${CYAN}════════════════════════════════════════════════════════════════════════════════════════════════════════════${NC}"
+    echo -e "${WHITE}                              🖥️  Post-Installation Configuration  🖼️${NC}"
+    echo -e "${CYAN}════════════════════════════════════════════════════════════════════════════════════════════════════════════${NC}"
     echo
     print_status "After rebooting, you may want to configure the following:"
     echo
@@ -1096,24 +1096,38 @@ main() {
     print_status "• Launch it from the application menu or run: ${CYAN}nwg-displays${NC}"
     print_status "• Adjust scaling for HiDPI displays if needed"
     echo
-    echo -e "${PURPLE}🖼️  Wallpaper Setup:${NC}"
-    print_status "• Set your wallpaper only through ${YELLOW}HyprPanel${NC} (AGS-based panel)"
-    print_status "• Find default wallpapers in the ${YELLOW}Pictures ${NC} folder"
-    print_status "• Access wallpaper settings directly from the panel configuration interface"
+    echo -e "${PURPLE}🪄 Zsh Configuration:${NC}"
+    print_status "• IMPORTANT: If you chose Zsh-shell then use ${CYAN}SUPER + Q${NC} to toggle Kitty and go through the Zsh setup"
+    print_status "• IMPORTANT: (Remember to type ${YELLOW}n${NC}o at the end when asked to Apply changes to .zshrc since HyprCandy already has them applied)"
+    print_status "• To configure Zsh, in the ${CYAN}Home${NC} directory edit ${CYAN}.hyprcandy-zsh.zsh${NC} or ${CYAN}.zshrc${NC}"
+    print_status "• You can also rerun the script to switch from either one or regenerate HyprCandy's default shell setup"
     echo
-    echo -e "${PURPLE}🎨 Additional Theming:${NC}"
+    echo -e "${PURPLE}🖼️  Wallpaper Setup:${NC}"
+    print_status "• On the firt login post reboot after running the script, use the keybind ${YELLOW}SUPER + H${NC}"
+    print_status "• This will reload Hyprpanel and SWWW for fluid wallpaper application"
+    print_status "• Then through Hyprpanel's configuration interface in the ${CYAN}Theming${NC} section do the following:"
+    print_status "• Under ${YELLOW}General Settings${NC} choose a wallaper to apply where it says None"
+    print_status "• Find default wallpapers check the ${CYAN}~/Pictures/HyprCandy${NC} or ${CYAN}HyprCandy${NC} folder"
+    print_status "• Under ${YELLOW}Matugen Settings${NC} toggle the button to enable matugen color application"
+    echo
+    echo -e "${PURPLE}🎨 Font, Icon And Cursor Theming:${NC}"
+    print_status "• Open the application-finder with SUPER + A and search for ${YELLOW}GTK Settings application${NC}"
+    print_status "• Prefered font to set through nwg-look is ${CYAN}JetBrainsMono Nerd Font Propo Regular${NC}  at size ${CYAN}10${NC}"
     print_status "• Use ${YELLOW}nwg-look${NC} to configure the system-font, tela-icons and cursor themes"
     print_status "• Cursor themes: Adwaita, Miku, Qogir and Bibata Modern Classic are installed"
+    print_status "• In ${CYAN}~/.config/hypr/hyprland.conf${NC} the ${CYAN}defautlt${NC} theme for ${CYAN}XCURSOR${NC} and ${CYAN}HYPRCURSOR${NC} is ${CYAN}Bibata-Mordern-Classic${NC}"
+    print_status "• Remeber to change the cursor name in this file to the name of your current chosen or newly-installed cursor si it persists on reboot"
+    print_status "• The same applies for cursor size changes made in nwg-look"
+    echo
+    echo -e "${PURPLE}🐟 Fish Configuration:${NC}"
+    print_status "• To configure Fish edit, in the ${YELLOW}~/.config/fish${NC} directory edit the ${YELLOW}config.fish${NC} file"
+    print_status "• You can also rerun the script to switch from either one or regenerate HyprCandy's default shell setup"
     echo
     echo -e "${PURPLE}🏠 Clean Home Directory:${NC}"
     print_status "• You can delete the ${CYAN}HyprCandy${NC} images folder since it's copied into ${CYAN}Pictures${NC}"
-    print_status "• ${YELLOW}hyprcandyinstall${NC} can also be deleted "
+    print_status "• The ${YELLOW}hyprcandyinstall${NC} folder can also be deleted since it only takes a few seconds to git clone again"
     echo
-    echo -e "${PURPLE}🪄 Shell Configuration:${NC}"
-    print_status "• To configure Zsh, in the ${CYAN}Home${NC} directory edit ${CYAN}.hyprcandy-zsh.zsh${NC} or ${CYAN}.zshrc${NC}"
-    print_status "• To configure Fish edit, in the ${YELLOW}~/.config/fish${NC} directory edit the ${YELLOW}config.fish${NC} file"
-    print_status "• You can also rerun the script to switch from either one or regenerate HyprCandy's default shell setup"
-    echo -e "${CYAN}══════════════════════════════════════════════════════════════════════════════${NC}"
+    echo -e "${CYAN}════════════════════════════════════════════════════════════════════════════════════════════════════════════${NC}"
     
     # Prompt for reboot
     prompt_reboot
