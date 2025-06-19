@@ -100,8 +100,8 @@ choose_display_manager() {
 
 # Function to choose shell
 choose_shell() {
-    print_status "Choose your shell: if you choose Zsh then always keep a copy of .zshrc incase you have to rerun the script later"
-    echo "1) Fish - Modern shell with intelligent autosuggestions and syntax highlighting"
+    print_status "Choose your shell: you can also rerun the script to switch from either or regenerate HyprCandy's default shell setup"
+    echo "1) Fish - A fast modern shell with intelligent autosuggestions and syntax highlighting"
     echo "2) Zsh - Powerful shell with extensive customization (Oh My Zsh + Powerlevel10k)"
     echo
     
@@ -776,18 +776,21 @@ setup_hyprcandy() {
         return 1
     fi
     
-    # Incase of updates, before cloning Hyprcandy repository first remove existing .hyprcandy folder
+    # In case of updates, remove existing .hyprcandy folder before cloning
     if [ -d "$HOME/.hyprcandy" ]; then
-        rm -rf .hyprcandy
-        echo " Removing existing .hyprcandy folder to clone updated dotfiles"
+        echo "🗑️  Removing existing .hyprcandy folder to clone updated dotfiles..."
+        rm -rf "$HOME/.hyprcandy"
+        sleep 2
     else
-        echo ".hyprcandy dotfiles folder doesn't exist : seems to be a fresh install"
+        echo "✅ .hyprcandy dotfiles folder doesn't exist — seems to be a fresh install."
+        sleep 2
     fi
-    
+
     # Clone Hyprcandy repository
-    local hyprcandy_dir="$HOME/.hyprcandy"
-    print_status "Cloning Hyprcandy repository..."
+    hyprcandy_dir="$HOME/.hyprcandy"
+    echo "🌐 Cloning Hyprcandy repository into $hyprcandy_dir..."
     git clone https://github.com/HyprCandy/Hyprcandy.git "$hyprcandy_dir"
+
     
     # Go to the home directory
     cd "$HOME"
@@ -1108,7 +1111,7 @@ main() {
     echo -e "${PURPLE}🪄 Shell Configuration:${NC}"
     print_status "• To configure Zsh, in the ${CYAN}Home${NC} directory edit ${CYAN}.hyprcandy-zsh.zsh${NC} or ${CYAN}.zshrc${NC}"
     print_status "• To configure Fish edit, in the ${YELLOW}~/.config/fish${NC} directory edit the ${YELLOW}config.fish${NC} file"
-    print_status "• To switch between Fish and Zsh, rerun the script and choose your desired shell"
+    print_status "• You can also rerun the script to switch from either one or regenerate HyprCandy's default shell setup"
     echo -e "${CYAN}══════════════════════════════════════════════════════════════════════════════${NC}"
     
     # Prompt for reboot
