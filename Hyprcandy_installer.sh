@@ -577,9 +577,7 @@ fastfetch
 # Welcome message
 function fish_greeting
     echo
-    set_color purple
-    echo "Welcome to HyprCandy Fish Shell! 🐟"
-    set_color normal
+    echo ""
     echo
 end
 
