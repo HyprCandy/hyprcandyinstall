@@ -1104,7 +1104,7 @@ main() {
     print_status "• You can delete the ${CYAN}HyprCandy${NC} images folder since it's copied into ${CYAN}Pictures${NC}"
     print_status "• ${YELLOW}hyprcandyinstall${NC} can also be deleted "
     echo
-    echo -e "${PURPLE}🎨 Shell Configuration:${NC}"
+    echo -e "${PURPLE}🪄 Shell Configuration:${NC}"
     print_status "• To configure Zsh, in the ${CYAN}Home${NC} directory edit ${CYAN}.hyprcandy-zsh.zsh${NC} or ${CYAN}.zshrc${NC}"
     print_status "• To configure Fish edit, in the ${YELLOW}~/.config/fish${NC} directory edit the ${YELLOW}config.fish${NC} file"
     print_status "• To switch between Fish and Zsh, rerun the script and choose your desired shell"
