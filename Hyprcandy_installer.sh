@@ -776,18 +776,19 @@ setup_hyprcandy() {
         return 1
     fi
     
+    # Incase of updates, before cloning Hyprcandy repository first remove existing .hyprcandy folder
+    if [ -d "$HOME/.hyprcandy" ]; then
+        rm -rf .hyprcandy
+        echo " Removing existing .hyprcandy folder to clone updated dotfiles"
+    else
+        echo ".hyprcandy dotfiles folder doesn't exist : seems to be a fresh install"
+    fi
+    
     # Clone Hyprcandy repository
     local hyprcandy_dir="$HOME/.hyprcandy"
+    print_status "Cloning Hyprcandy repository..."
+    git clone https://github.com/HyprCandy/Hyprcandy.git "$hyprcandy_dir"
     
-    if [ -d "$hyprcandy_dir" ]; then
-        print_warning "Hyprcandy directory already exists. Updating..."
-        cd "$hyprcandy_dir"
-        git pull
-    else
-        print_status "Cloning Hyprcandy repository..."
-        git clone https://github.com/HyprCandy/Hyprcandy.git "$hyprcandy_dir"
-    fi
-
     # Go to the home directory
     cd "$HOME"
 
