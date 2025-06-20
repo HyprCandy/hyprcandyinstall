@@ -261,7 +261,7 @@ build_package_list() {
         # Customization and theming
         "ags-hyprpanel-git"
         "matugen-bin"
-        "python-pywal"
+        "python-pywal16"
         
         # Applications
         "gedit"
