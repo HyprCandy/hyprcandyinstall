@@ -1095,7 +1095,9 @@ main() {
     print_status "• IMPORTANT: If you chose Zsh-shell then use ${CYAN}SUPER + Q${NC} to toggle Kitty and go through the Zsh setup"
     print_status "• IMPORTANT: (Remember to type ${YELLOW}n${NC}o at the end when asked to Apply changes to .zshrc since HyprCandy already has them applied)"
     print_status "• To configure Zsh, in the ${CYAN}Home${NC} directory edit ${CYAN}.hyprcandy-zsh.zsh${NC} or ${CYAN}.zshrc${NC}"
-    print_status "• You can also rerun the script to switch from either one or regenerate HyprCandy's default shell setup"
+    print_status "• You can also rerun the script to switch from either one or regenerate HyprCandy's default Zsh shell setup"
+    print_status "• You can also rerun the script to install Fish shell"
+    print_status "• When both are installed switch at anytime by running ${CYAN}chsh -s /usr/bin/<name of shell>${NC} then reboot"
     echo
     echo -e "${PURPLE}🖼️ Wallpaper Setup (Hyprpanel):${NC}"
     print_status "• On the firt login post reboot after running the script, use the keybind ${YELLOW}SUPER + H${NC}"
@@ -1113,7 +1115,9 @@ main() {
     echo
     echo -e "${PURPLE}🐟 Fish Configuration:${NC}"
     print_status "• To configure Fish edit, in the ${YELLOW}~/.config/fish${NC} directory edit the ${YELLOW}config.fish${NC} file"
-    print_status "• You can also rerun the script to switch from either one or regenerate HyprCandy's default shell setup"
+    print_status "• You can also rerun the script to switch from either one or regenerate HyprCandy's default Fish shell setup"
+    print_status "• You can also rerun the script to install Zsh shell"
+    print_status "• When both are installed switch by running ${CYAN}chsh -s /usr/bin/<name of shell>${NC} then reboot"
     echo
     echo -e "${PURPLE}🏠 Clean Home Directory:${NC}"
     print_status "• You can delete the ${CYAN}HyprCandy${NC} images folder since it's copied into ${CYAN}Pictures${NC}"
