@@ -553,8 +553,8 @@ alias wget="wget -c"
 
 # Git aliases
 alias g="git"
-alias ga="git add"
-alias gc="git commit"
+alias ga="git add ."
+alias gc="git commit -m "latest commit""
 alias gp="git push"
 alias gl="git pull"
 alias gs="git status"
@@ -1097,7 +1097,7 @@ main() {
     print_status "• To configure Zsh, in the ${CYAN}Home${NC} directory edit ${CYAN}.hyprcandy-zsh.zsh${NC} or ${CYAN}.zshrc${NC}"
     print_status "• You can also rerun the script to switch from either one or regenerate HyprCandy's default shell setup"
     echo
-    echo -e "${PURPLE}🖼️ Wallpaper Setup:${NC}"
+    echo -e "${PURPLE}🖼️ Wallpaper Setup (Hyprpanel):${NC}"
     print_status "• On the firt login post reboot after running the script, use the keybind ${YELLOW}SUPER + H${NC}"
     print_status "• This will reload Hyprpanel and SWWW for fluid wallpaper application"
     print_status "• Then through Hyprpanel's configuration interface in the ${CYAN}Theming${NC} section do the following:"
@@ -1106,13 +1106,10 @@ main() {
     print_status "• Under ${YELLOW}Matugen Settings${NC} toggle the button to enable matugen color application"
     echo
     echo -e "${PURPLE}🎨 Font, Icon And Cursor Theming:${NC}"
-    print_status "• Open the application-finder with SUPER + A and search for ${YELLOW}GTK Settings application${NC}"
-    print_status "• Prefered font to set through nwg-look is ${CYAN}JetBrainsMono Nerd Font Propo Regular${NC}  at size ${CYAN}10${NC}"
+    print_status "• Open the application-finder with SUPER + A and search for ${YELLOW}GTK Settings${NC} application"
+    print_status "• Prefered font to set through nwg-look is ${CYAN}JetBrainsMono Nerd Font Propo Regular${NC} at size ${CYAN}10${NC}"
     print_status "• Use ${YELLOW}nwg-look${NC} to configure the system-font, tela-icons and cursor themes"
-    print_status "• Cursor themes: Adwaita, Miku, Qogir and Bibata Modern Classic are installed"
-    print_status "• In ${CYAN}~/.config/hypr/hyprland.conf${NC} the ${CYAN}defautlt${NC} theme for ${CYAN}XCURSOR${NC} and ${CYAN}HYPRCURSOR${NC} is ${CYAN}Bibata-Mordern-Classic${NC}"
-    print_status "• Remeber to change the cursor name in this file to the name of your current chosen or newly-installed cursor si it persists on reboot"
-    print_status "• The same applies for cursor size changes made in nwg-look"
+    print_status "• Cursor themes take effect after loging out and back in"
     echo
     echo -e "${PURPLE}🐟 Fish Configuration:${NC}"
     print_status "• To configure Fish edit, in the ${YELLOW}~/.config/fish${NC} directory edit the ${YELLOW}config.fish${NC} file"
