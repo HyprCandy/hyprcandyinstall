@@ -82,6 +82,16 @@ After rebooting, you may want to configure the following:
 
 • When both are installed switch by running chsh -s /usr/bin/<name of shell> then reboot
 
+[INFO] 🎭 Fatfetch:
+
+• In "~/.config/fastfetch" you can editthe "config.jsonc" file to your liking
+
+• You can also add custom images in "png" fomart into the "pngs" folder
+
+• If you wish to disable fastfetch when using Zsh, remove the "fastfetch" comment in "~/.hyprcandy-zsh.zsh"
+
+• If you wish to disable fastfetch when using Fish, remove the "fastfetch" comment in "~/.config/fish/config.fish"
+
 [INFO] 🏠 Clean Home Directory:
 
 • You can delete the HyprCandy images folder since it's copied into Pictures
