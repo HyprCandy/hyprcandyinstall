@@ -308,6 +308,10 @@ build_package_list() {
         "gtksourceview3"
         "gtksourceview4"
         "gtksourceview5"
+
+        # Fun stuff
+        "cmatrix"
+        "pipes.sh"
         
         # Configuration management
         "stow"
