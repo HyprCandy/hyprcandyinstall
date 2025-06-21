@@ -1,15 +1,15 @@
 ![2025-06-19T17:33:32,983422067+03:00](https://github.com/user-attachments/assets/671960f9-e5ec-42cd-a3ce-87c072ead1eb)
-Needed packages: git, hyprland, kitty, then run this commad from inside base hyprland
+
+The script works from TTY if on a free OS install without a DE on and also from base Hyprland or Gnome which is the only recommended secondary DE for this setup.
+
+Needed packages: git, hyprland, kitty, then run:
 ```shell
 git clone https://github.com/HyprCandy/hyprcandyinstall.git && cd hyprcandyinstall
 ```
-followed by
+followed by:
 ```shell
 chmod +x Hyprcandy_installer.sh && ./Hyprcandy_installer.sh
 ```
-The script may also work from TTY but with an error when it tries to reload Hyprland. Shouldn't be an issue after restarting.
-
-
 
 [INFO] 🏠 Clean Home Directory:
 
