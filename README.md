@@ -11,8 +11,4 @@ followed by:
 chmod +x Hyprcandy_installer.sh && ./Hyprcandy_installer.sh
 ```
 
-[INFO] 🏠 Clean Home Directory:
-
-• You can delete the HyprCandy images folder since it's copied into Pictures
-
-• The hyprcandyinstall folder can also be deleted since it only takes a few seconds to git clone again
+[INFO] ❣️ If you like my project, [donations](https://ko-fi.com/ianmking) help support my younger siblings' schooling 🙂
