@@ -17,13 +17,11 @@ Configuration management tips:
 
 • To update configs: cd ~/.hyprcandy && git pull && stow */
 
-• To remove a config: cd ~/.hyprcandy && stow -D <config_name> -t /home/king
-
-• To reinstall a config: cd ~/.hyprcandy && stow -R <config_name> -t /home/king
 
 ═══════════🖥️  Post-Installation Configuration  🖼️═══════════
 
 After rebooting, you may want to configure the following:
+
 
 [INFO] 📱 Display Configuration:
 
