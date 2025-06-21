@@ -217,7 +217,7 @@ build_package_list() {
         # GNOME components (always include gnome-control-center and gnome-tweaks)
         "gnome-control-center"
         "gnome-tweaks"
-        "gnome software"
+        "gnome-software"
         
         # Terminal and file manager
         "kitty"
