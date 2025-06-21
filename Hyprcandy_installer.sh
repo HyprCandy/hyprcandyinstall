@@ -793,8 +793,9 @@ setup_hyprcandy() {
     # Remove present .zshrc file (removed .zshrc from list since it's now handled by the script) 
     rm -rf .face.icon .hyprcandy-zsh.zsh .icons HyprCandy
 
-     # Remove specified config directories from ~/.config
-    cd ~/.config || exit 1
+    # Ensure ~/.config exists, then remove specified subdirectories
+    [ -d "$HOME/.config" ] || mkdir -p "$HOME/.config"
+    cd "$HOME/.config" || exit 1
     rm -rf btop cava fastfetch gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct rofi uwsmm wlogout xsettingsd
 
     # Go to the home directory
@@ -811,11 +812,6 @@ setup_hyprcandy() {
     echo "📁 Ensuring directories for screenshots and recordings exist..."
     mkdir -p "$HOME/Pictures/Screenshots" "$HOME/Videos/Recordings"
     echo "✅ Created ~/Pictures/Screenshots and ~/Videos/Recordings (if missing)"
-
-    # Ensure ~/.config exists, then remove specified subdirectories
-    [ -d "$HOME/.config" ] || mkdir -p "$HOME/.config"
-    cd "$HOME/.config" || exit 1
-    rm -rf btop cava fastfetch gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct rofi uwsmm wlogout xsettingsd
 
     # Return to the home directory
     cd "$HOME"
