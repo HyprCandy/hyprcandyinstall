@@ -11,4 +11,4 @@ followed by:
 chmod +x Hyprcandy_installer.sh && ./Hyprcandy_installer.sh
 ```
 
-[INFO] ❣️ If you like my project, [donations](https://ko-fi.com/ianmking) help support my younger siblings' schooling 🙂
+[INFO] ❣️ If you like my project, [donations](https://ko-fi.com/ianmking) help support my younger siblings'(yes multiple siblings) schooling 🙂
