@@ -2,7 +2,7 @@
 
 The script works from TTY if on a free OS install without a DE on and also from base Hyprland or Gnome which is the only recommended secondary DE for this setup.
 
-Needed packages: git, hyprland, kitty, then run:
+Needed packages: git, hyprland, kitty, or just git if installing from tty then run:
 ```shell
 git clone https://github.com/HyprCandy/hyprcandyinstall.git && cd hyprcandyinstall
 ```
