@@ -8,7 +8,7 @@ git clone https://github.com/HyprCandy/hyprcandyinstall.git && cd hyprcandyinsta
 ```
 followed by:
 ```shell
-chmod +x Hyprcandy_installer.sh && ./Hyprcandy_installer.sh
+bash Hyprcandy_installer.sh
 ```
 
 [INFO] ❣️ If you like my project, [donations](https://ko-fi.com/ianmking) help support my younger siblings' (yes multiple siblings) schooling 🙂
