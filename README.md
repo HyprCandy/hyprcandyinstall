@@ -17,6 +17,9 @@ Configuration management tips:
 
 • To update configs: cd ~/.hyprcandy && git pull && stow */
 
+• To set custom keybinds and other Hyprland settings, create the "hyprcustom" folder in "~/.config" waith a "custom.conf" file
+
+Then in "~/.config/hypr/hyprland.conf" uncomment the line "#source = ~/.config/hyprcustom/custom.conf"
 
 ═══════════🖥️  Post-Installation Configuration  🖼️═══════════
 
