@@ -21,6 +21,8 @@ Configuration management tips:
 
 Then in "~/.config/hypr/hyprland.conf" uncomment the line "#source = ~/.config/hyprcustom/custom.conf"
 
+•  Toggle "SUPER + CTRL + K" for the rofi-keybinds menu
+
 ═══════════🖥️  Post-Installation Configuration  🖼️═══════════
 
 After rebooting, you may want to configure the following:
@@ -36,7 +38,7 @@ After rebooting, you may want to configure the following:
 
 [INFO] 🪄 Zsh Configuration:
 
-• IMPORTANT: If you chose Zsh-shell then use SUPER + Q to toggle Kitty and go through the Zsh setup
+• IMPORTANT: If you chose Zsh-shell then use "SUPER + Q" to toggle Kitty scratchpad instance and go through the Zsh setup
 
 • IMPORTANT: (Remember to type no at the end when asked to Apply changes to .zshrc since HyprCandy already has them applied)
 
@@ -62,7 +64,7 @@ After rebooting, you may want to configure the following:
 
 [INFO] 🎨 Font, Icon And Cursor Theming:
 
-• Open the application-finder with SUPER + A and search for GTK Settings application
+• Open the application-finder with "SUPER + A" and search for GTK Settings application
 
 • Prefered font to set through nwg-look is JetBrainsMono Nerd Font Propo Regular at size 10
 
