@@ -50,17 +50,15 @@ After rebooting, you may want to configure the following:
 
 [INFO] 🖼️ Wallpaper Setup (Hyprpanel):
 
-• On the firt login post reboot after running the script, use the keybind SUPER + H
-
-• This will reload Hyprpanel and SWWW for fluid wallpaper application
-
-• Then through Hyprpanel's configuration interface in the Theming section do the following:
+• Through Hyprpanel's configuration interface in the Theming section do the following:
 
 • Under General Settings choose a wallaper to apply where it says None
 
 • Find default wallpapers check the ~/Pictures/HyprCandy or HyprCandy folder
 
 • Under Matugen Settings toggle the button to enable matugen color application
+
+• Incase the wallpaper doesn't apply then reload Hyprpanel and SWWW with the keybind "SUPER + H"
 
 [INFO] 🎨 Font, Icon And Cursor Theming:
 
