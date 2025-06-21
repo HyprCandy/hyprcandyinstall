@@ -7,7 +7,7 @@ followed by
 ```shell
 chmod +x Hyprcandy_installer.sh && ./Hyprcandy_installer.sh
 ```
-The script may also work from TTY but with an error it tries to reload Hyprland. Shouldn't be an issue post-install. 
+The script may also work from TTY but with an error when it tries to reload Hyprland. Shouldn't be an issue after restarting. 
 
 # Post Install 
 
