@@ -218,6 +218,7 @@ build_package_list() {
         "gnome-control-center"
         "gnome-tweaks"
         "gnome-software"
+        "mutter"
         
         # Terminal and file manager
         "kitty"
