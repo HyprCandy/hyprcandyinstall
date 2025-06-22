@@ -941,6 +941,63 @@ setup_hyprcandy() {
         exit 1
     fi
 
+     ### ✅ Setup Background Hooks
+    echo "📁 Creating background hook scripts..."
+    mkdir -p "$HOME/.config/hyprcandy/hooks"
+
+    if ! command -v inotifywait &>/dev/null; then
+        echo "❌ 'inotifywait' (from inotify-tools) is not installed. Please install it first."
+        echo "👉 Run: sudo pacman -S inotify-tools"
+        exit 1
+    fi
+
+    cat > "$HOME/.config/hyprcandy/hooks/update_background.sh" << 'EOF'
+#!/bin/bash
+if command -v convert >/dev/null && [ -f "$HOME/.config/background" ]; then
+    convert "$HOME/.config/background[0]" "$HOME/.config/background.png" 2>>"$HOME/.config/bg_errors.log"
+    cp "$HOME/.config/background.png" "$HOME/.config/" >/dev/null 2>&1
+fi
+EOF
+    chmod +x "$HOME/.config/hyprcandy/hooks/update_background.sh"
+
+    cat > "$HOME/.config/hyprcandy/hooks/clear_swww.sh" << 'EOF'
+#!/bin/bash
+CACHE_DIR="$HOME/.cache/swww"
+[ -d "$CACHE_DIR" ] && rm -rf "$CACHE_DIR"
+EOF
+    chmod +x "$HOME/.config/hyprcandy/hooks/clear_swww.sh"
+
+    cat > "$HOME/.config/hyprcandy/hooks/watch_background.sh" << 'EOF'
+#!/bin/bash
+inotifywait -m -e close_write --format "%w%f" "$HOME/.config/background" | while read -r file; do
+    "$HOME/.config/hyprcandy/hooks/clear_swww.sh"
+    sleep 2
+    "$HOME/.config/hyprcandy/hooks/update_background.sh"
+done
+EOF
+    chmod +x "$HOME/.config/hyprcandy/hooks/watch_background.sh"
+
+    mkdir -p "$HOME/.config/systemd/user"
+    cat > "$HOME/.config/systemd/user/background-watcher.service" << 'EOF'
+[Unit]
+Description=Watch ~/.config/background, clear swww cache, update PNG
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+ExecStart=%h/.config/hyprcandy/hooks/watch_background.sh
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+EOF
+
+    echo "🔄 Reloading and enabling systemd user service..."
+    systemctl --user daemon-reexec
+    systemctl --user daemon-reload
+    systemctl --user enable --now background-watcher.service &>/dev/null
+    echo "✅ Background watcher service enabled."
+
     print_success "HyprCandy configuration setup completed!"
 }
 
@@ -985,71 +1042,6 @@ EOF
             print_warning "Sugar Candy theme not found. SDDM will use default theme."
         fi
     fi
-}
-
-# Function to setup background watching service
-setup_background_hooks() {
-    echo "📁 Creating hook directories..."
-    mkdir -p "$HOME/.hyprcandy/.config/hyprcandy/hooks"
-
-    echo "📜 Writing update_background.sh..."
-    cat > "$HOME/.hyprcandy/.config/hyprcandy/hooks/update_background.sh" << 'EOF'
-#!/bin/bash
-if command -v convert >/dev/null && [ -f "$HOME/.config/background" ]; then
-    convert "$HOME/.config/background[0]" "$HOME/.config/background.png" 2>>"$HOME/.config/bg_errors.log"
-    cp "$HOME/.config/background.png" "$HOME/.config/" >/dev/null 2>&1
-fi
-EOF
-    chmod +x "$HOME/.hyprcandy/.config/hyprcandy/hooks/update_background.sh"
-
-    echo "📜 Writing clear_swww.sh..."
-    cat > "$HOME/.hyprcandy/.config/hyprcandy/hooks/clear_swww.sh" << 'EOF'
-#!/bin/bash
-CACHE_DIR="$HOME/.cache/swww"
-if [ -d "$CACHE_DIR" ]; then
-    rm -rf "$CACHE_DIR"
-fi
-EOF
-    chmod +x "$HOME/.hyprcandy/.config/hyprcandy/hooks/clear_swww.sh"
-
-    echo "📜 Writing watch_background.sh..."
-    cat > "$HOME/.hyprcandy/.config/hyprcandy/hooks/watch_background.sh" << 'EOF'
-#!/bin/bash
-inotifywait -m -e close_write --format "%w%f" "$HOME/.config/background" | while read -r file; do
-    "$HOME/.hyprcandy/.config/hyprcandy/hooks/clear_swww.sh"
-    sleep 2
-    "$HOME/.hyprcandy/.config/hyprcandy/hooks/update_background.sh"
-
-    # Optional: apply wallpaper
-    # if command -v swww >/dev/null && [ -f "$HOME/.config/background.png" ]; then
-    #     swww img "$HOME/.config/background.png"
-    # fi
-done
-EOF
-    chmod +x "$HOME/.hyprcandy/.config/hyprcandy/hooks/watch_background.sh"
-
-    echo "⚙️  Creating systemd user service..."
-    mkdir -p "$HOME/.config/systemd/user"
-    cat > "$HOME/.config/systemd/user/background-watcher.service" << 'EOF'
-[Unit]
-Description=Watch ~/.config/background, clear swww cache, update PNG
-After=graphical-session.target
-PartOf=graphical-session.target
-
-[Service]
-ExecStart=%h/.hyprcandy/.config/hyprcandy/hooks/watch_background.sh
-Restart=on-failure
-
-[Install]
-WantedBy=default.target
-EOF
-
-    echo "🔄 Reloading and enabling background-watcher.service..."
-    systemctl --user daemon-reexec
-    systemctl --user daemon-reload
-    systemctl --user enable --now background-watcher.service
-
-    echo "✅ Setup complete! Watching ~/.config/background for changes."
 }
 
 # Function to prompt for reboot
