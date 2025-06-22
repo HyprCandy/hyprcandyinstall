@@ -279,6 +279,7 @@ build_package_list() {
         "video-trimmer"
         "eog"
         "pyprland"
+        "inotify-tools"
         
         # Fonts
         "nerd-fonts"
@@ -949,6 +950,54 @@ setup_hyprcandy() {
     fi
 
     print_success "HyprCandy configuration setup completed!"
+}
+
+# Function to setup zsh background watching service if zsh is being used
+setup_background_watcher() {
+    #set -e
+    echo "📁 Creating hook directories..."
+    mkdir -p "$HOME/.config/hyprcandy/hooks"
+
+    echo "📜 Writing update_background.sh..."
+    cat > "$HOME/.config/hyprcandy/hooks/update_background.sh" << 'EOF'
+#!/bin/bash
+if command -v convert >/dev/null && [ -f "$HOME/.config/background" ]; then
+    convert "$HOME/.config/background[0]" "$HOME/.config/background.png" 2>>"$HOME/.config/bg_errors.log"
+    cp "$HOME/.config/background.png" "$HOME/.config/" >/dev/null 2>&1
+fi
+EOF
+    chmod +x "$HOME/.config/hyprcandy/hooks/update_background.sh"
+
+    echo "📜 Writing watch_background.sh..."
+    cat > "$HOME/.config/hyprcandy/hooks/watch_background.sh" << 'EOF'
+#!/bin/bash
+inotifywait -m -e close_write --format "%w%f" "$HOME/.config/background" | while read -r file; do
+    "$HOME/.config/hyprcandy/hooks/update_background.sh"
+done
+EOF
+    chmod +x "$HOME/.config/hyprcandy/hooks/watch_background.sh"
+
+    echo "⚙️  Creating systemd user service..."
+    mkdir -p "$HOME/.config/systemd/user"
+    cat > "$HOME/.config/systemd/user/background-watcher.service" << 'EOF'
+[Unit]
+Description=Watch ~/.config/background and update PNG on changes
+After=graphical-session.target
+
+[Service]
+ExecStart=%h/.config/hyprcandy/hooks/watch_background.sh
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+EOF
+
+    echo "🔄 Reloading and enabling background-watcher.service..."
+    systemctl --user daemon-reexec
+    systemctl --user daemon-reload
+    systemctl --user enable --now background-watcher.service
+
+    echo "✅ Setup complete! Watching ~/.config/background for changes."
 }
 
 # Function to enable display manager and prompt for reboot
