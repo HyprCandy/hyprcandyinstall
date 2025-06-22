@@ -1,6 +1,6 @@
 ![2025-06-19T17:33:32,983422067+03:00](https://github.com/user-attachments/assets/671960f9-e5ec-42cd-a3ce-87c072ead1eb)
 
-Needed packages: git, hyprland, kitty, or just git t
+Needed packages: git, hyprland, kitty
 
 Then from base Hyprland or Gnome which is the only recommended secondary DE for this setup run:
 ```shell
