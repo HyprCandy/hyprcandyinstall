@@ -581,14 +581,6 @@ alias pipes="pipes.sh"
 # Start HyprCandy fastfetch
 fastfetch
 
-# Run in background to generate hyprlock wallpaper from .gif or .mp4
-if test -f ~/.config/background -a ~/.config/background -nt ~/.config/background.png
-    begin
-        convert ~/.config/background[0] ~/.config/background.png
-        cp ~/.config/background.png ~/.config/
-    end &
-end
-
 # Welcome message
 function fish_greeting
 end
