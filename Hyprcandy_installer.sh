@@ -952,9 +952,8 @@ setup_hyprcandy() {
     print_success "HyprCandy configuration setup completed!"
 }
 
-# Function to setup zsh background watching service if zsh is being used
-setup_background_watcher() {
-    #set -e
+# Function to setup background watching service
+setup_background_hooks() {
     echo "📁 Creating hook directories..."
     mkdir -p "$HOME/.config/hyprcandy/hooks"
 
@@ -968,11 +967,31 @@ fi
 EOF
     chmod +x "$HOME/.config/hyprcandy/hooks/update_background.sh"
 
+    echo "📜 Writing clear_swww.sh..."
+    cat > "$HOME/.config/hyprcandy/hooks/clear_swww.sh" << 'EOF'
+#!/bin/bash
+
+CACHE_DIR="$HOME/.cache/swww"
+
+if [ -d "$CACHE_DIR" ]; then
+    rm -rf "$CACHE_DIR"
+fi
+EOF
+    chmod +x "$HOME/.config/hyprcandy/hooks/clear_swww.sh"
+
     echo "📜 Writing watch_background.sh..."
     cat > "$HOME/.config/hyprcandy/hooks/watch_background.sh" << 'EOF'
 #!/bin/bash
+
 inotifywait -m -e close_write --format "%w%f" "$HOME/.config/background" | while read -r file; do
+    "$HOME/.config/hyprcandy/hooks/clear_swww.sh"
+    sleep 2
     "$HOME/.config/hyprcandy/hooks/update_background.sh"
+
+    # Optional: immediately apply wallpaper with swww
+    # if command -v swww >/dev/null && [ -f "$HOME/.config/background.png" ]; then
+    #     swww img "$HOME/.config/background.png"
+    # fi
 done
 EOF
     chmod +x "$HOME/.config/hyprcandy/hooks/watch_background.sh"
@@ -981,7 +1000,7 @@ EOF
     mkdir -p "$HOME/.config/systemd/user"
     cat > "$HOME/.config/systemd/user/background-watcher.service" << 'EOF'
 [Unit]
-Description=Watch ~/.config/background and update PNG on changes
+Description=Watch ~/.config/background, clear swww cache, update PNG
 After=graphical-session.target
 
 [Service]
