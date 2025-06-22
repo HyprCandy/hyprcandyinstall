@@ -941,8 +941,7 @@ setup_hyprcandy() {
         exit 1
     fi
 
-     #!/bin/bash
-
+#!/bin/bash
 set -e
 
 echo "📁 Creating necessary directories..."
@@ -1032,7 +1031,7 @@ After=graphical-session.target
 
 [Service]
 Type=simple
-ExecStart=ExecStart=%h/.config/hyprcandy/hooks/watch_background.sh
+ExecStart=%h/.config/hyprcandy/hooks/watch_background.sh
 Restart=on-failure
 Environment=DISPLAY=:0
 Environment=XDG_RUNTIME_DIR=/run/user/%U
