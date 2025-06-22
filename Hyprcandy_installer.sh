@@ -945,25 +945,35 @@ setup_hyprcandy() {
 echo "📁 Creating background hook scripts..."
 mkdir -p "$HOME/.config/hyprcandy/hooks" "$HOME/.config/systemd/user"
 
-# update_background.sh
+### 🧼 Create update_background.sh
 cat > "$HOME/.config/hyprcandy/hooks/update_background.sh" << 'EOF'
 #!/bin/bash
+
+# Convert background image to PNG
 if command -v convert >/dev/null && [ -f "$HOME/.config/background" ]; then
-    convert "$HOME/.config/background[0]" "$HOME/.config/background.png" >/dev/null 2>&1"
-    cp "$HOME/.config/background.png" "$HOME/.config/" >/dev/null 2>&1
+    echo "🎨 Converting background to PNG..."
+    convert "$HOME/.config/background[0]" "$HOME/.config/background.png" >/dev/null 2>&1
+else
+    echo "⚠️ 'convert' not found or background file missing."
 fi
 EOF
 chmod +x "$HOME/.config/hyprcandy/hooks/update_background.sh"
 
-# clear_swww.sh
+### 🧹 Create clear_swww.sh
 cat > "$HOME/.config/hyprcandy/hooks/clear_swww.sh" << 'EOF'
 #!/bin/bash
+
 CACHE_DIR="$HOME/.cache/swww"
-[ -d "$CACHE_DIR" ] && rm -rf "$CACHE_DIR"
+if [ -d "$CACHE_DIR" ]; then
+    echo "🗑️ Clearing swww cache..."
+    rm -rf "$CACHE_DIR"
+else
+    echo "ℹ️ No swww cache to clear."
+fi
 EOF
 chmod +x "$HOME/.config/hyprcandy/hooks/clear_swww.sh"
 
-# watch_background.sh
+### 👀 Create watch_background.sh
 cat > "$HOME/.config/hyprcandy/hooks/watch_background.sh" << 'EOF'
 #!/bin/bash
 
@@ -981,34 +991,28 @@ inotifywait -m -e close_write --format "%w%f" "$HOME/.config/background" | while
         echo "⏳ Waiting for Matugen to update dock colors..."
         inotifywait -e close_write "$MATUGEN_FILE"
         echo "✅ Matugen dock colors updated!"
-    else
-        echo "⚠️ $MATUGEN_FILE not found. Skipping Matugen wait."
     fi
-
-    # 🔁 Restart nwg-dock-hyprland
-    if pgrep -f "nwg-dock-hyprland" > /dev/null; then
-        echo "🛑 Killing existing nwg-dock-hyprland..."
-        pkill -f "nwg-dock-hyprland"
-        sleep 1
-    fi
+    
+    echo "🛑 Killing existing nwg-dock-hyprland..."
+    pkill -f "nwg-dock-hyprland"
+    sleep 1
 
     if [ -x "$HOME/.config/nwg-dock-hyprland/launch.sh" ]; then
         echo "🚀 Launching nwg-dock-hyprland..."
-        "$HOME/.config/nwg-dock-hyprland/launch.sh" &
-    else
-        echo "⚠️  Dock launch script not found or not executable."
+        "$HOME/.config/nwg-dock-hyprland/launch.sh" &2
     fi
 done
 EOF
 chmod +x "$HOME/.config/hyprcandy/hooks/watch_background.sh"
 
-# background-watcher.service
+### 🔧 Create background-watcher.service
 cat > "$HOME/.config/systemd/user/background-watcher.service" << 'EOF'
 [Unit]
 Description=Watch ~/.config/background, clear swww cache, update PNG, reload dock
 After=graphical-session.target
 
 [Service]
+Type=simple
 ExecStart=%h/.config/hyprcandy/hooks/watch_background.sh
 Restart=on-failure
 
@@ -1016,11 +1020,11 @@ Restart=on-failure
 WantedBy=default.target
 EOF
 
-# Enable systemd service
+### 🌀 Enable and start service
 echo "🔄 Reloading and enabling background-watcher.service..."
 systemctl --user daemon-reexec
 systemctl --user daemon-reload
-systemctl --user enable --now background-watcher.service &>/dev/null
+systemctl --user enable --now background-watcher.service
 echo "✅ Background watcher service enabled."
 
     print_success "HyprCandy configuration setup completed!"
