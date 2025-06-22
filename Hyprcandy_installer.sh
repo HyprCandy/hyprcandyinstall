@@ -945,13 +945,6 @@ setup_hyprcandy() {
 echo "📁 Creating background hook scripts..."
 mkdir -p "$HOME/.config/hyprcandy/hooks" "$HOME/.config/systemd/user"
 
-# Ensure inotifywait is installed
-if ! command -v inotifywait &>/dev/null; then
-    echo "❌ 'inotifywait' (from inotify-tools) is not installed. Please install it first."
-    echo "👉 Run: sudo pacman -S inotify-tools"
-    exit 1
-fi
-
 # update_background.sh
 cat > "$HOME/.config/hyprcandy/hooks/update_background.sh" << 'EOF'
 #!/bin/bash
