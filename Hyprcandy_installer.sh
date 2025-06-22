@@ -941,16 +941,15 @@ setup_hyprcandy() {
         exit 1
     fi
 
-   ### ✅ Setup Background Hooks
+### ✅ Setup Background Hooks
 echo "📁 Creating background hook scripts..."
 mkdir -p "$HOME/.config/hyprcandy/hooks" "$HOME/.config/systemd/user"
 
 # update_background.sh
 cat > "$HOME/.config/hyprcandy/hooks/update_background.sh" << 'EOF'
 #!/bin/bash
-
 if command -v convert >/dev/null && [ -f "$HOME/.config/background" ]; then
-    convert "$HOME/.config/background[0]" "$HOME/.config/background.png" 2>>"$HOME/.config/bg_errors.log"
+    convert "$HOME/.config/background[0]" "$HOME/.config/background.png" >/dev/null 2>&1"
     cp "$HOME/.config/background.png" "$HOME/.config/" >/dev/null 2>&1
 fi
 EOF
@@ -959,7 +958,6 @@ chmod +x "$HOME/.config/hyprcandy/hooks/update_background.sh"
 # clear_swww.sh
 cat > "$HOME/.config/hyprcandy/hooks/clear_swww.sh" << 'EOF'
 #!/bin/bash
-
 CACHE_DIR="$HOME/.cache/swww"
 [ -d "$CACHE_DIR" ] && rm -rf "$CACHE_DIR"
 EOF
@@ -1009,7 +1007,6 @@ cat > "$HOME/.config/systemd/user/background-watcher.service" << 'EOF'
 [Unit]
 Description=Watch ~/.config/background, clear swww cache, update PNG, reload dock
 After=graphical-session.target
-PartOf=graphical-session.target
 
 [Service]
 ExecStart=%h/.config/hyprcandy/hooks/watch_background.sh
