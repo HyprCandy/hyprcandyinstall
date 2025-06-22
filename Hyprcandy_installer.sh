@@ -957,6 +957,13 @@ setup_background_hooks() {
     echo "📁 Creating hook directories..."
     mkdir -p "$HOME/.config/hyprcandy/hooks"
 
+    # ✅ Ensure inotifywait (from inotify-tools) is installed
+    if ! command -v inotifywait &>/dev/null; then
+        echo "❌ 'inotifywait' (from inotify-tools) is not installed."
+        echo "👉 Install it with: sudo pacman -S inotify-tools"
+        exit 1
+    fi
+
     echo "📜 Writing update_background.sh..."
     cat > "$HOME/.config/hyprcandy/hooks/update_background.sh" << 'EOF'
 #!/bin/bash
@@ -970,9 +977,7 @@ EOF
     echo "📜 Writing clear_swww.sh..."
     cat > "$HOME/.config/hyprcandy/hooks/clear_swww.sh" << 'EOF'
 #!/bin/bash
-
 CACHE_DIR="$HOME/.cache/swww"
-
 if [ -d "$CACHE_DIR" ]; then
     rm -rf "$CACHE_DIR"
 fi
@@ -982,13 +987,12 @@ EOF
     echo "📜 Writing watch_background.sh..."
     cat > "$HOME/.config/hyprcandy/hooks/watch_background.sh" << 'EOF'
 #!/bin/bash
-
 inotifywait -m -e close_write --format "%w%f" "$HOME/.config/background" | while read -r file; do
     "$HOME/.config/hyprcandy/hooks/clear_swww.sh"
     sleep 2
     "$HOME/.config/hyprcandy/hooks/update_background.sh"
 
-    # Optional: immediately apply wallpaper with swww
+    # Optional: apply wallpaper
     # if command -v swww >/dev/null && [ -f "$HOME/.config/background.png" ]; then
     #     swww img "$HOME/.config/background.png"
     # fi
@@ -1002,6 +1006,7 @@ EOF
 [Unit]
 Description=Watch ~/.config/background, clear swww cache, update PNG
 After=graphical-session.target
+PartOf=graphical-session.target
 
 [Service]
 ExecStart=%h/.config/hyprcandy/hooks/watch_background.sh
@@ -1014,7 +1019,7 @@ EOF
     echo "🔄 Reloading and enabling background-watcher.service..."
     systemctl --user daemon-reexec
     systemctl --user daemon-reload
-    systemctl --user enable --now background-watcher.service
+    systemctl --user enable --now background-watcher.service &>/dev/null
 
     echo "✅ Setup complete! Watching ~/.config/background for changes."
 }
