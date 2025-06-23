@@ -934,6 +934,7 @@ HOOKS_DIR="$HOME/.config/hyprcandy/hooks"
 while [ ! -f "$CONFIG_BG" ]; do
     echo "⏳ Waiting for background file to appear..."
     sleep 2
+done
 
 # Monitor changes to the background file
 inotifywait -m -e close_write --format "%w%f" "$HOME/.config/background" | while read -r file; do
@@ -960,7 +961,6 @@ inotifywait -m -e close_write --format "%w%f" "$HOME/.config/background" | while
         echo "❌ Dock launcher not found or not executable."
     fi
 done
-
 EOF
 chmod +x "$HOME/.config/hyprcandy/hooks/watch_dock.sh"
 
