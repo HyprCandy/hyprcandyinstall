@@ -927,6 +927,14 @@ cat > "$HOME/.config/hyprcandy/hooks/watch_dock.sh" << 'EOF'
 
 # Path to Matugen-generated CSS color file
 MATUGEN_FILE="$HOME/.config/nwg-dock-hyprland/colors.css"
+CONFIG_BG="$HOME/.config/background"
+HOOKS_DIR="$HOME/.config/hyprcandy/hooks"
+
+# ⏳ Wait for background file to exist
+while [ ! -f "$CONFIG_BG" ]; do
+    echo "⏳ Waiting for background file to appear..."
+    sleep 2
+done
 
 # Monitor changes to the background file
 inotifywait -m -e close_write --format "%w%f" "$HOME/.config/background" | while read -r file; do
@@ -937,27 +945,16 @@ inotifywait -m -e close_write --format "%w%f" "$HOME/.config/background" | while
     # 🎨 Wait for Matugen to update colors.css
     if [ -f "$MATUGEN_FILE" ]; then
         echo "⏳ Waiting for Matugen to update dock colors..."
-        inotifywait -e close_write "$MATUGEN_FILE"
+        inotifywait -e close_write "$MATUGEN_FILE" | while read -r file; do
         echo "✅ Matugen dock colors updated!"
+        pkill -f "nwg-dock-hyprland"
     else
         echo "⚠️ $MATUGEN_FILE not found. Skipping Matugen wait."
     fi
-
-    if [ -x "$HOME/.hyprcandy/.config/nwg-dock-hyprland/launch.sh" ]; then
+    
+    if [ -x "$HOME/.config/nwg-dock-hyprland/launch.sh" ]; then
         echo "🚀 Launching nwg-dock-hyprland..."
-        "$HOME/.hyprcandy/.config/nwg-dock-hyprland/launch.sh" &
-    fi
-
-    # 🔁 Restart nwg-dock-hyprland
-    if pgrep -f "nwg-dock-hyprland" > /dev/null; then
-        echo "🛑 Killing existing nwg-dock-hyprland..."
-        pkill -f "nwg-dock-hyprland"
-        while pgrep -f "nwg-dock-hyprland" >/dev/null; do sleep 2; done
-    fi
-
-    if [ -x "$HOME/.hyprcandy/.config/nwg-dock-hyprland/launch.sh" ]; then
-        echo "🚀 Launching nwg-dock-hyprland..."
-        "$HOME/.hyprcandy/.config/nwg-dock-hyprland/launch.sh" &
+        "$HOME/.config/nwg-dock-hyprland/launch.sh" &
     fi
 done
 EOF
