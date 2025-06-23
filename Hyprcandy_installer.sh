@@ -945,7 +945,7 @@ echo "🔄 Reloading and enabling background-watcher and dock-launcher..."
 systemctl --user daemon-reexec
 systemctl --user daemon-reload
 systemctl --user enable --now background-watcher.service &>/dev/null
-echo "✅ All set! Both services are running and watching for changes."
+echo "✅ All set! The wallpaper service is watching for changes."
 
     # 🛠️ GNOME Window Button Layout Adjustment
     echo
