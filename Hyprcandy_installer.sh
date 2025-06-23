@@ -934,29 +934,33 @@ HOOKS_DIR="$HOME/.config/hyprcandy/hooks"
 while [ ! -f "$CONFIG_BG" ]; do
     echo "⏳ Waiting for background file to appear..."
     sleep 2
-done
 
 # Monitor changes to the background file
 inotifywait -m -e close_write --format "%w%f" "$HOME/.config/background" | while read -r file; do
     "$HOME/.config/hyprcandy/hooks/clear_swww.sh"
     sleep 2
     "$HOME/.config/hyprcandy/hooks/update_background.sh"
-    
-    # 🎨 Wait for Matugen to update colors.css
+
+    # 🎨 Wait for Matugen to update colors.conf
     if [ -f "$MATUGEN_FILE" ]; then
         echo "⏳ Waiting for Matugen to update dock colors..."
-        inotifywait -e close_write "$MATUGEN_FILE" | while read -r file; do
+        inotifywait -e close_write "$MATUGEN_FILE"
         echo "✅ Matugen dock colors updated!"
         pkill -f "nwg-dock-hyprland"
+        while pgrep -f "nwg-dock-hyprland" >/dev/null; do sleep 0.2; done
     else
         echo "⚠️ $MATUGEN_FILE not found. Skipping Matugen wait."
     fi
-    
+
+    # 🚀 Always launch the dock at the end
     if [ -x "$HOME/.config/nwg-dock-hyprland/launch.sh" ]; then
         echo "🚀 Launching nwg-dock-hyprland..."
         "$HOME/.config/nwg-dock-hyprland/launch.sh" &
+    else
+        echo "❌ Dock launcher not found or not executable."
     fi
 done
+
 EOF
 chmod +x "$HOME/.config/hyprcandy/hooks/watch_dock.sh"
 
