@@ -916,9 +916,10 @@ done
 inotifywait -m -e close_write "$CONFIG_BG" | while read -r file; do
     echo "🎯 Detected background update: $file"
     "$HOOKS_DIR/clear_swww.sh
-    sleep 0.5
     killall -e swww-daemon
-    hyprpanel -q
+    sleep 0.5
+    swww-daemon &
+    hyprpanel -q 
     sleep 0.5
     hyprpanel &
     sleep 0.5
