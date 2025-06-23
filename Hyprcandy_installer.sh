@@ -940,130 +940,88 @@ setup_hyprcandy() {
         echo "❌ grid.svg not found at $SVG_SOURCE"
         exit 1
     fi
-
 #!/bin/bash
-set -e
 
-echo "📁 Creating necessary directories..."
+### ✅ Setup Background Hooks
+echo "📁 Creating background hook scripts..."
 mkdir -p "$HOME/.config/hyprcandy/hooks" "$HOME/.config/systemd/user"
 
-### 🧩 Check for inotifywait
-if ! command -v inotifywait &>/dev/null; then
-    echo "❌ 'inotifywait' not found. Please install 'inotify-tools' first."
-    exit 1
-fi
-
-### 📄 Create update_background.sh
+# update_background.sh
 cat > "$HOME/.config/hyprcandy/hooks/update_background.sh" << 'EOF'
 #!/bin/bash
-
 if command -v convert >/dev/null && [ -f "$HOME/.config/background" ]; then
-    echo "🎨 Converting background to PNG..."
-    convert "$HOME/.config/background[0]" "$HOME/.config/background.png" >/dev/null 2>&1
-else
-    echo "⚠️ 'convert' not found or background file missing."
+    convert "$HOME/.config/background[0]" "$HOME/.config/background.png"
 fi
 EOF
 chmod +x "$HOME/.config/hyprcandy/hooks/update_background.sh"
 
-### 🧹 Create clear_swww.sh
+# clear_swww.sh
 cat > "$HOME/.config/hyprcandy/hooks/clear_swww.sh" << 'EOF'
 #!/bin/bash
-
 CACHE_DIR="$HOME/.cache/swww"
-if [ -d "$CACHE_DIR" ]; then
-    echo "🗑️ Clearing swww cache..."
-    rm -rf "$CACHE_DIR"
-else
-    echo "ℹ️ No swww cache to clear."
-fi
+[ -d "$CACHE_DIR" ] && rm -rf "$CACHE_DIR"
 EOF
 chmod +x "$HOME/.config/hyprcandy/hooks/clear_swww.sh"
 
-### 👀 Create watch_background.sh
+# watch_background.sh
 cat > "$HOME/.config/hyprcandy/hooks/watch_background.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_BG="$HOME/.config/background"
-HOOKS_DIR="$HOME/.config/hyprcandy/hooks"
+# Path to Matugen-generated CSS color file
+MATUGEN_FILE="$HOME/.config/nwg-dock-hyprland/colors.css"
 
-if [ ! -f "$CONFIG_BG" ]; then
-    echo "⚠️ $CONFIG_BG not found. Waiting for changes..."
-fi
+# Monitor changes to the background file
+inotifywait -m -e close_write --format "%w%f" "$HOME/.config/background" | while read -r file; do
+    "$HOME/.config/hyprcandy/hooks/clear_swww.sh"
+    sleep 2
+    "$HOME/.config/hyprcandy/hooks/update_background.sh"
+    
+    # 🎨 Wait for Matugen to update colors.css
+    if [ -f "$MATUGEN_FILE" ]; then
+        echo "⏳ Waiting for Matugen to update dock colors..."
+        inotifywait -e close_write "$MATUGEN_FILE"
+        echo "✅ Matugen dock colors updated!"
+    else
+        echo "⚠️ $MATUGEN_FILE not found. Skipping Matugen wait."
+    fi
 
-inotifywait -m -e close_write "$CONFIG_BG" | while read -r file; do
-    echo "🎯 Detected background update: \$file"
-    "\$HOOKS_DIR/clear_swww.sh"
-    "\$HOOKS_DIR/update_background.sh"
+    # 🔁 Restart nwg-dock-hyprland
+    if pgrep -f "nwg-dock-hyprland" > /dev/null; then
+        echo "🛑 Killing existing nwg-dock-hyprland..."
+        pkill -f "nwg-dock-hyprland"
+        sleep 1
+    fi
+
+    if [ -x "$HOME/.config/nwg-dock-hyprland/launch.sh" ]; then
+        echo "🚀 Launching nwg-dock-hyprland..."
+        "$HOME/.config/nwg-dock-hyprland/launch.sh" &
+    else
+        echo "⚠️  Dock launch script not found or not executable."
+    fi
 done
 EOF
 chmod +x "$HOME/.config/hyprcandy/hooks/watch_background.sh"
 
-### 👀 Create watch_dock.sh
-cat > "$HOME/.config/hyprcandy/hooks/watch_dock.sh" << 'EOF'
-#!/bin/bash
-
-MATUGEN_FILE="$HOME/.config/hypr/colors.conf"
-DOCK_LAUNCHER="$HOME/.config/nwg-dock-hyprland/launch.sh"
-
-if [ ! -f "$MATUGEN_FILE" ]; then
-    echo "⚠️ $MATUGEN_FILE not found. Waiting for changes..."
-fi
-
-inotifywait -m -e close_write "$MATUGEN_FILE" | while read -r file; do
-    echo "🎯 Detected Matugen update: \$file"
-
-    pkill -f "nwg-dock-hyprland" 2>/dev/null || echo "ℹ️ Dock was not running."
-    while pgrep -f "nwg-dock-hyprland" >/dev/null; do
-        sleep 0.2
-    done
-
-    [ -x "\$DOCK_LAUNCHER" ] && "\$DOCK_LAUNCHER" &
-done
-EOF
-chmod +x "$HOME/.config/hyprcandy/hooks/watch_dock.sh"
-
-### 🔧 Create background-watcher.service
+# background-watcher.service
 cat > "$HOME/.config/systemd/user/background-watcher.service" << 'EOF'
 [Unit]
-Description=Watch ~/.config/background, clear swww cache, update PNG
+Description=Watch ~/.config/background, clear swww cache, update PNG, reload dock
 After=graphical-session.target
 
 [Service]
-Type=simple
 ExecStart=%h/.config/hyprcandy/hooks/watch_background.sh
 Restart=on-failure
-Environment=DISPLAY=:0
-Environment=XDG_RUNTIME_DIR=/run/user/%U
 
 [Install]
 WantedBy=default.target
 EOF
 
-### 🔧 Create dock-launcher.service
-cat > "$HOME/.config/systemd/user/dock-launcher.service" << 'EOF'
-[Unit]
-Description=Continuously restart dock when Matugen updates
-After=graphical-session.target
-
-[Service]
-Type=simple
-ExecStart=%h/.config/hyprcandy/hooks/watch_dock.sh
-Restart=on-failure
-Environment=DISPLAY=:0
-Environment=XDG_RUNTIME_DIR=/run/user/%U
-
-[Install]
-WantedBy=default.target
-EOF
-
-### 🔄 Reload and enable services
-echo "🔄 Reloading and enabling background-watcher and dock-launcher..."
+# Enable systemd service
+echo "🔄 Reloading and enabling background-watcher.service..."
 systemctl --user daemon-reexec
 systemctl --user daemon-reload
-systemctl --user enable --now background-watcher.service dock-launcher.service
-
-echo "✅ All set! Both services are running and watching for changes."
+systemctl --user enable --now background-watcher.service &>/dev/null
+echo "✅ Background watcher service enabled."
 
     print_success "HyprCandy configuration setup completed!"
 }
