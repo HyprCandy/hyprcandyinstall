@@ -878,7 +878,7 @@ setup_hyprcandy() {
     if [ ${#stow_failed[@]} -ne 0 ]; then
         echo "❌ Failed to install: ${stow_failed[*]}"
     fi
-    
+
 ### ✅ Setup Background Hooks
 echo "📁 Creating background hook scripts..."
 mkdir -p "$HOME/.config/hyprcandy/hooks" "$HOME/.config/systemd/user"
@@ -924,9 +924,6 @@ chmod +x "$HOME/.config/hyprcandy/hooks/watch_background.sh"
 ### 👀 Create watch_dock.sh
 cat > "$HOME/.config/hyprcandy/hooks/watch_dock.sh" << 'EOF'
 #!/bin/bash
-
-MATUGEN_FILE="$HOME/.config/hypr/colors.conf"
-DOCK_LAUNCHER="$HOME/.config/nwg-dock-hyprland/launch.sh"
 
 # Path to Matugen-generated CSS color file
 MATUGEN_FILE="$HOME/.config/nwg-dock-hyprland/colors.css"
