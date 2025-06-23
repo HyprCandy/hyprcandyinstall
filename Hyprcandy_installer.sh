@@ -921,49 +921,6 @@ done
 EOF
 chmod +x "$HOME/.config/hyprcandy/hooks/watch_background.sh"
 
-### 👀 Create watch_dock.sh
-cat > "$HOME/.config/hyprcandy/hooks/watch_dock.sh" << 'EOF'
-#!/bin/bash
-
-# Path to Matugen-generated CSS color file
-MATUGEN_FILE="$HOME/.config/nwg-dock-hyprland/colors.css"
-CONFIG_BG="$HOME/.config/background"
-HOOKS_DIR="$HOME/.config/hyprcandy/hooks"
-
-# ⏳ Wait for background file to exist
-while [ ! -f "$CONFIG_BG" ]; do
-    echo "⏳ Waiting for background file to appear..."
-    sleep 2
-done
-
-# Monitor changes to the background file
-inotifywait -m -e close_write --format "%w%f" "$HOME/.config/background" | while read -r file; do
-    "$HOME/.config/hyprcandy/hooks/clear_swww.sh"
-    sleep 2
-    "$HOME/.config/hyprcandy/hooks/update_background.sh"
-
-    # 🎨 Wait for Matugen to update colors.conf
-    if [ -f "$MATUGEN_FILE" ]; then
-        echo "⏳ Waiting for Matugen to update dock colors..."
-        inotifywait -e close_write "$MATUGEN_FILE"
-        echo "✅ Matugen dock colors updated!"
-
-        pkill -f "nwg-dock-hyprland"
-        sleep 2  # <-- FIX: was written as `sleep2` (invalid)
-
-        "$HOME/.config/nwg-dock-hyprland/launch.sh" &
-
-        # Optional: wait until it's running again (not required unless you need confirmation)
-        while ! pgrep -f "nwg-dock-hyprland" >/dev/null; do
-            sleep 1
-        done
-    else
-        echo "⚠️ $MATUGEN_FILE not found. Skipping Matugen wait."
-    fi
-done
-EOF
-chmod +x "$HOME/.config/hyprcandy/hooks/watch_dock.sh"
-
 ### 🔧 Create background-watcher.service
 cat > "$HOME/.config/systemd/user/background-watcher.service" << 'EOF'
 [Unit]
@@ -978,25 +935,11 @@ Restart=on-failure
 WantedBy=default.target
 EOF
 
-### 🔧 Create dock-launcher.service
-cat > "$HOME/.config/systemd/user/dock-launcher.service" << 'EOF'
-[Unit]
-Description=Continuously restart dock when Matugen updates
-After=graphical-session.target
-
-[Service]
-ExecStart=%h/.config/hyprcandy/hooks/watch_dock.sh
-Restart=on-failure
-
-[Install]
-WantedBy=default.target
-EOF
-
 ### 🔄 Reload and enable services
 echo "🔄 Reloading and enabling background-watcher and dock-launcher..."
 systemctl --user daemon-reexec
 systemctl --user daemon-reload
-systemctl --user enable --now background-watcher.service dock-launcher.service &>/dev/null
+systemctl --user enable --now background-watcher.service &>/dev/null
 echo "✅ All set! Both services are running and watching for changes."
 
     # 🛠️ GNOME Window Button Layout Adjustment
