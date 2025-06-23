@@ -878,15 +878,6 @@ setup_hyprcandy() {
     if [ ${#stow_failed[@]} -ne 0 ]; then
         echo "❌ Failed to install: ${stow_failed[*]}"
     fi
-
-    # 🔄 Reload Hyprland
-    echo
-    echo "🔄 Reloading Hyprland with 'hyprctl reload'..."
-    if command -v hyprctl >/dev/null 2>&1; then
-        hyprctl reload && echo "✅ Hyprland reloaded successfully." || echo "❌ Failed to reload Hyprland."
-    else
-        echo "⚠️  'hyprctl' not found. Skipping Hyprland reload."
-    fi
     
 ### ✅ Setup Background Hooks
 echo "📁 Creating background hook scripts..."
@@ -953,6 +944,11 @@ inotifywait -m -e close_write --format "%w%f" "$HOME/.config/background" | while
         echo "✅ Matugen dock colors updated!"
     else
         echo "⚠️ $MATUGEN_FILE not found. Skipping Matugen wait."
+    fi
+
+    if [ -x "$HOME/.hyprcandy/.config/nwg-dock-hyprland/launch.sh" ]; then
+        echo "🚀 Launching nwg-dock-hyprland..."
+        "$HOME/.hyprcandy/.config/nwg-dock-hyprland/launch.sh" &
     fi
 
     # 🔁 Restart nwg-dock-hyprland
@@ -1056,6 +1052,15 @@ echo "✅ All set! Both services are running and watching for changes."
     else
         echo "❌ grid.svg not found at $SVG_SOURCE"
         exit 1
+    fi
+
+    # 🔄 Reload Hyprland
+    echo
+    echo "🔄 Reloading Hyprland with 'hyprctl reload'..."
+    if command -v hyprctl >/dev/null 2>&1; then
+        hyprctl reload && echo "✅ Hyprland reloaded successfully." || echo "❌ Failed to reload Hyprland."
+    else
+        echo "⚠️  'hyprctl' not found. Skipping Hyprland reload."
     fi
 
     print_success "HyprCandy configuration setup completed!"
