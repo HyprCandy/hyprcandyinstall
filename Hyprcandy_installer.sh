@@ -903,8 +903,8 @@ chmod +x "$HOME/.config/hyprcandy/hooks/clear_swww.sh"
 ### 🧼 Create update_background.sh
 cat > "$HOME/.config/hyprcandy/hooks/update_background.sh" << 'EOF'
 #!/bin/bash
-if command -v convert >/dev/null && [ -f "$HOME/.config/background" ]; then
-    convert "$HOME/.config/background[0]" "$HOME/.config/background.png"
+if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
+    magick "$HOME/.config/background[0]" "$HOME/.config/background.png"
 fi
 EOF
 chmod +x "$HOME/.config/hyprcandy/hooks/update_background.sh"
@@ -954,19 +954,22 @@ inotifywait -m -e close_write --format "%w%f" "$HOME/.config/background" | while
     else
         echo "⚠️ $MATUGEN_FILE not found. Skipping Matugen wait."
     fi
+    
+    if [ -x "$HOME/.config/nwg-dock-hyprland/launch.sh" ]; then
+        echo "🚀 Launching nwg-dock-hyprland..."
+        "$HOME/.hyprcandy/.config/nwg-dock-hyprland/launch.sh" &
+    fi
 
     # 🔁 Restart nwg-dock-hyprland
     if pgrep -f "nwg-dock-hyprland" > /dev/null; then
         echo "🛑 Killing existing nwg-dock-hyprland..."
         pkill -f "nwg-dock-hyprland"
-        sleep 1
+        while pgrep -f "nwg-dock-hyprland" >/dev/null; do sleep 2; done
     fi
 
     if [ -x "$HOME/.config/nwg-dock-hyprland/launch.sh" ]; then
         echo "🚀 Launching nwg-dock-hyprland..."
-        "$HOME/.config/nwg-dock-hyprland/launch.sh" &
-    else
-        echo "⚠️  Dock launch script not found or not executable."
+        "$HOME/.hyprcandy/.config/nwg-dock-hyprland/launch.sh" &
     fi
 done
 EOF
