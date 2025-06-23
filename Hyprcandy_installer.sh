@@ -947,18 +947,18 @@ inotifywait -m -e close_write --format "%w%f" "$HOME/.config/background" | while
         echo "⏳ Waiting for Matugen to update dock colors..."
         inotifywait -e close_write "$MATUGEN_FILE"
         echo "✅ Matugen dock colors updated!"
+
         pkill -f "nwg-dock-hyprland"
-        while pgrep -f "nwg-dock-hyprland" >/dev/null; do sleep 0.2; done
+        sleep 2  # <-- FIX: was written as `sleep2` (invalid)
+
+        "$HOME/.config/nwg-dock-hyprland/launch.sh" &
+
+        # Optional: wait until it's running again (not required unless you need confirmation)
+        while ! pgrep -f "nwg-dock-hyprland" >/dev/null; do
+            sleep 1
+        done
     else
         echo "⚠️ $MATUGEN_FILE not found. Skipping Matugen wait."
-    fi
-
-    # 🚀 Always launch the dock at the end
-    if [ -x "$HOME/.config/nwg-dock-hyprland/launch.sh" ]; then
-        echo "🚀 Launching nwg-dock-hyprland..."
-        "$HOME/.config/nwg-dock-hyprland/launch.sh" &
-    else
-        echo "❌ Dock launcher not found or not executable."
     fi
 done
 EOF
