@@ -942,7 +942,7 @@ WantedBy=default.target
 EOF
 
 ### 🔄 Reload and enable services
-echo "🔄 Reloading and enabling background-watcher and dock-launcher..."
+echo "🔄 Reloading and enabling background-watcher..."
 systemctl --user daemon-reexec
 systemctl --user daemon-reload
 systemctl --user enable --now background-watcher.service &>/dev/null
