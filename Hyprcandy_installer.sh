@@ -899,9 +899,11 @@ if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
 fi
 
 sleep 1
+rm -f "$HOME/.local/share/sddm/themes/sugar-candy-user/Backgrounds/Mountain.jpg
+sleep 1
 
 if command -v magick >/dev/null && [ -f "$HOME/.config/background.png" ]; then
-    magick "$HOME/.config/background.png" -quality 95 "$HOME/.config/Mountain.jpg"
+    magick "$HOME/.config/background.png" -quality 95 "$HOME/.local/share/sddm/themes/sugar-candy-user/Backgrounds/Mountain.jpg"
 fi
 EOF
 chmod +x "$HOME/.config/hyprcandy/hooks/update_background.sh"
