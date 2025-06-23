@@ -915,14 +915,8 @@ done
 
 inotifywait -m -e close_write "$CONFIG_BG" | while read -r file; do
     echo "🎯 Detected background update: $file"
-    "$HOOKS_DIR/clear_swww.sh
+    "$HOOKS_DIR/clear_swww.sh"
     "$HOOKS_DIR/update_background.sh"
-    killall -e swww-daemon
-    sleep 0.5
-    swww-daemon &
-    hyprpanel-q
-    sleep 0.5
-    hyprpanel &
 done
 EOF
 chmod +x "$HOME/.config/hyprcandy/hooks/watch_background.sh"
@@ -942,11 +936,11 @@ WantedBy=default.target
 EOF
 
 ### 🔄 Reload and enable services
-echo "🔄 Reloading and enabling background-watcher..."
+echo "🔄 Reloading and enabling background-watcher and dock-launcher..."
 systemctl --user daemon-reexec
 systemctl --user daemon-reload
 systemctl --user enable --now background-watcher.service &>/dev/null
-echo "✅ All set! The wallpaper service is watching for changes."
+echo "✅ All set! Both services are running and watching for changes."
 
     # 🛠️ GNOME Window Button Layout Adjustment
     echo
