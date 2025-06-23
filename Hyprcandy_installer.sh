@@ -954,11 +954,6 @@ inotifywait -m -e close_write --format "%w%f" "$HOME/.config/background" | while
     else
         echo "⚠️ $MATUGEN_FILE not found. Skipping Matugen wait."
     fi
-    
-    if [ -x "$HOME/.config/nwg-dock-hyprland/launch.sh" ]; then
-        echo "🚀 Launching nwg-dock-hyprland..."
-        "$HOME/.hyprcandy/.config/nwg-dock-hyprland/launch.sh" &
-    fi
 
     # 🔁 Restart nwg-dock-hyprland
     if pgrep -f "nwg-dock-hyprland" > /dev/null; then
@@ -967,7 +962,7 @@ inotifywait -m -e close_write --format "%w%f" "$HOME/.config/background" | while
         while pgrep -f "nwg-dock-hyprland" >/dev/null; do sleep 2; done
     fi
 
-    if [ -x "$HOME/.config/nwg-dock-hyprland/launch.sh" ]; then
+    if [ -x "$HOME/.hyprcandy/.config/nwg-dock-hyprland/launch.sh" ]; then
         echo "🚀 Launching nwg-dock-hyprland..."
         "$HOME/.hyprcandy/.config/nwg-dock-hyprland/launch.sh" &
     fi
