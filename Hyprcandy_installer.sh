@@ -916,14 +916,13 @@ done
 inotifywait -m -e close_write "$CONFIG_BG" | while read -r file; do
     echo "🎯 Detected background update: $file"
     "$HOOKS_DIR/clear_swww.sh
+    "$HOOKS_DIR/update_background.sh"
     killall -e swww-daemon
     sleep 0.5
     swww-daemon &
-    hyprpanel -q 
+    hyprpanel-q
     sleep 0.5
     hyprpanel &
-    sleep 0.5
-    "$HOOKS_DIR/update_background.sh"
 done
 EOF
 chmod +x "$HOME/.config/hyprcandy/hooks/watch_background.sh"
