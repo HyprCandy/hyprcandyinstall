@@ -910,12 +910,17 @@ HOOKS_DIR="$HOME/.config/hyprcandy/hooks"
 # ⏳ Wait for background file to exist
 while [ ! -f "$CONFIG_BG" ]; do
     echo "⏳ Waiting for background file to appear..."
-    sleep 2
+    sleep 0.5
 done
 
 inotifywait -m -e close_write "$CONFIG_BG" | while read -r file; do
     echo "🎯 Detected background update: $file"
     "$HOOKS_DIR/clear_swww.sh"
+    sleep 0.5
+    hyprpanel -q
+    sleep 0.5
+    hyprpanel &
+    sleep 0.5
     "$HOOKS_DIR/update_background.sh"
 done
 EOF
