@@ -897,6 +897,12 @@ cat > "$HOME/.config/hyprcandy/hooks/update_background.sh" << 'EOF'
 if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
     magick "$HOME/.config/background[0]" "$HOME/.config/background.png"
 fi
+
+sleep 1
+
+if command -v magick >/dev/null && [ -f "$HOME/.config/background.png" ]; then
+    magick "$HOME/.config/background.png" -quality 95 "$HOME/.config/Mountain.jpg"
+fi
 EOF
 chmod +x "$HOME/.config/hyprcandy/hooks/update_background.sh"
 
@@ -1047,6 +1053,49 @@ EOF
         else
             print_warning "Sugar Candy theme not found. SDDM will use default theme."
         fi
+        ### 🎨 Setup Local SDDM Theme (Sugar Candy User Edition)
+        echo "🎨 Setting up local SDDM theme..."
+
+        # Define paths
+        LOCAL_SDDM_DIR="$HOME/.local/share/sddm/themes"
+        USER_THEME_NAME="sugar-candy-user"
+        SYSTEM_THEME_DIR="/usr/share/sddm/themes/sugar-candy"
+        LOCAL_THEME_DIR="$LOCAL_SDDM_DIR/$USER_THEME_NAME"
+        SDDM_BG_DIR="$LOCAL_THEME_DIR/Backgrounds"
+        WALLPAPER_SRC="$HOME/.config/Mountain.jpg"
+        WALLPAPER_TARGET="$SDDM_BG_DIR/Mountain.jpg"
+
+        # Ensure local SDDM themes directory exists
+        mkdir -p "$LOCAL_SDDM_DIR"
+
+        # Copy Sugar Candy to local user directory if not already present
+        if [ ! -d "$LOCAL_THEME_DIR" ]; then
+            if [ -d "$SYSTEM_THEME_DIR" ]; then
+                cp -r "$SYSTEM_THEME_DIR" "$LOCAL_THEME_DIR"
+                echo "✅ Copied Sugar Candy theme to $LOCAL_THEME_DIR"
+            else
+                echo "❌ Sugar Candy theme not found in $SYSTEM_THEME_DIR"
+            fi
+        else
+            echo "ℹ️ User version of Sugar Candy already exists at $LOCAL_THEME_DIR"
+        fi
+
+        # 🔗 Link the wallpaper to Mountain.jpg inside the theme
+        mkdir -p "$SDDM_BG_DIR"
+        if [ -f "$WALLPAPER_SRC" ]; then
+            rm -f "$WALLPAPER_TARGET"
+            ln -s "$WALLPAPER_SRC" "$WALLPAPER_TARGET"
+            echo "✅ Linked $WALLPAPER_SRC → $WALLPAPER_TARGET"
+        else
+            echo "⚠️ Wallpaper source $WALLPAPER_SRC not found. Symlink skipped."
+        fi
+
+        # 🛠️ Activate the user theme via sddm.conf.d
+        echo "🛠️ Setting SDDM to use $USER_THEME_NAME as the active theme..."
+        sudo mkdir -p /etc/sddm.conf.d
+        echo -e "[Theme]\nCurrent=$USER_THEME_NAME" | sudo tee /etc/sddm.conf.d/theme.conf >/dev/null
+
+        echo "✅ SDDM theme set to '$USER_THEME_NAME' with live wallpaper symlink"
     fi
 }
 
