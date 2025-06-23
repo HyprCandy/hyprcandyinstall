@@ -972,7 +972,6 @@ done
 EOF
 chmod +x "$HOME/.config/hyprcandy/hooks/watch_dock.sh"
 
-
 ### 🔧 Create background-watcher.service
 cat > "$HOME/.config/systemd/user/background-watcher.service" << 'EOF'
 [Unit]
