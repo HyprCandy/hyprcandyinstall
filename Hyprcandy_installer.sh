@@ -1146,7 +1146,8 @@ main() {
     echo
     print_status "Configuration management tips:"
     print_status "• Your Hyprcandy configs are in: ~/.hyprcandy/"
-    print_status "• To update configs: cd ~/.hyprcandy && git pull && stow */"
+    print_status "• Minor updates: cd ~/.hyprcandy && git pull && stow */"
+    print_status "• Major updates: rerun the install script for updated apps and configs"
     print_status "• To remove a config: cd ~/.hyprcandy && stow -D <config_name> -t $HOME"
     print_status "• To reinstall a config: cd ~/.hyprcandy && stow -R <config_name> -t $HOME"
     
