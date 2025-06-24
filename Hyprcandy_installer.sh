@@ -341,6 +341,7 @@ build_package_list() {
         packages+=(
             "zsh"
             "zsh-completions"
+            "zsh-autocomplete"
             "zsh-autosuggestions"
             "zsh-history-substring-search"
             "zsh-syntax-highlighting"
@@ -644,10 +645,10 @@ EOF
   emulate -L zsh -o extended_glob
 
   # Unset all configuration options.
-  unset POWERLEVEL9K_*
+  unset POWERLEVEL10K_*
 
   # Left prompt segments.
-  typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
+  typeset -g POWERLEVEL10K_LEFT_PROMPT_ELEMENTS=(
     os_icon
     dir
     vcs
@@ -655,7 +656,7 @@ EOF
   )
 
   # Right prompt segments.
-  typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
+  typeset -g POWERLEVEL10K_RIGHT_PROMPT_ELEMENTS=(
     status
     command_execution_time
     background_jobs
@@ -663,95 +664,95 @@ EOF
   )
 
   # Basic style options.
-  typeset -g POWERLEVEL9K_MODE='nerdfont-complete'
-  typeset -g POWERLEVEL9K_ICON_PADDING=moderate
-  typeset -g POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
-  typeset -g POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX=''
-  typeset -g POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_PREFIX=''
-  typeset -g POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX=''
-  typeset -g POWERLEVEL9K_MULTILINE_FIRST_PROMPT_SUFFIX=''
-  typeset -g POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_SUFFIX=''
-  typeset -g POWERLEVEL9K_MULTILINE_LAST_PROMPT_SUFFIX=''
-  typeset -g POWERLEVEL9K_LEFT_SUBSEGMENT_SEPARATOR=''
-  typeset -g POWERLEVEL9K_RIGHT_SUBSEGMENT_SEPARATOR=''
-  typeset -g POWERLEVEL9K_LEFT_SEGMENT_SEPARATOR=''
-  typeset -g POWERLEVEL9K_RIGHT_SEGMENT_SEPARATOR=''
-  typeset -g POWERLEVEL9K_LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL=''
-  typeset -g POWERLEVEL9K_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL=''
-  typeset -g POWERLEVEL9K_LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL=''
-  typeset -g POWERLEVEL9K_RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL=''
-  typeset -g POWERLEVEL9K_EMPTY_LINE_LEFT_PROMPT_FIRST_SEGMENT_END_SYMBOL='%{%G═╮%}'
-  typeset -g POWERLEVEL9K_EMPTY_LINE_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL='%{%G╭═%}'
-  typeset -g POWERLEVEL9K_EMPTY_LINE_LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL='%{%G═╯%}'
-  typeset -g POWERLEVEL9K_EMPTY_LINE_RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL='%{%G╰═%}'
+  typeset -g POWERLEVEL10K_MODE='nerdfont-complete'
+  typeset -g POWERLEVEL10K_ICON_PADDING=moderate
+  typeset -g POWERLEVEL10K_PROMPT_ADD_NEWLINE=true
+  typeset -g POWERLEVEL10K_MULTILINE_FIRST_PROMPT_PREFIX=''
+  typeset -g POWERLEVEL10K_MULTILINE_NEWLINE_PROMPT_PREFIX=''
+  typeset -g POWERLEVEL10K_MULTILINE_LAST_PROMPT_PREFIX=''
+  typeset -g POWERLEVEL10K_MULTILINE_FIRST_PROMPT_SUFFIX=''
+  typeset -g POWERLEVEL10K_MULTILINE_NEWLINE_PROMPT_SUFFIX=''
+  typeset -g POWERLEVEL10K_MULTILINE_LAST_PROMPT_SUFFIX=''
+  typeset -g POWERLEVEL10K_LEFT_SUBSEGMENT_SEPARATOR=''
+  typeset -g POWERLEVEL10K_RIGHT_SUBSEGMENT_SEPARATOR=''
+  typeset -g POWERLEVEL10K_LEFT_SEGMENT_SEPARATOR=''
+  typeset -g POWERLEVEL10K_RIGHT_SEGMENT_SEPARATOR=''
+  typeset -g POWERLEVEL10K_LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL=''
+  typeset -g POWERLEVEL10K_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL=''
+  typeset -g POWERLEVEL10K_LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL=''
+  typeset -g POWERLEVEL10K_RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL=''
+  typeset -g POWERLEVEL10K_EMPTY_LINE_LEFT_PROMPT_FIRST_SEGMENT_END_SYMBOL='%{%G═╮%}'
+  typeset -g POWERLEVEL10K_EMPTY_LINE_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL='%{%G╭═%}'
+  typeset -g POWERLEVEL10K_EMPTY_LINE_LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL='%{%G═╯%}'
+  typeset -g POWERLEVEL10K_EMPTY_LINE_RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL='%{%G╰═%}'
 
   # OS icon
-  typeset -g POWERLEVEL9K_OS_ICON_FOREGROUND=232
-  typeset -g POWERLEVEL9K_OS_ICON_BACKGROUND=7
+  typeset -g POWERLEVEL10K_OS_ICON_FOREGROUND=232
+  typeset -g POWERLEVEL10K_OS_ICON_BACKGROUND=7
 
   # Directory
-  typeset -g POWERLEVEL9K_DIR_FOREGROUND=232
-  typeset -g POWERLEVEL9K_DIR_BACKGROUND=4
-  typeset -g POWERLEVEL9K_SHORTEN_STRATEGY=truncate_to_last
-  typeset -g POWERLEVEL9K_SHORTEN_DIR_LENGTH=1
+  typeset -g POWERLEVEL10K_DIR_FOREGROUND=232
+  typeset -g POWERLEVEL10K_DIR_BACKGROUND=4
+  typeset -g POWERLEVEL10K_SHORTEN_STRATEGY=truncate_to_last
+  typeset -g POWERLEVEL10K_SHORTEN_DIR_LENGTH=1
 
   # VCS (Git)
-  typeset -g POWERLEVEL9K_VCS_BRANCH_ICON=''
-  typeset -g POWERLEVEL9K_VCS_UNTRACKED_ICON='?'
-  typeset -g POWERLEVEL9K_VCS_UNSTAGED_ICON='!'
-  typeset -g POWERLEVEL9K_VCS_STAGED_ICON='+'
-  typeset -g POWERLEVEL9K_VCS_INCOMING_CHANGES_ICON='⇣'
-  typeset -g POWERLEVEL9K_VCS_OUTGOING_CHANGES_ICON='⇡'
-  typeset -g POWERLEVEL9K_VCS_COMMIT_ICON=''
-  typeset -g POWERLEVEL9K_VCS_CLEAN_FOREGROUND=232
-  typeset -g POWERLEVEL9K_VCS_CLEAN_BACKGROUND=2
-  typeset -g POWERLEVEL9K_VCS_MODIFIED_FOREGROUND=232
-  typeset -g POWERLEVEL9K_VCS_MODIFIED_BACKGROUND=3
-  typeset -g POWERLEVEL9K_VCS_UNTRACKED_FOREGROUND=232
-  typeset -g POWERLEVEL9K_VCS_UNTRACKED_BACKGROUND=1
+  typeset -g POWERLEVEL10K_VCS_BRANCH_ICON=''
+  typeset -g POWERLEVEL10K_VCS_UNTRACKED_ICON='?'
+  typeset -g POWERLEVEL10K_VCS_UNSTAGED_ICON='!'
+  typeset -g POWERLEVEL10K_VCS_STAGED_ICON='+'
+  typeset -g POWERLEVEL10K_VCS_INCOMING_CHANGES_ICON='⇣'
+  typeset -g POWERLEVEL10K_VCS_OUTGOING_CHANGES_ICON='⇡'
+  typeset -g POWERLEVEL10K_VCS_COMMIT_ICON=''
+  typeset -g POWERLEVEL10K_VCS_CLEAN_FOREGROUND=232
+  typeset -g POWERLEVEL10K_VCS_CLEAN_BACKGROUND=2
+  typeset -g POWERLEVEL10K_VCS_MODIFIED_FOREGROUND=232
+  typeset -g POWERLEVEL10K_VCS_MODIFIED_BACKGROUND=3
+  typeset -g POWERLEVEL10K_VCS_UNTRACKED_FOREGROUND=232
+  typeset -g POWERLEVEL10K_VCS_UNTRACKED_BACKGROUND=1
 
   # Prompt character
-  typeset -g POWERLEVEL9K_PROMPT_CHAR_OK_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND=76
-  typeset -g POWERLEVEL9K_PROMPT_CHAR_ERROR_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND=196
-  typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VIINS_CONTENT_EXPANSION='❯'
-  typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VICMD_CONTENT_EXPANSION='❮'
-  typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VIVIS_CONTENT_EXPANSION='V'
-  typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VIOWR_CONTENT_EXPANSION='▶'
-  typeset -g POWERLEVEL9K_PROMPT_CHAR_BACKGROUND=''
-  typeset -g POWERLEVEL9K_PROMPT_CHAR_LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL=''
-  typeset -g POWERLEVEL9K_PROMPT_CHAR_LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL=''
+  typeset -g POWERLEVEL10K_PROMPT_CHAR_OK_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND=76
+  typeset -g POWERLEVEL10K_PROMPT_CHAR_ERROR_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND=196
+  typeset -g POWERLEVEL10K_PROMPT_CHAR_{OK,ERROR}_VIINS_CONTENT_EXPANSION='❯'
+  typeset -g POWERLEVEL10K_PROMPT_CHAR_{OK,ERROR}_VICMD_CONTENT_EXPANSION='❮'
+  typeset -g POWERLEVEL10K_PROMPT_CHAR_{OK,ERROR}_VIVIS_CONTENT_EXPANSION='V'
+  typeset -g POWERLEVEL10K_PROMPT_CHAR_{OK,ERROR}_VIOWR_CONTENT_EXPANSION='▶'
+  typeset -g POWERLEVEL10K_PROMPT_CHAR_BACKGROUND=''
+  typeset -g POWERLEVEL10K_PROMPT_CHAR_LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL=''
+  typeset -g POWERLEVEL10K_PROMPT_CHAR_LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL=''
 
   # Command execution time
-  typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD=3
-  typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION=0
-  typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_FOREGROUND=232
-  typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_BACKGROUND=3
+  typeset -g POWERLEVEL10K_COMMAND_EXECUTION_TIME_THRESHOLD=3
+  typeset -g POWERLEVEL10K_COMMAND_EXECUTION_TIME_PRECISION=0
+  typeset -g POWERLEVEL10K_COMMAND_EXECUTION_TIME_FOREGROUND=232
+  typeset -g POWERLEVEL10K_COMMAND_EXECUTION_TIME_BACKGROUND=3
 
   # Time
-  typeset -g POWERLEVEL9K_TIME_FOREGROUND=232
-  typeset -g POWERLEVEL9K_TIME_BACKGROUND=7
-  typeset -g POWERLEVEL9K_TIME_FORMAT='%D{%H:%M:%S}'
+  typeset -g POWERLEVEL10K_TIME_FOREGROUND=232
+  typeset -g POWERLEVEL10K_TIME_BACKGROUND=7
+  typeset -g POWERLEVEL10K_TIME_FORMAT='%D{%H:%M:%S}'
 
   # Status
-  typeset -g POWERLEVEL9K_STATUS_EXTENDED_STATES=true
-  typeset -g POWERLEVEL9K_STATUS_OK=false
-  typeset -g POWERLEVEL9K_STATUS_OK_FOREGROUND=2
-  typeset -g POWERLEVEL9K_STATUS_OK_BACKGROUND=''
-  typeset -g POWERLEVEL9K_STATUS_OK_VISUAL_IDENTIFIER_EXPANSION='✓'
-  typeset -g POWERLEVEL9K_STATUS_ERROR_FOREGROUND=9
-  typeset -g POWERLEVEL9K_STATUS_ERROR_BACKGROUND=''
-  typeset -g POWERLEVEL9K_STATUS_ERROR_VISUAL_IDENTIFIER_EXPANSION='✗'
+  typeset -g POWERLEVEL10K_STATUS_EXTENDED_STATES=true
+  typeset -g POWERLEVEL10K_STATUS_OK=false
+  typeset -g POWERLEVEL10K_STATUS_OK_FOREGROUND=2
+  typeset -g POWERLEVEL10K_STATUS_OK_BACKGROUND=''
+  typeset -g POWERLEVEL10K_STATUS_OK_VISUAL_IDENTIFIER_EXPANSION='✓'
+  typeset -g POWERLEVEL10K_STATUS_ERROR_FOREGROUND=9
+  typeset -g POWERLEVEL10K_STATUS_ERROR_BACKGROUND=''
+  typeset -g POWERLEVEL10K_STATUS_ERROR_VISUAL_IDENTIFIER_EXPANSION='✗'
 
   # Background jobs
-  typeset -g POWERLEVEL9K_BACKGROUND_JOBS_FOREGROUND=6
-  typeset -g POWERLEVEL9K_BACKGROUND_JOBS_BACKGROUND=''
-  typeset -g POWERLEVEL9K_BACKGROUND_JOBS_VISUAL_IDENTIFIER_EXPANSION='⚙'
+  typeset -g POWERLEVEL10K_BACKGROUND_JOBS_FOREGROUND=6
+  typeset -g POWERLEVEL10K_BACKGROUND_JOBS_BACKGROUND=''
+  typeset -g POWERLEVEL10K_BACKGROUND_JOBS_VISUAL_IDENTIFIER_EXPANSION='⚙'
 
   # Instant prompt mode.
-  typeset -g POWERLEVEL9K_INSTANT_PROMPT=verbose
+  typeset -g POWERLEVEL10K_INSTANT_PROMPT=verbose
 
   # Hot reload.
-  typeset -g POWERLEVEL9K_DISABLE_HOT_RELOAD=true
+  typeset -g POWERLEVEL10K_DISABLE_HOT_RELOAD=true
 
   # If p10k is already loaded, reload configuration.
   (( ! $+functions[p10k] )) || p10k reload
@@ -900,10 +901,15 @@ chmod +x "$HOME/.config/hyprcandy/hooks/clear_swww.sh"
 ### 🧼 Create update_background.sh
 cat > "$HOME/.config/hyprcandy/hooks/update_background.sh" << 'EOF'
 #!/bin/bash
+
+# Update local background.png
 if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
     magick "$HOME/.config/background[0]" "$HOME/.config/background.png"
 fi
+
 sleep 1
+
+# Update SDDM background with sudo
 if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
     sudo magick "$HOME/.config/background[0]" "/usr/share/sddm/themes/sugar-candy/Backgrounds/Mountain.jpg"
 fi
@@ -1005,10 +1011,28 @@ echo "✅ All set! The service is running and watching for changes."
         exit 1
     fi
 
+    # 🔐 Add sudoers entry for background script
+    echo
+    echo "🔐 Adding sudoers entry for background script..."
+    
+    # Get the current username
+    USERNAME=$(whoami)
+    
+    # Create the sudoers entry for background script
+    SUDOERS_ENTRY="$USERNAME ALL=(ALL) NOPASSWD: $HOME/.config/hyprcandy/hooks/update_background.sh"
+    
+    # Add the entry to sudoers safely using visudo
+    echo "$SUDOERS_ENTRY" | sudo EDITOR='tee -a' visudo -f /etc/sudoers.d/hyprcandy-background
+    
+    # Set proper permissions on the sudoers file
+    sudo chmod 440 /etc/sudoers.d/hyprcandy-background
+    
+    echo "✅ Sudoers entry added: $SUDOERS_ENTRY"
+    
     # 🔄 Reload Hyprland
     echo
     echo "🔄 Reloading Hyprland with 'hyprctl reload'..."
-    if command -v hyprctl >/dev/null 2>&1; then
+    if command -v hyprctl > /dev/null 2>&1; then
         hyprctl reload && echo "✅ Hyprland reloaded successfully." || echo "❌ Failed to reload Hyprland."
     else
         echo "⚠️  'hyprctl' not found. Skipping Hyprland reload."
@@ -1052,8 +1076,12 @@ enable_display_manager() {
             sudo tee /etc/sddm.conf.d/sugar-candy.conf > /dev/null << EOF
 [Theme]
 Current=sugar-candy
+
+[General]
+Background=$HOME/.config/background.png
 EOF
-            print_success "SDDM configured to use Sugar Candy theme"
+            
+            print_success "SDDM configured to use Sugar Candy theme with custom auto-updating background"
         else
             print_warning "Sugar Candy theme not found. SDDM will use default theme."
         fi
