@@ -1173,8 +1173,7 @@ main() {
     print_status "• When both are installed switch at anytime by running ${CYAN}chsh -s /usr/bin/<name of shell>${NC} then reboot"
     echo
     echo -e "${PURPLE}🖼️ Wallpaper Setup (Hyprpanel):${NC}"
-    print_status "• This will reload Hyprpanel and SWWW for fluid wallpaper application"
-    print_status "• Then through Hyprpanel's configuration interface in the ${CYAN}Theming${NC} section do the following:"
+    print_status "• Through Hyprpanel's configuration interface in the ${CYAN}Theming${NC} section do the following:"
     print_status "• Under ${YELLOW}General Settings${NC} choose a wallaper to apply where it says None"
     print_status "• Find default wallpapers check the ${CYAN}~/Pictures/HyprCandy${NC} or ${CYAN}HyprCandy${NC} folder"
     print_status "• Under ${YELLOW}Matugen Settings${NC} toggle the button to enable matugen color application"
@@ -1193,9 +1192,11 @@ main() {
     print_status "• You can also rerun the script to install Zsh shell"
     print_status "• When both are installed switch by running ${CYAN}chsh -s /usr/bin/<name of shell>${NC} then reboot"
     echo
+    echo -e "${PURPLE}🔎 Firefox:${NC}"
+    print_status "• Required packages are already installed. Just open firefox and install the "pywalfox" extension"
+    echo
     echo -e "${PURPLE}🏠 Clean Home Directory:${NC}"
-    print_status "• You can delete the ${CYAN}HyprCandy${NC} images folder since it's copied into ${CYAN}Pictures${NC}"
-    print_status "• The ${YELLOW}hyprcandyinstall${NC} folder can also be deleted since it only takes a few seconds to git clone again"
+    print_status "• You can delete any stowed symlinks made in the 'Home' directory"
     echo
     echo -e "${CYAN}════════════════════════════════════════════════════════════════════════════════════════════════════════════${NC}"
     
