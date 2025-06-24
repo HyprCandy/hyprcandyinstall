@@ -800,6 +800,12 @@ setup_hyprcandy() {
     # Remove present .zshrc file (removed .zshrc from list since it's now handled by the script) 
     rm -rf .face.icon .hyprcandy-zsh.zsh .icons HyprCandy
 
+    # Create the custom settings directory and file if it doesn't already exist 
+    if [ ! -d "$HOME/.config/hyprcustom" ]; then
+        mkdir -p "$HOME/.config/hyprcustom" && touch "$HOME/.config/hyprcustom/custom.conf"
+        echo "📂 Created the custom settings directory and 'custom.conf' file for your personal settings..."
+    fi
+
     # Ensure ~/.config exists, then remove specified subdirectories
     [ -d "$HOME/.config" ] || mkdir -p "$HOME/.config"
     cd "$HOME/.config" || exit 1
