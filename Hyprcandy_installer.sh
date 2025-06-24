@@ -903,6 +903,10 @@ cat > "$HOME/.config/hyprcandy/hooks/update_background.sh" << 'EOF'
 if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
     magick "$HOME/.config/background[0]" "$HOME/.config/background.png"
 fi
+sleep 1
+if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
+    sudo magick "$HOME/.config/background[0]" "/usr/share/sddm/themes/sugar-candy/Backgrounds/Mountain.jpg"
+fi
 EOF
 chmod +x "$HOME/.config/hyprcandy/hooks/update_background.sh"
 
