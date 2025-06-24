@@ -1029,6 +1029,20 @@ echo "✅ All set! The service is running and watching for changes."
     
     echo "✅ Sudoers entry added: $SUDOERS_ENTRY"
     
+    # 🎨 Update wlogout style.css with correct username
+    echo
+    echo "🎨 Updating wlogout style.css with current username..."
+    
+    WLOGOUT_STYLE="$HOME/.config/wlogout/style.css"
+    
+    if [ -f "$WLOGOUT_STYLE" ]; then
+        # Replace $USERNAME with actual username in the background image path
+        sed -i "s|\$USERNAME|$USERNAME|g" "$WLOGOUT_STYLE"
+        echo "✅ Updated wlogout style.css with username: $USERNAME"
+    else
+        echo "⚠️  wlogout style.css not found at $WLOGOUT_STYLE"
+    fi
+    
     # 🔄 Reload Hyprland
     echo
     echo "🔄 Reloading Hyprland with 'hyprctl reload'..."
