@@ -836,7 +836,7 @@ setup_hyprcandy() {
     config_dirs=(".face.icon" ".config" ".icons" ".hyprcandy-zsh.zsh")
 
     # Add files/folders to exclude from deletion
-    preserve_items=("HyprCandy")
+    preserve_items=("HyprCandy" ".git")
 
     if [ ${#config_dirs[@]} -eq 0 ]; then
         echo "❌ No configuration directories specified."
@@ -1172,12 +1172,13 @@ main() {
     print_status "• When both are installed switch at anytime by running ${CYAN}chsh -s /usr/bin/<name of shell>${NC} then reboot"
     echo
     echo -e "${PURPLE}🖼️ Wallpaper Setup (Hyprpanel):${NC}"
-    print_status "• On the firt login post reboot after running the script, use the keybind ${YELLOW}SUPER + H${NC}"
     print_status "• This will reload Hyprpanel and SWWW for fluid wallpaper application"
     print_status "• Then through Hyprpanel's configuration interface in the ${CYAN}Theming${NC} section do the following:"
     print_status "• Under ${YELLOW}General Settings${NC} choose a wallaper to apply where it says None"
     print_status "• Find default wallpapers check the ${CYAN}~/Pictures/HyprCandy${NC} or ${CYAN}HyprCandy${NC} folder"
     print_status "• Under ${YELLOW}Matugen Settings${NC} toggle the button to enable matugen color application"
+    print_status "• If the wallpaper doesn't apply through the configuration interface, then toggle the button to apply wallpapers"
+    print_status "• Ths will quickly reset swww and apply the background"
     echo
     echo -e "${PURPLE}🎨 Font, Icon And Cursor Theming:${NC}"
     print_status "• Open the application-finder with SUPER + A and search for ${YELLOW}GTK Settings${NC} application"
