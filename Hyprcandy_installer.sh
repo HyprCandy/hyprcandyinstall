@@ -803,7 +803,7 @@ setup_hyprcandy() {
     # Create the custom settings directory and file if it doesn't already exist 
     if [ ! -d "$HOME/.config/hyprcustom" ]; then
         mkdir -p "$HOME/.config/hyprcustom" && touch "$HOME/.config/hyprcustom/custom.conf"
-        echo "📂 Created the custom settings directory and 'custom.conf' file for your personal settings..."
+        echo "📁 Created the custom settings directory and 'custom.conf' file for your personal settings..."
     fi
 
     # Ensure ~/.config exists, then remove specified subdirectories
