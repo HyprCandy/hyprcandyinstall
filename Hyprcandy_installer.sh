@@ -940,7 +940,7 @@ chmod +x "$HOME/.config/hyprcandy/hooks/watch_background.sh"
 ### 🔧 Create background-watcher.service
 cat > "$HOME/.config/systemd/user/background-watcher.service" << 'EOF'
 [Unit]
-Description=Watch ~/.config/background, clear swww cache, update PNG, reload dock
+Description=Watch ~/.config/background, clear swww cache and update background images
 After=graphical-session.target
 
 [Service]
@@ -1018,11 +1018,15 @@ echo "✅ All set! The service is running and watching for changes."
     # Get the current username
     USERNAME=$(whoami)
     
-    # Create the sudoers entry for background script
-    SUDOERS_ENTRY="$USERNAME ALL=(ALL) NOPASSWD: $HOME/.config/hyprcandy/hooks/update_background.sh"
+    # Create the sudoers entries for background script and required commands
+    SUDOERS_ENTRIES=(
+        "$USERNAME ALL=(ALL) NOPASSWD: $HOME/.config/hyprcandy/hooks/update_background.sh"
+        "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/magick * /usr/share/sddm/themes/sugar-candy/Backgrounds/Mountain.jpg"
+        "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/cp * /usr/share/sddm/themes/sugar-candy/Backgrounds/Mountain.jpg"
+    )
     
-    # Add the entry to sudoers safely using visudo
-    echo "$SUDOERS_ENTRY" | sudo EDITOR='tee -a' visudo -f /etc/sudoers.d/hyprcandy-background
+    # Add all entries to sudoers safely using visudo
+    printf '%s\n' "${SUDOERS_ENTRIES[@]}" | sudo EDITOR='tee -a' visudo -f /etc/sudoers.d/hyprcandy-background
     
     # Set proper permissions on the sudoers file
     sudo chmod 440 /etc/sudoers.d/hyprcandy-background
