@@ -281,9 +281,10 @@ build_package_list() {
         "pyprland"
         "inotify-tools"
         
-        # Fonts
+        # Fonts and emojis
         "nerd-fonts"
         "powerline-fonts"
+        "noto-fonts-emoji"
         "awesome-terminal-fonts"
         
         # Clipboard
