@@ -285,6 +285,7 @@ build_package_list() {
         "nerd-fonts"
         "powerline-fonts"
         "noto-fonts-emoji"
+        "noto-color-emoji-fonconfig"
         "awesome-terminal-fonts"
         
         # Clipboard
