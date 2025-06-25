@@ -71,8 +71,8 @@ print_error() {
 # Function to choose display manager
 choose_display_manager() {
     print_status "Choose your display manager:"
-    echo "1) SDDM with Sugar Candy theme (Recommended for Hyprland)"
-    echo "2) GDM with settings (GNOME Display Manager)"
+    echo "1) SDDM with Sugar Candy theme (HyprCandy automatic background set according to applied wallpaper)"
+    echo "2) GDM with GDM settings app (GNOME Display Manager and customization app)"
     echo
     
     while true; do
@@ -82,13 +82,13 @@ choose_display_manager() {
             1)
                 DISPLAY_MANAGER="sddm"
                 DISPLAY_MANAGER_SERVICE="sddm"
-                print_status "Selected SDDM with Sugar Candy theme"
+                print_status "Selected SDDM with Sugar Candy theme and HyprCandy automatic background setting"
                 break
                 ;;
             2)
                 DISPLAY_MANAGER="gdm"
                 DISPLAY_MANAGER_SERVICE="gdm"
-                print_status "Selected GDM with settings"
+                print_status "Selected GDM with GDM settings app"
                 break
                 ;;
             *)
