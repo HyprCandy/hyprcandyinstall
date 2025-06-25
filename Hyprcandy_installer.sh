@@ -1243,7 +1243,7 @@ main() {
     print_status "• When both are installed switch by running ${CYAN}chsh -s /usr/bin/<name of shell>${NC} then reboot"
     echo
     echo -e "${PURPLE}🔎 Firefox:${NC}"
-    print_status "• Required packages are already installed. Just open firefox and install the "pywalfox" extension"
+    print_status "• Required packages are already installed. Just open firefox, install the ${YELLOW}pywalfox${NC} extension and run ${YELLOW}pywalfox update${NC} in kitty"
     echo
     echo -e "${PURPLE}🏠 Clean Home Directory:${NC}"
     print_status "• You can delete any stowed symlinks made in the 'Home' directory"
