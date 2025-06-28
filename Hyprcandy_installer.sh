@@ -984,12 +984,134 @@ Restart=on-failure
 WantedBy=default.target
 EOF
 
+### 🎮 Create hyprpanel_idle_monitor.sh
+cat > "$HOME/.config/hyprcandy/hooks/hyprpanel_idle_monitor.sh" << 'EOF'
+#!/bin/bash
+
+# Script to monitor hyprpanel and manage idle inhibitor accordingly
+# When hyprpanel is not running, enable idle inhibitor
+# When hyprpanel is running, disable idle inhibitor (only our own, not hyprpanel's)
+
+IDLE_INHIBITOR_PID=""
+CHECK_INTERVAL=5  # Check every 5 seconds
+INHIBITOR_WHO="HyprCandy-Monitor"  # Unique identifier for our inhibitor
+
+# Function to check if hyprpanel has its own idle inhibitor active
+has_hyprpanel_inhibitor() {
+    # Check for existing systemd-inhibit processes that might be from hyprpanel
+    # Look for inhibitors with "hyprpanel" or similar in the why/who field
+    systemd-inhibit --list 2>/dev/null | grep -i "hyprpanel\|panel" >/dev/null 2>&1
+}
+
+# Function to check if our specific inhibitor is running
+has_our_inhibitor() {
+    systemd-inhibit --list 2>/dev/null | grep "$INHIBITOR_WHO" >/dev/null 2>&1
+}
+
+# Function to start idle inhibitor (only if hyprpanel doesn't have one)
+start_idle_inhibitor() {
+    # Don't start our inhibitor if hyprpanel already has one active
+    if has_hyprpanel_inhibitor; then
+        echo "$(date): Hyprpanel appears to have its own idle inhibitor active, not starting ours"
+        return
+    fi
+    
+    # Don't start if our inhibitor is already running
+    if has_our_inhibitor; then
+        echo "$(date): Our idle inhibitor is already active"
+        return
+    fi
+    
+    if [ -z "$IDLE_INHIBITOR_PID" ] || ! kill -0 "$IDLE_INHIBITOR_PID" 2>/dev/null; then
+        echo "$(date): Starting idle inhibitor..."
+        systemd-inhibit --what=idle --who="$INHIBITOR_WHO" --why="Hyprpanel not running" sleep infinity &
+        IDLE_INHIBITOR_PID=$!
+        echo "$(date): Idle inhibitor started with PID: $IDLE_INHIBITOR_PID"
+    fi
+}
+
+# Function to stop our idle inhibitor (only our own, never hyprpanel's)
+stop_idle_inhibitor() {
+    if [ -n "$IDLE_INHIBITOR_PID" ] && kill -0 "$IDLE_INHIBITOR_PID" 2>/dev/null; then
+        echo "$(date): Stopping our idle inhibitor..."
+        kill "$IDLE_INHIBITOR_PID"
+        IDLE_INHIBITOR_PID=""
+        echo "$(date): Our idle inhibitor stopped"
+    fi
+}
+
+# Function to check if hyprpanel is running
+is_hyprpanel_running() {
+    pgrep -f "hyprpanel" >/dev/null 2>&1
+}
+
+# Cleanup function
+cleanup() {
+    echo "$(date): Cleaning up..."
+    stop_idle_inhibitor
+    exit 0
+}
+
+# Set up signal handlers
+trap cleanup SIGTERM SIGINT
+
+echo "$(date): Starting hyprpanel idle monitor..."
+echo "$(date): Will only manage our own inhibitor (WHO=$INHIBITOR_WHO)"
+
+# Main monitoring loop
+while true; do
+    if is_hyprpanel_running; then
+        # Hyprpanel is running, stop our idle inhibitor if it's running
+        # (hyprpanel can manage its own inhibitor)
+        if [ -n "$IDLE_INHIBITOR_PID" ] && kill -0 "$IDLE_INHIBITOR_PID" 2>/dev/null; then
+            echo "$(date): Hyprpanel detected, stopping our idle inhibitor"
+            stop_idle_inhibitor
+        fi
+    else
+        # Hyprpanel is not running, start our idle inhibitor if needed
+        # But only if hyprpanel doesn't have its own inhibitor still active
+        if [ -z "$IDLE_INHIBITOR_PID" ] || ! kill -0 "$IDLE_INHIBITOR_PID" 2>/dev/null; then
+            if ! has_hyprpanel_inhibitor; then
+                echo "$(date): Hyprpanel not detected and no hyprpanel inhibitor found, starting our idle inhibitor"
+                start_idle_inhibitor
+            else
+                echo "$(date): Hyprpanel not running but hyprpanel inhibitor still active, waiting..."
+            fi
+        fi
+    fi
+    
+    sleep "$CHECK_INTERVAL"
+done
+EOF
+chmod +x "$HOME/.config/hyprcandy/hooks/hyprpanel_idle_monitor.sh"
+
+### 🔧 Create hyprpanel-idle-monitor.service
+cat > "$HOME/.config/systemd/user/hyprpanel-idle-monitor.service" << 'EOF'
+[Unit]
+Description=Monitor hyprpanel and manage idle inhibitor
+After=graphical-session.target
+Wants=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=%h/.config/hyprcandy/hooks/hyprpanel_idle_monitor.sh
+Restart=always
+RestartSec=10
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStopSec=10
+
+[Install]
+WantedBy=default.target
+EOF
+
 ### 🔄 Reload and enable services
-echo "🔄 Reloading and enabling the wallpaper service..."
+echo "🔄 Reloading and enabling services..."
 systemctl --user daemon-reexec
 systemctl --user daemon-reload
 systemctl --user enable --now background-watcher.service &>/dev/null
-echo "✅ All set! The service is running and watching for changes."
+systemctl --user enable --now hyprpanel-idle-monitor.service &>/dev/null
+echo "✅ All set! Both services are running and monitoring for changes."
 
     # 🛠️ GNOME Window Button Layout Adjustment
     echo
