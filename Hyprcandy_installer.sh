@@ -1089,8 +1089,10 @@ chmod +x "$HOME/.config/hyprcandy/hooks/hyprpanel_idle_monitor.sh"
 cat > "$HOME/.config/systemd/user/hyprpanel-idle-monitor.service" << 'EOF'
 [Unit]
 Description=Monitor gjs and manage idle inhibitor
-After=graphical-session.target
+After=graphical-session.target hyprland-session.target
 Wants=graphical-session.target
+PartOf=graphical-session.target
+Requisite=graphical-session.target
 
 [Service]
 Type=simple
@@ -1102,7 +1104,7 @@ KillSignal=SIGTERM
 TimeoutStopSec=10
 
 [Install]
-WantedBy=default.target
+WantedBy=graphical-session.target
 EOF
 
 ### 🔄 Reload and enable services
