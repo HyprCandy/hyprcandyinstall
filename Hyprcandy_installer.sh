@@ -1042,7 +1042,7 @@ stop_idle_inhibitor() {
 
 # Function to check if hyprpanel is running
 is_hyprpanel_running() {
-    pgrep -f "hyprpanel" >/dev/null 2>&1
+    pgrep -f "gjs" > /dev/null 2>&1
 }
 
 # Cleanup function
@@ -1088,7 +1088,7 @@ chmod +x "$HOME/.config/hyprcandy/hooks/hyprpanel_idle_monitor.sh"
 ### 🔧 Create hyprpanel-idle-monitor.service
 cat > "$HOME/.config/systemd/user/hyprpanel-idle-monitor.service" << 'EOF'
 [Unit]
-Description=Monitor hyprpanel and manage idle inhibitor
+Description=Monitor gjs and manage idle inhibitor
 After=graphical-session.target
 Wants=graphical-session.target
 
