@@ -918,14 +918,14 @@ fi
 
 sleep 1
 
-# Restart portal
-
+# Restart portals
 # Setup Timers
 _sleep1="1"
 _sleep2="2"
 _sleep3="3"
 
 # Kill all possible running xdg-desktop-portals
+killall -e xdg-desktop-portal-hyprland
 killall -e xdg-desktop-portal-gtk
 killall -e xdg-desktop-portal
 
@@ -936,16 +936,19 @@ sleep $_sleep1
 # Stop all services
 systemctl --user stop xdg-desktop-portal
 systemctl --user stop xdg-desktop-portal-gtk
+systemctl --user stop xdg-desktop-portal-hyprland
 sleep $_sleep2
 
 # Start xdg-desktop-portal-hyprland
 /usr/lib/xdg-desktop-portal &
 /usr/lib/xdg-desktop-portal-gtk &
+/usr/lib/xdg-desktop-portal-hyprland &
 sleep $_sleep3
 
 # Start required services
 systemctl --user start xdg-desktop-portal
 systemctl --user start xdg-desktop-portal-gtk
+systemctl --user start xdg-desktop-portal-hyprland
 EOF
 chmod +x "$HOME/.config/hyprcandy/hooks/update_background.sh"
 
