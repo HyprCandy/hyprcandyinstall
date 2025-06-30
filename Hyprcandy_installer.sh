@@ -1161,7 +1161,7 @@ echo "✅ All set! Both services are running and monitoring for changes."
     cd "$HOME" || exit 1
 
     # 📂 Step 3: Copy new grid.svg from custom SVG folder
-    SVG_SOURCE="$HOME/Pictures/HyprCandy/SVGs/grid.svg"
+    SVG_SOURCE="$HOME/Pictures/HyprCandy/Dock-SVGs/grid.svg"
     SVG_DEST="/usr/share/nwg-dock-hyprland/images"
 
     if [ -f "$SVG_SOURCE" ]; then
