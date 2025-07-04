@@ -1611,22 +1611,6 @@ decoration {
     end
 end
 
-    # Execute the appropriate function based on the detected shell
-    case "$CURRENT_SHELL" in
-        "fish")
-            echo "🐟 Detected Fish shell - using Fish syntax"
-            create_custom_fish
-            ;;
-        "bash"|"zsh"|"dash"|"sh")
-            echo "🐚 Detected $CURRENT_SHELL shell - using Bash-compatible syntax"
-            create_custom_bash
-            ;;
-        *)
-            echo "⚠️  Unknown shell: $CURRENT_SHELL - defaulting to Bash-compatible syntax"
-            create_custom_bash
-            ;;
-    esac
-
 # Function to setup keyboard layout
 setup_keyboard_layout() {
     # Keyboard layout selection
