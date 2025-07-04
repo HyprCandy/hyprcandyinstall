@@ -774,43 +774,11 @@ EOF
     
     print_success "Zsh shell configuration completed!"
 }
-    
-# Function to automatically setup Hyprcandy configuration
-setup_hyprcandy() {
-    print_status "Setting up Hyprcandy configuration..."
-    
-    # Check if stow is available
-    if ! command -v stow &> /dev/null; then
-        print_error "stow is not installed. Cannot proceed with configuration setup."
-        return 1
-    fi
-    
-    # In case of updates, remove existing .hyprcandy folder before cloning
-    if [ -d "$HOME/.hyprcandy" ]; then
-        echo "🗑️  Removing existing .hyprcandy folder to clone updated dotfiles..."
-        rm -rf "$HOME/.hyprcandy"
-        sleep 2
-    else
-        echo "✅ .hyprcandy dotfiles folder doesn't exist — seems to be a fresh install."
-        sleep 2
-    fi
 
-    # Clone Hyprcandy repository
-    hyprcandy_dir="$HOME/.hyprcandy"
-    echo "🌐 Cloning Hyprcandy repository into $hyprcandy_dir..."
-    git clone https://github.com/HyprCandy/Hyprcandy.git "$hyprcandy_dir"
-
-    
-    # Go to the home directory
-    cd "$HOME"
-
-    # Remove present .zshrc file (removed .zshrc from list since it's now handled by the script) 
-    rm -rf .face.icon .hyprcandy-zsh.zsh .icons HyprCandy
-
-    # Detect the current shell
+# Detect the current shell
     CURRENT_SHELL=$(basename "$SHELL")
     
-    # Function to create custom settings for bash-compatible shells (bash, zsh, dash)
+ # Function to create custom settings for bash-compatible shells (bash, zsh, dash)
     create_custom_bash() {
         # Create the custom settings directory and file if it doesn't already exist
         if [ ! -d "$HOME/.config/hyprcustom" ]; then
@@ -1134,6 +1102,8 @@ decoration {
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 # ┃                      Window & layer rules                   ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ ' > "$HOME/.config/hyprcustom/custom.conf"
+    end
+}
     
     # Execute the appropriate function based on the detected shell
     case "$CURRENT_SHELL" in
@@ -1315,6 +1285,39 @@ decoration {
                 ;;
         esac
     done
+}
+    
+# Function to automatically setup Hyprcandy configuration
+setup_hyprcandy() {
+    print_status "Setting up Hyprcandy configuration..."
+    
+    # Check if stow is available
+    if ! command -v stow &> /dev/null; then
+        print_error "stow is not installed. Cannot proceed with configuration setup."
+        return 1
+    fi
+    
+    # In case of updates, remove existing .hyprcandy folder before cloning
+    if [ -d "$HOME/.hyprcandy" ]; then
+        echo "🗑️  Removing existing .hyprcandy folder to clone updated dotfiles..."
+        rm -rf "$HOME/.hyprcandy"
+        sleep 2
+    else
+        echo "✅ .hyprcandy dotfiles folder doesn't exist — seems to be a fresh install."
+        sleep 2
+    fi
+
+    # Clone Hyprcandy repository
+    hyprcandy_dir="$HOME/.hyprcandy"
+    echo "🌐 Cloning Hyprcandy repository into $hyprcandy_dir..."
+    git clone https://github.com/HyprCandy/Hyprcandy.git "$hyprcandy_dir"
+
+    
+    # Go to the home directory
+    cd "$HOME"
+
+    # Remove present .zshrc file (removed .zshrc from list since it's now handled by the script) 
+    rm -rf .face.icon .hyprcandy-zsh.zsh .icons HyprCandy
     
     # Apply the keyboard layout to custom.conf
     if [ -f "$HOME/.config/hyprcustom/custom.conf" ]; then
@@ -1732,8 +1735,7 @@ echo "✅ All set! Both services are running and monitoring for changes."
         echo "⚠️  'hyprctl' not found. Skipping Hyprland reload."
     fi
 
-    print_success "HyprCandy configuration setup completed!"
- fi   
+    print_success "HyprCandy configuration setup completed!"  
 }
 
 # Function to enable display manager and prompt for reboot
