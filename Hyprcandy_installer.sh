@@ -804,10 +804,40 @@ setup_hyprcandy() {
     rm -rf .face.icon .hyprcandy-zsh.zsh .icons HyprCandy
 
     # Create the custom settings directory and file if it doesn't already exist 
-    if [ ! -d "$HOME/.config/hyprcustom" ]; then
-        mkdir -p "$HOME/.config/hyprcustom" && touch "$HOME/.config/hyprcustom/custom.conf"
-        echo "📁 Created the custom settings directory and 'custom.conf' file for your personal settings..."
-    fi
+if [ ! -d "$HOME/.config/hyprcustom" ]; then
+    mkdir -p "$HOME/.config/hyprcustom" && touch "$HOME/.config/hyprcustom/custom.conf"
+    echo "📁 Created the custom settings directory and 'custom.conf' file for your personal settings..."
+    
+    # Add default content to the custom.conf file
+    cat > "$HOME/.config/hyprcustom/custom.conf" << 'EOF'
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                         Env-variables                       ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+# After using nwg-look, also change the cursor settings here to maintain changes after every reboot
+env = XCURSOR_THEME,Bibata-Modern-Classic
+env = XCURSOR_SIZE,18
+env = HYPRCURSOR_THEME,Bibata-Modern-Classic
+env = HYPRCURSOR_SIZE,18
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                         Keybindings                         ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+#### $ ####
+
+$mainMod = SUPER
+$HYPRSCRIPTS = ~/.config/hypr/scripts
+$SCRIPTS = ~/.config/hyprcandy/scripts
+$EDITOR = gedit # Change from the default editor to your prefered editor
+#$DISCORD = equibop
+
+#### Applications ####
+#bind = $mainMod CTRL, S, exec, spotify
+#bind = $mainMod, D, exec, $DISCORD
+#bind = $mainMod, W, exec, warp-terminal 
+EOF
+fi
 
     # Ensure ~/.config exists, then remove specified subdirectories
     [ -d "$HOME/.config" ] || mkdir -p "$HOME/.config"
