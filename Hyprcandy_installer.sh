@@ -820,6 +820,22 @@ setup_hyprcandy() {
             # Add default content to the custom.conf file
             cat > "$HOME/.config/hyprcustom/custom.conf" << 'EOF'
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                           Autostart                         ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                           Animations                        ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+source = ~/.config/hypr/conf/animations/silent.conf
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                        Hypraland-colors                     ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+source = ~/.config/hypr/colors.conf
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 # ┃                         Env-variables                       ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
@@ -869,7 +885,91 @@ input {
         # clickfinger_behavior = false
         scroll_factor = 1.0  # Touchpad scroll factor
     }
-    sensitivity = 0 # Pointer speed: -1.0 - 1.0, 0 means no modification. 
+    sensitivity = 0 # Pointer speed: -1.0 - 1.0, 0 means no modification.
+}
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                             Layout                          ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+general {
+    gaps_in = 2
+    gaps_out = 6
+    border_size = 2
+    col.active_border = $primary $source_color $source_color $primary 90deg
+    col.inactive_border = $background
+    layout = dwindle
+    resize_on_border = true
+    allow_tearing = true
+}
+
+group:groupbar:col.active = $primary
+group:groupbar:col.inactive = $source_color
+
+dwindle {
+    pseudotile = true
+    preserve_split = true
+}
+
+master {
+    new_status = slave
+    new_on_active = after
+    smart_resizing = true
+    drop_at_cursor = true
+}
+
+gestures {
+  workspace_swipe = true
+  workspace_swipe_fingers = 3
+  workspace_swipe_distance = 500
+  workspace_swipe_invert = true
+  workspace_swipe_min_speed_to_force = 30
+  workspace_swipe_cancel_ratio = 0.5
+  workspace_swipe_create_new = true
+  workspace_swipe_forever = true
+}
+
+binds {
+  workspace_back_and_forth = true
+  allow_workspace_cycles = true
+  pass_mouse_when_bound = false
+}
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                          Decorations                        ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+decoration {
+    rounding = 10
+    rounding_power = 2
+    active_opacity = 0.85
+    inactive_opacity = 0.85
+    fullscreen_opacity = 1.0
+
+    blur {
+    enabled = true
+    size = 2
+    passes = 4
+    new_optimizations = on
+    ignore_opacity = true
+    xray = false
+    vibrancy = 0.1696
+    noise = 0.01
+    popups = true
+    popups_ignorealpha = 0.8
+    }
+
+    shadow {
+        enabled = false
+        range = 15
+        render_power = 4
+        color = 0x66000000
+    }
+}
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                      Window & layer rules                   ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 EOF
         fi
     }
@@ -883,6 +983,22 @@ EOF
             
             # Add default content to the custom.conf file
             echo '
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                           Autostart                         ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                           Animations                        ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+source = ~/.config/hypr/conf/animations/silent.conf
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                        Hypraland-colors                     ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+source = ~/.config/hypr/colors.conf
+
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 # ┃                           Env-variables                     ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
@@ -933,7 +1049,91 @@ input {
         # clickfinger_behavior = false
         scroll_factor = 1.0  # Touchpad scroll factor
     }
-    sensitivity = 0 # Pointer speed: -1.0 - 1.0, 0 means no modification. ' > "$HOME/.config/hyprcustom/custom.conf"
+    sensitivity = 0 # Pointer speed: -1.0 - 1.0, 0 means no modification.
+}
+    
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                             Layout                          ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+general {
+    gaps_in = 2
+    gaps_out = 6
+    border_size = 2
+    col.active_border = $primary $source_color $source_color $primary 90deg
+    col.inactive_border = $background
+    layout = dwindle
+    resize_on_border = true
+    allow_tearing = true
+}
+
+group:groupbar:col.active = $primary
+group:groupbar:col.inactive = $source_color
+
+dwindle {
+    pseudotile = true
+    preserve_split = true
+}
+
+master {
+    new_status = slave
+    new_on_active = after
+    smart_resizing = true
+    drop_at_cursor = true
+}
+
+gestures {
+  workspace_swipe = true
+  workspace_swipe_fingers = 3
+  workspace_swipe_distance = 500
+  workspace_swipe_invert = true
+  workspace_swipe_min_speed_to_force = 30
+  workspace_swipe_cancel_ratio = 0.5
+  workspace_swipe_create_new = true
+  workspace_swipe_forever = true
+}
+
+binds {
+  workspace_back_and_forth = true
+  allow_workspace_cycles = true
+  pass_mouse_when_bound = false
+}
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                          Decorations                        ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+decoration {
+    rounding = 10
+    rounding_power = 2
+    active_opacity = 0.85
+    inactive_opacity = 0.85
+    fullscreen_opacity = 1.0
+
+    blur {
+    enabled = true
+    size = 2
+    passes = 4
+    new_optimizations = on
+    ignore_opacity = true
+    xray = false
+    vibrancy = 0.1696
+    noise = 0.01
+    popups = true
+    popups_ignorealpha = 0.8
+    }
+
+    shadow {
+        enabled = false
+        range = 15
+        render_power = 4
+        color = 0x66000000
+    }
+}
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                      Window & layer rules                   ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ ' > "$HOME/.config/hyprcustom/custom.conf"
         end
     }
     
@@ -1126,8 +1326,6 @@ input {
     else
         print_warning "custom.conf file not found. Keyboard layout not applied."
     fi
-
-    cd "$HOME"
 
     # Ensure ~/.config exists, then remove specified subdirectories
     [ -d "$HOME/.config" ] || mkdir -p "$HOME/.config"
@@ -1694,7 +1892,7 @@ main() {
     print_status "• Launch it from the application menu or run: ${CYAN}nwg-displays${NC}"
     print_status "• Adjust scaling for HiDPI displays if needed"
     echo
-    echo -e "${PURPLE}🐚 Zsh Configuration:${NC}"
+    echo -e "${PURPLE}🪄 Zsh Configuration:${NC}"
     print_status "• IMPORTANT: If you chose Zsh-shell then use ${CYAN}SUPER + Q${NC} to toggle Kitty and go through the Zsh setup"
     print_status "• IMPORTANT: (Remember to type ${YELLOW}n${NC}o at the end when asked to Apply changes to .zshrc since HyprCandy already has them applied)"
     print_status "• To configure Zsh, in the ${CYAN}Home${NC} directory edit ${CYAN}.hyprcandy-zsh.zsh${NC} or ${CYAN}.zshrc${NC}"
