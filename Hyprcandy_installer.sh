@@ -777,10 +777,12 @@ EOF
 
 # Function to setup default "custom.conf" file
 setup_custom_file() {
-    # Detect the current shell
+# Detect the current shell
     CURRENT_SHELL=$(basename "$SHELL")
+    
+    # Function to create custom settings for bash-compatible shells (bash, zsh, dash)
+    create_custom_bash() {
         # Create the custom settings directory and file if it doesn't already exist
-        custom_zsh() {
         if [ ! -d "$HOME/.config/hyprcustom" ]; then
             mkdir -p "$HOME/.config/hyprcustom" && touch "$HOME/.config/hyprcustom/custom.conf"
             echo "📁 Created the custom settings directory and 'custom.conf' file for your personal settings..."
@@ -938,11 +940,14 @@ decoration {
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 # ┃                      Window & layer rules                   ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
 EOF
         fi
-        }
+    }
+    
+    # Function to create custom settings for fish shell
+    create_custom_fish() {
         # Create the custom settings directory and file if it doesn't already exist
-        custom_fish() {
         if not test -d "$HOME/.config/hyprcustom"
             mkdir -p "$HOME/.config/hyprcustom"
             echo "📁 Created the custom settings directory and 'custom.conf' file for your personal settings..."
@@ -966,7 +971,7 @@ source = ~/.config/hypr/conf/animations/silent.conf
 source = ~/.config/hypr/colors.conf
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                           Env-variables                     ┃
+# ┃                         Env-variables                       ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 # After using nwg-look, also change the cursor settings here to maintain changes after every reboot
@@ -990,7 +995,7 @@ $EDITOR = gedit # Change from the default editor to your prefered editor
 #### Applications ####
 #bind = $mainMod CTRL, S, exec, spotify
 #bind = $mainMod, D, exec, $DISCORD
-#bind = $mainMod, W, exec, warp-terminal 
+#bind = $mainMod, W, exec, warp-terminal
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 # ┃                           Keyboard                          ┃
@@ -1017,7 +1022,7 @@ input {
     }
     sensitivity = 0 # Pointer speed: -1.0 - 1.0, 0 means no modification.
 }
-    
+
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 # ┃                             Layout                          ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
@@ -1099,10 +1104,9 @@ decoration {
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 # ┃                      Window & layer rules                   ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ 
-' > "$HOME/.config/hyprcustom/custom.conf"
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ ' > "$HOME/.config/hyprcustom/custom.conf"
         end
-        }
+    }
 
     # Execute the appropriate function based on the detected shell
     case "$CURRENT_SHELL" in
