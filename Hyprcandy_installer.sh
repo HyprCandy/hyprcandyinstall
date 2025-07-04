@@ -1213,17 +1213,6 @@ echo "✅ All set! Both services are running and monitoring for changes."
     else
         echo "⚠️  wlogout style.css not found at $WLOGOUT_STYLE"
     fi
-    
-    # 🔄 Reload Hyprland
-    echo
-    echo "🔄 Reloading Hyprland with 'hyprctl reload'..."
-    if command -v hyprctl > /dev/null 2>&1; then
-        hyprctl reload && echo "✅ Hyprland reloaded successfully." || echo "❌ Failed to reload Hyprland."
-    else
-        echo "⚠️  'hyprctl' not found. Skipping Hyprland reload."
-    fi
-
-    print_success "HyprCandy configuration setup completed!"  
 }
 
 # Function to enable display manager and prompt for reboot
@@ -1614,6 +1603,17 @@ setup_keyboard_layout() {
         print_error "Custom config file not found at $CUSTOM_CONFIG_FILE"
         print_error "Please run setup_custom_config() first"
     fi
+
+        # 🔄 Reload Hyprland
+    echo
+    echo "🔄 Reloading Hyprland with 'hyprctl reload'..."
+    if command -v hyprctl > /dev/null 2>&1; then
+        hyprctl reload && echo "✅ Hyprland reloaded successfully." || echo "❌ Failed to reload Hyprland."
+    else
+        echo "⚠️  'hyprctl' not found. Skipping Hyprland reload."
+    fi
+
+    print_success "HyprCandy configuration setup completed!"  
 }
 
 # Function to prompt for reboot
