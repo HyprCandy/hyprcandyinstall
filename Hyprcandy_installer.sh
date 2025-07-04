@@ -1118,7 +1118,7 @@ WantedBy=graphical-session.target
 EOF
 
 ### 🔄 Reload and enable services
-echo "🔄 Reloading and enabling services..."
+echo "🔄 Reloading and enabling background-watcher.service to generate backgrounds and hyprpanel-idle-monitor.service for idle-inibitor configuration depending on hyprpanel status..."
 systemctl --user daemon-reexec
 systemctl --user daemon-reload
 systemctl --user enable --now background-watcher.service &>/dev/null
