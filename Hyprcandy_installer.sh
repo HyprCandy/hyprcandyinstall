@@ -1602,7 +1602,8 @@ decoration {
 # ┃                      Window & layer rules                   ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛' > "$HOME/.config/hyprcustom/custom.conf"
         end
-    }
+    end
+}
 
     # Call the appropriate function based on the detected shell
     if [ "$CURRENT_SHELL" = "bash" ] || [ "$CURRENT_SHELL" = "zsh" ] || [ "$CURRENT_SHELL" = "dash" ]; then
