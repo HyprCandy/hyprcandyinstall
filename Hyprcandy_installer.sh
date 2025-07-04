@@ -774,12 +774,19 @@ EOF
     
     print_success "Zsh shell configuration completed!"
 }
-
-# Detect the current shell
-    CURRENT_SHELL=$(basename "$SHELL")
     
- # Function to create custom settings for bash-compatible shells (bash, zsh, dash)
-    create_custom_bash() {
+# Function to automatically setup Hyprcandy configuration
+setup_hyprcandy() {
+    print_status "Setting up Hyprcandy configuration..."
+    
+    # Check if stow is available
+    if ! command -v stow &> /dev/null; then
+        print_error "stow is not installed. Cannot proceed with configuration setup."
+        return 1
+    fi
+
+    # Detect the current shell
+    CURRENT_SHELL=$(basename "$SHELL")
         # Create the custom settings directory and file if it doesn't already exist
         if [ ! -d "$HOME/.config/hyprcustom" ]; then
             mkdir -p "$HOME/.config/hyprcustom" && touch "$HOME/.config/hyprcustom/custom.conf"
@@ -940,10 +947,7 @@ decoration {
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 EOF
         fi
-    }
-    
-    # Function to create custom settings for fish shell
-    create_custom_fish() {
+        
         # Create the custom settings directory and file if it doesn't already exist
         if not test -d "$HOME/.config/hyprcustom"
             mkdir -p "$HOME/.config/hyprcustom"
@@ -1283,16 +1287,6 @@ decoration {
                 ;;
         esac
     done
-    
-# Function to automatically setup Hyprcandy configuration
-setup_hyprcandy() {
-    print_status "Setting up Hyprcandy configuration..."
-    
-    # Check if stow is available
-    if ! command -v stow &> /dev/null; then
-        print_error "stow is not installed. Cannot proceed with configuration setup."
-        return 1
-    fi
     
     # In case of updates, remove existing .hyprcandy folder before cloning
     if [ -d "$HOME/.hyprcandy" ]; then
