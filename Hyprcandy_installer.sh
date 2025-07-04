@@ -1614,7 +1614,7 @@ setup_keyboard_layout() {
             echo "ℹ️  Hyprland is not currently running. Configuration will be applied on next start and Hyprland login."
         fi
     else
-        echo "⚠️  'hyprctl' not found. Skipping Hyprland. Configuration will be applied on next start and Hyprland login."
+        echo "⚠️  'hyprctl' not found. Skipping Hyprland reload. Run 'hyprctl reload' on next start and Hyprland login."
     fi
 
     print_success "HyprCandy configuration setup completed!"  
