@@ -512,7 +512,7 @@ format = "⏱️ [$duration]($style) "
 style = "yellow"
 
 [jobs]
-symbol = "+ "
+symbol = "⚡ "
 style = "bold blue"
 EOF
         
@@ -689,7 +689,7 @@ format = "⏱️ [$duration]($style) "
 style = "yellow"
 
 [jobs]
-symbol = "+ "
+symbol = "⚡ "
 style = "bold blue"
 EOF
         
