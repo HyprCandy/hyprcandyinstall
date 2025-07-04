@@ -776,7 +776,6 @@ EOF
 }
 
 # Function to setup default "custom.conf" file
-setup_custom_file() {
     # Detect the current shell
     CURRENT_SHELL=$(basename "$SHELL")
     
