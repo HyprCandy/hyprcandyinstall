@@ -1733,6 +1733,7 @@ echo "✅ All set! Both services are running and monitoring for changes."
     fi
 
     print_success "HyprCandy configuration setup completed!"
+ fi   
 }
 
 # Function to enable display manager and prompt for reboot
