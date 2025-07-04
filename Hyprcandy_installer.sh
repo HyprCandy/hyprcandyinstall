@@ -777,7 +777,7 @@ EOF
 
 # Function to setup default "custom.conf" file
 setup_custom_file() {
-# Detect the current shell
+    # Detect the current shell
     CURRENT_SHELL=$(basename "$SHELL")
     
     # Function to create custom settings for bash-compatible shells (bash, zsh, dash)
@@ -940,20 +940,19 @@ decoration {
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 # ┃                      Window & layer rules                   ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
 EOF
         fi
     }
     
-    # Function to create custom settings for fish shell
-    create_custom_fish() {
-        # Create the custom settings directory and file if it doesn't already exist
-        if not test -d "$HOME/.config/hyprcustom"
-            mkdir -p "$HOME/.config/hyprcustom"
-            echo "📁 Created the custom settings directory and 'custom.conf' file for your personal settings..."
-            
-            # Add default content to the custom.conf file
-            echo '
+# Function to create custom settings for fish shell
+function create_custom_fish
+    # Create the custom settings directory and file if it doesn't already exist
+    if not test -d "$HOME/.config/hyprcustom"
+        mkdir -p "$HOME/.config/hyprcustom"
+        echo "📁 Created the custom settings directory and 'custom.conf' file for your personal settings..."
+        
+        # Add default content to the custom.conf file
+        echo '
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 # ┃                           Autostart                         ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
@@ -1105,8 +1104,7 @@ decoration {
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 # ┃                      Window & layer rules                   ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ ' > "$HOME/.config/hyprcustom/custom.conf"
-        end
-    }
+        fi
 
     # Execute the appropriate function based on the detected shell
     case "$CURRENT_SHELL" in
