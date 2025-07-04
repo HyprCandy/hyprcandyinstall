@@ -775,11 +775,12 @@ EOF
     print_success "Zsh shell configuration completed!"
 }
 
-# Function to setup default custom.conf
-custom_setup() {
+# Function to setup default "custom.conf" file
+setup_custom_file() {
     # Detect the current shell
     CURRENT_SHELL=$(basename "$SHELL")
         # Create the custom settings directory and file if it doesn't already exist
+        custom_zsh() {
         if [ ! -d "$HOME/.config/hyprcustom" ]; then
             mkdir -p "$HOME/.config/hyprcustom" && touch "$HOME/.config/hyprcustom/custom.conf"
             echo "📁 Created the custom settings directory and 'custom.conf' file for your personal settings..."
@@ -939,8 +940,9 @@ decoration {
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 EOF
         fi
-        
+        }
         # Create the custom settings directory and file if it doesn't already exist
+        custom_fish() {
         if not test -d "$HOME/.config/hyprcustom"
             mkdir -p "$HOME/.config/hyprcustom"
             echo "📁 Created the custom settings directory and 'custom.conf' file for your personal settings..."
@@ -1097,7 +1099,10 @@ decoration {
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 # ┃                      Window & layer rules                   ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ ' > "$HOME/.config/hyprcustom/custom.conf"
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ 
+' > "$HOME/.config/hyprcustom/custom.conf"
+        end
+        }
 
     # Execute the appropriate function based on the detected shell
     case "$CURRENT_SHELL" in
