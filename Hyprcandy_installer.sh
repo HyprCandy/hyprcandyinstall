@@ -1274,6 +1274,7 @@ EOF
 }
 
 # Function to setup default "custom.conf" file
+setup_custom_cnfig() {
     # Detect the current shell
     CURRENT_SHELL=$(basename "$SHELL")
 
@@ -1626,7 +1627,8 @@ end
             create_custom_bash
             ;;
     esac
-    
+}
+
 # Function to setup keyboard layout
 setup_keyboard_layout() {
     # Keyboard layout selection
@@ -1880,6 +1882,9 @@ main() {
     
     # Enable display manager
     enable_display_manager
+
+    # Function to setup default "custom.conf" file
+    setup_custom_cnfig
 
     # Setup keyboard layout
     setup_keyboard_layout
