@@ -1290,7 +1290,7 @@ setup_custom_config() {
 # ┃                           Animations                        ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-source = ~/.config/hypr/conf/animations/silent.conf
+#source = ~/.config/hypr/conf/animations/silent.conf
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 # ┃                        Hypraland-colors                     ┃
