@@ -774,518 +774,6 @@ EOF
     
     print_success "Zsh shell configuration completed!"
 }
-
-# Function to setup default "custom.conf" file
-    # Detect the current shell
-    CURRENT_SHELL=$(basename "$SHELL")
-    
-    # Function to create custom settings for bash-compatible shells (bash, zsh, dash)
-    create_custom_bash() {
-        # Create the custom settings directory and file if it doesn't already exist
-        if [ ! -d "$HOME/.config/hyprcustom" ]; then
-            mkdir -p "$HOME/.config/hyprcustom" && touch "$HOME/.config/hyprcustom/custom.conf"
-            echo "📁 Created the custom settings directory and 'custom.conf' file for your personal settings..."
-            
-            # Add default content to the custom.conf file
-            cat > "$HOME/.config/hyprcustom/custom.conf" << 'EOF'
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                           Autostart                         ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                           Animations                        ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-source = ~/.config/hypr/conf/animations/silent.conf
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                        Hypraland-colors                     ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-source = ~/.config/hypr/colors.conf
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                         Env-variables                       ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-# After using nwg-look, also change the cursor settings here to maintain changes after every reboot
-env = XCURSOR_THEME,Bibata-Modern-Classic
-env = XCURSOR_SIZE,18
-env = HYPRCURSOR_THEME,Bibata-Modern-Classic
-env = HYPRCURSOR_SIZE,18
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                         Keybindings                         ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-#### $ ####
-
-$mainMod = SUPER
-$HYPRSCRIPTS = ~/.config/hypr/scripts
-$SCRIPTS = ~/.config/hyprcandy/scripts
-$EDITOR = gedit # Change from the default editor to your prefered editor
-#$DISCORD = equibop
-
-#### Applications ####
-#bind = $mainMod CTRL, S, exec, spotify
-#bind = $mainMod, D, exec, $DISCORD
-#bind = $mainMod, W, exec, warp-terminal
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                           Keyboard                          ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-input {
-    kb_layout = $LAYOUT
-    kb_variant = 
-    kb_model =
-    kb_options =
-    numlock_by_default = true
-    mouse_refocus = false
-
-    follow_mouse = 1
-    touchpad {
-        # for desktop
-        natural_scroll = false
-
-        # for laptop
-        # natural_scroll = yes
-        # middle_button_emulation = true
-        # clickfinger_behavior = false
-        scroll_factor = 1.0  # Touchpad scroll factor
-    }
-    sensitivity = 0 # Pointer speed: -1.0 - 1.0, 0 means no modification.
-}
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                             Layout                          ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-general {
-    gaps_in = 2
-    gaps_out = 6
-    border_size = 2
-    col.active_border = $primary $source_color $source_color $primary 90deg
-    col.inactive_border = $background
-    layout = dwindle
-    resize_on_border = true
-    allow_tearing = true
-}
-
-group:groupbar:col.active = $primary
-group:groupbar:col.inactive = $source_color
-
-dwindle {
-    pseudotile = true
-    preserve_split = true
-}
-
-master {
-    new_status = slave
-    new_on_active = after
-    smart_resizing = true
-    drop_at_cursor = true
-}
-
-gestures {
-  workspace_swipe = true
-  workspace_swipe_fingers = 3
-  workspace_swipe_distance = 500
-  workspace_swipe_invert = true
-  workspace_swipe_min_speed_to_force = 30
-  workspace_swipe_cancel_ratio = 0.5
-  workspace_swipe_create_new = true
-  workspace_swipe_forever = true
-}
-
-binds {
-  workspace_back_and_forth = true
-  allow_workspace_cycles = true
-  pass_mouse_when_bound = false
-}
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                          Decorations                        ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-decoration {
-    rounding = 10
-    rounding_power = 2
-    active_opacity = 0.85
-    inactive_opacity = 0.85
-    fullscreen_opacity = 1.0
-
-    blur {
-    enabled = true
-    size = 2
-    passes = 4
-    new_optimizations = on
-    ignore_opacity = true
-    xray = false
-    vibrancy = 0.1696
-    noise = 0.01
-    popups = true
-    popups_ignorealpha = 0.8
-    }
-
-    shadow {
-        enabled = false
-        range = 15
-        render_power = 4
-        color = 0x66000000
-    }
-}
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                      Window & layer rules                   ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-EOF
-        fi
-    }
-    
-# Function to create custom settings for fish shell
-function create_custom_fish
-    # Create the custom settings directory and file if it doesn't already exist
-    if not test -d "$HOME/.config/hyprcustom"
-        mkdir -p "$HOME/.config/hyprcustom"
-        echo "📁 Created the custom settings directory and 'custom.conf' file for your personal settings..."
-        
-        # Add default content to the custom.conf file
-        echo '
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                           Autostart                         ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                           Animations                        ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-source = ~/.config/hypr/conf/animations/silent.conf
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                        Hypraland-colors                     ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-source = ~/.config/hypr/colors.conf
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                         Env-variables                       ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-# After using nwg-look, also change the cursor settings here to maintain changes after every reboot
-env = XCURSOR_THEME,Bibata-Modern-Classic
-env = XCURSOR_SIZE,18
-env = HYPRCURSOR_THEME,Bibata-Modern-Classic
-env = HYPRCURSOR_SIZE,18
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                         Keybindings                         ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-#### $ ####
-
-$mainMod = SUPER
-$HYPRSCRIPTS = ~/.config/hypr/scripts
-$SCRIPTS = ~/.config/hyprcandy/scripts
-$EDITOR = gedit # Change from the default editor to your prefered editor
-#$DISCORD = equibop
-
-#### Applications ####
-#bind = $mainMod CTRL, S, exec, spotify
-#bind = $mainMod, D, exec, $DISCORD
-#bind = $mainMod, W, exec, warp-terminal
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                           Keyboard                          ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-input {
-    kb_layout = $LAYOUT
-    kb_variant = 
-    kb_model =
-    kb_options =
-    numlock_by_default = true
-    mouse_refocus = false
-
-    follow_mouse = 1
-    touchpad {
-        # for desktop
-        natural_scroll = false
-
-        # for laptop
-        # natural_scroll = yes
-        # middle_button_emulation = true
-        # clickfinger_behavior = false
-        scroll_factor = 1.0  # Touchpad scroll factor
-    }
-    sensitivity = 0 # Pointer speed: -1.0 - 1.0, 0 means no modification.
-}
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                             Layout                          ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-general {
-    gaps_in = 2
-    gaps_out = 6
-    border_size = 2
-    col.active_border = $primary $source_color $source_color $primary 90deg
-    col.inactive_border = $background
-    layout = dwindle
-    resize_on_border = true
-    allow_tearing = true
-}
-
-group:groupbar:col.active = $primary
-group:groupbar:col.inactive = $source_color
-
-dwindle {
-    pseudotile = true
-    preserve_split = true
-}
-
-master {
-    new_status = slave
-    new_on_active = after
-    smart_resizing = true
-    drop_at_cursor = true
-}
-
-gestures {
-  workspace_swipe = true
-  workspace_swipe_fingers = 3
-  workspace_swipe_distance = 500
-  workspace_swipe_invert = true
-  workspace_swipe_min_speed_to_force = 30
-  workspace_swipe_cancel_ratio = 0.5
-  workspace_swipe_create_new = true
-  workspace_swipe_forever = true
-}
-
-binds {
-  workspace_back_and_forth = true
-  allow_workspace_cycles = true
-  pass_mouse_when_bound = false
-}
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                          Decorations                        ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-decoration {
-    rounding = 10
-    rounding_power = 2
-    active_opacity = 0.85
-    inactive_opacity = 0.85
-    fullscreen_opacity = 1.0
-
-    blur {
-    enabled = true
-    size = 2
-    passes = 4
-    new_optimizations = on
-    ignore_opacity = true
-    xray = false
-    vibrancy = 0.1696
-    noise = 0.01
-    popups = true
-    popups_ignorealpha = 0.8
-    }
-
-    shadow {
-        enabled = false
-        range = 15
-        render_power = 4
-        color = 0x66000000
-    }
-}
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                      Window & layer rules                   ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ ' > "$HOME/.config/hyprcustom/custom.conf"
-        end
-
-    # Execute the appropriate function based on the detected shell
-    case "$CURRENT_SHELL" in
-        "fish")
-            echo "🐟 Detected Fish shell - using Fish syntax"
-            create_custom_fish
-            ;;
-        "bash"|"zsh"|"dash"|"sh")
-            echo "🐚 Detected $CURRENT_SHELL shell - using Bash-compatible syntax"
-            create_custom_bash
-            ;;
-        *)
-            echo "⚠️  Unknown shell: $CURRENT_SHELL - defaulting to Bash-compatible syntax"
-            create_custom_bash
-            ;;
-    esac
-
-    # Keyboard layout selection
-    echo
-    print_status "Keyboard Layout Configuration"
-    echo "Select your keyboard layout (this will be applied to Hyprland):"
-    echo "1) us - United States (default)"
-    echo "2) gb - United Kingdom"
-    echo "3) de - Germany"
-    echo "4) fr - France"
-    echo "5) es - Spain"
-    echo "6) it - Italy"
-    echo "7) cn - China"
-    echo "8) ru - Russia"
-    echo "9) jp - Japan"
-    echo "10) kr - South Korea"
-    echo "11) ar - Arabic"
-    echo "12) il - Israel"
-    echo "13) in - India"
-    echo "14) tr - Turkey"
-    echo "15) uz - Uzbekistan"
-    echo "16) br - Brazil"
-    echo "17) no - Norway"
-    echo "18) pl - Poland"
-    echo "19) nl - Netherlands"
-    echo "20) se - Sweden"
-    echo "21) fi - Finland"
-    echo "22) custom - Enter your own layout code"
-    echo
-    echo -e "${CYAN}Note: For other countries not listed above, use option 22 (custom)${NC}"
-    echo -e "${CYAN}Common examples: 'dvorak', 'colemak', 'ca' (Canada), 'au' (Australia), etc.${NC}"
-    echo
-    
-    KEYBOARD_LAYOUT="us"  # Default layout
-    
-    while true; do
-        echo -e "${YELLOW}Enter your choice (1-22, or press Enter for default 'us'):${NC}"
-        read -r layout_choice
-        
-        # If empty input, use default
-        if [ -z "$layout_choice" ]; then
-            layout_choice=1
-        fi
-        
-        case $layout_choice in
-            1)
-                KEYBOARD_LAYOUT="us"
-                print_status "Selected: United States (us)"
-                break
-                ;;
-            2)
-                KEYBOARD_LAYOUT="gb"
-                print_status "Selected: United Kingdom (gb)"
-                break
-                ;;
-            3)
-                KEYBOARD_LAYOUT="de"
-                print_status "Selected: Germany (de)"
-                break
-                ;;
-            4)
-                KEYBOARD_LAYOUT="fr"
-                print_status "Selected: France (fr)"
-                break
-                ;;
-            5)
-                KEYBOARD_LAYOUT="es"
-                print_status "Selected: Spain (es)"
-                break
-                ;;
-            6)
-                KEYBOARD_LAYOUT="it"
-                print_status "Selected: Italy (it)"
-                break
-                ;;
-            7)
-                KEYBOARD_LAYOUT="cn"
-                print_status "Selected: China (cn)"
-                break
-                ;;
-            8)
-                KEYBOARD_LAYOUT="ru"
-                print_status "Selected: Russia (ru)"
-                break
-                ;;
-            9)
-                KEYBOARD_LAYOUT="jp"
-                print_status "Selected: Japan (jp)"
-                break
-                ;;
-            10)
-                KEYBOARD_LAYOUT="kr"
-                print_status "Selected: South Korea (kr)"
-                break
-                ;;
-            11)
-                KEYBOARD_LAYOUT="ar"
-                print_status "Selected: Arabic (ar)"
-                break
-                ;;
-            12)
-                KEYBOARD_LAYOUT="il"
-                print_status "Selected: Israel (il)"
-                break
-                ;;
-            13)
-                KEYBOARD_LAYOUT="in"
-                print_status "Selected: India (in)"
-                break
-                ;;
-            14)
-                KEYBOARD_LAYOUT="tr"
-                print_status "Selected: Turkey (tr)"
-                break
-                ;;
-            15)
-                KEYBOARD_LAYOUT="uz"
-                print_status "Selected: Uzbekistan (uz)"
-                break
-                ;;
-            16)
-                KEYBOARD_LAYOUT="br"
-                print_status "Selected: Brazil (br)"
-                break
-                ;;
-            17)
-                KEYBOARD_LAYOUT="no"
-                print_status "Selected: Norway (no)"
-                break
-                ;;
-            18)
-                KEYBOARD_LAYOUT="pl"
-                print_status "Selected: Poland (pl)"
-                break
-                ;;
-            19)
-                KEYBOARD_LAYOUT="nl"
-                print_status "Selected: Netherlands (nl)"
-                break
-                ;;
-            20)
-                KEYBOARD_LAYOUT="se"
-                print_status "Selected: Sweden (se)"
-                break
-                ;;
-            21)
-                KEYBOARD_LAYOUT="fi"
-                print_status "Selected: Finland (fi)"
-                break
-                ;;
-            22)
-                echo -e "${YELLOW}Enter your custom keyboard layout code (e.g., 'dvorak', 'colemak', 'ca', 'au'):${NC}"
-                read -r custom_layout
-                if [ -n "$custom_layout" ]; then
-                    KEYBOARD_LAYOUT="$custom_layout"
-                    print_status "Selected: Custom layout ($custom_layout)"
-                    break
-                else
-                    print_error "Custom layout cannot be empty. Please try again."
-                fi
-                ;;
-            *)
-                print_error "Invalid choice. Please enter a number between 1-22."
-                ;;
-        esac
-    done
-}
     
 # Function to automatically setup Hyprcandy configuration
 setup_hyprcandy() {
@@ -1785,6 +1273,528 @@ EOF
     fi
 }
 
+# Function to setup default "custom.conf" file
+    # Detect the current shell
+    CURRENT_SHELL=$(basename "$SHELL")
+
+    if [ "$CURRENT_SHELL" = "bash" ] || [ "$CURRENT_SHELL" = "zsh" ] || [ "$CURRENT_SHELL" = "dash" ]; then
+        create_custom_bash
+    elif [ "$CURRENT_SHELL" = "fish" ]; then
+        create_custom_fish
+    else
+        echo "Unsupported shell: $CURRENT_SHELL"
+    fi
+    
+    # Function to create custom settings for bash-compatible shells (bash, zsh, dash)
+    create_custom_bash() {
+        # Create the custom settings directory and file if it doesn't already exist
+        if [ ! -d "$HOME/.config/hyprcustom" ]; then
+            mkdir -p "$HOME/.config/hyprcustom" && touch "$HOME/.config/hyprcustom/custom.conf"
+            echo "📁 Created the custom settings directory and 'custom.conf' file for your personal settings..."
+            
+            # Add default content to the custom.conf file
+            cat > "$HOME/.config/hyprcustom/custom.conf" << 'EOF'
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                           Autostart                         ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                           Animations                        ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+source = ~/.config/hypr/conf/animations/silent.conf
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                        Hypraland-colors                     ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+source = ~/.config/hypr/colors.conf
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                         Env-variables                       ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+# After using nwg-look, also change the cursor settings here to maintain changes after every reboot
+env = XCURSOR_THEME,Bibata-Modern-Classic
+env = XCURSOR_SIZE,18
+env = HYPRCURSOR_THEME,Bibata-Modern-Classic
+env = HYPRCURSOR_SIZE,18
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                         Keybindings                         ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+#### $ ####
+
+$mainMod = SUPER
+$HYPRSCRIPTS = ~/.config/hypr/scripts
+$SCRIPTS = ~/.config/hyprcandy/scripts
+$EDITOR = gedit # Change from the default editor to your prefered editor
+#$DISCORD = equibop
+
+#### Applications ####
+#bind = $mainMod CTRL, S, exec, spotify
+#bind = $mainMod, D, exec, $DISCORD
+#bind = $mainMod, W, exec, warp-terminal
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                           Keyboard                          ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+input {
+    kb_layout = $LAYOUT
+    kb_variant = 
+    kb_model =
+    kb_options =
+    numlock_by_default = true
+    mouse_refocus = false
+
+    follow_mouse = 1
+    touchpad {
+        # for desktop
+        natural_scroll = false
+
+        # for laptop
+        # natural_scroll = yes
+        # middle_button_emulation = true
+        # clickfinger_behavior = false
+        scroll_factor = 1.0  # Touchpad scroll factor
+    }
+    sensitivity = 0 # Pointer speed: -1.0 - 1.0, 0 means no modification.
+}
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                             Layout                          ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+general {
+    gaps_in = 2
+    gaps_out = 6
+    border_size = 2
+    col.active_border = $primary $source_color $source_color $primary 90deg
+    col.inactive_border = $background
+    layout = dwindle
+    resize_on_border = true
+    allow_tearing = true
+}
+
+group:groupbar:col.active = $primary
+group:groupbar:col.inactive = $source_color
+
+dwindle {
+    pseudotile = true
+    preserve_split = true
+}
+
+master {
+    new_status = slave
+    new_on_active = after
+    smart_resizing = true
+    drop_at_cursor = true
+}
+
+gestures {
+  workspace_swipe = true
+  workspace_swipe_fingers = 3
+  workspace_swipe_distance = 500
+  workspace_swipe_invert = true
+  workspace_swipe_min_speed_to_force = 30
+  workspace_swipe_cancel_ratio = 0.5
+  workspace_swipe_create_new = true
+  workspace_swipe_forever = true
+}
+
+binds {
+  workspace_back_and_forth = true
+  allow_workspace_cycles = true
+  pass_mouse_when_bound = false
+}
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                          Decorations                        ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+decoration {
+    rounding = 10
+    rounding_power = 2
+    active_opacity = 0.85
+    inactive_opacity = 0.85
+    fullscreen_opacity = 1.0
+
+    blur {
+    enabled = true
+    size = 2
+    passes = 4
+    new_optimizations = on
+    ignore_opacity = true
+    xray = false
+    vibrancy = 0.1696
+    noise = 0.01
+    popups = true
+    popups_ignorealpha = 0.8
+    }
+
+    shadow {
+        enabled = false
+        range = 15
+        render_power = 4
+        color = 0x66000000
+    }
+}
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                      Window & layer rules                   ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+EOF
+        fi
+    }
+    
+# Function to create custom settings for fish shell
+function create_custom_fish
+    # Create the custom settings directory and file if it doesn't already exist
+    if not test -d "$HOME/.config/hyprcustom"
+        mkdir -p "$HOME/.config/hyprcustom"
+        echo "📁 Created the custom settings directory and 'custom.conf' file for your personal settings..."
+        
+        # Add default content to the custom.conf file
+        echo '# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                           Autostart                         ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                           Animations                        ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+source = ~/.config/hypr/conf/animations/silent.conf
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                        Hypraland-colors                     ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+source = ~/.config/hypr/colors.conf
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                         Env-variables                       ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+# After using nwg-look, also change the cursor settings here to maintain changes after every reboot
+env = XCURSOR_THEME,Bibata-Modern-Classic
+env = XCURSOR_SIZE,18
+env = HYPRCURSOR_THEME,Bibata-Modern-Classic
+env = HYPRCURSOR_SIZE,18
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                         Keybindings                         ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+#### $ ####
+
+$mainMod = SUPER
+$HYPRSCRIPTS = ~/.config/hypr/scripts
+$SCRIPTS = ~/.config/hyprcandy/scripts
+$EDITOR = gedit # Change from the default editor to your prefered editor
+#$DISCORD = equibop
+
+#### Applications ####
+#bind = $mainMod CTRL, S, exec, spotify
+#bind = $mainMod, D, exec, $DISCORD
+#bind = $mainMod, W, exec, warp-terminal
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                           Keyboard                          ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+input {
+    kb_layout = $LAYOUT
+    kb_variant = 
+    kb_model =
+    kb_options =
+    numlock_by_default = true
+    mouse_refocus = false
+
+    follow_mouse = 1
+    touchpad {
+        # for desktop
+        natural_scroll = false
+
+        # for laptop
+        # natural_scroll = yes
+        # middle_button_emulation = true
+        # clickfinger_behavior = false
+        scroll_factor = 1.0  # Touchpad scroll factor
+    }
+    sensitivity = 0 # Pointer speed: -1.0 - 1.0, 0 means no modification.
+}
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                             Layout                          ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+general {
+    gaps_in = 2
+    gaps_out = 6
+    border_size = 2
+    col.active_border = $primary $source_color $source_color $primary 90deg
+    col.inactive_border = $background
+    layout = dwindle
+    resize_on_border = true
+    allow_tearing = true
+}
+
+group:groupbar:col.active = $primary
+group:groupbar:col.inactive = $source_color
+
+dwindle {
+    pseudotile = true
+    preserve_split = true
+}
+
+master {
+    new_status = slave
+    new_on_active = after
+    smart_resizing = true
+    drop_at_cursor = true
+}
+
+gestures {
+  workspace_swipe = true
+  workspace_swipe_fingers = 3
+  workspace_swipe_distance = 500
+  workspace_swipe_invert = true
+  workspace_swipe_min_speed_to_force = 30
+  workspace_swipe_cancel_ratio = 0.5
+  workspace_swipe_create_new = true
+  workspace_swipe_forever = true
+}
+
+binds {
+  workspace_back_and_forth = true
+  allow_workspace_cycles = true
+  pass_mouse_when_bound = false
+}
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                          Decorations                        ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+decoration {
+    rounding = 10
+    rounding_power = 2
+    active_opacity = 0.85
+    inactive_opacity = 0.85
+    fullscreen_opacity = 1.0
+
+    blur {
+    enabled = true
+    size = 2
+    passes = 4
+    new_optimizations = on
+    ignore_opacity = true
+    xray = false
+    vibrancy = 0.1696
+    noise = 0.01
+    popups = true
+    popups_ignorealpha = 0.8
+    }
+
+    shadow {
+        enabled = false
+        range = 15
+        render_power = 4
+        color = 0x66000000
+    }
+}
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                      Window & layer rules                   ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛' > "$HOME/.config/hyprcustom/custom.conf"
+    end
+end
+
+    # Execute the appropriate function based on the detected shell
+    case "$CURRENT_SHELL" in
+        "fish")
+            echo "🐟 Detected Fish shell - using Fish syntax"
+            create_custom_fish
+            ;;
+        "bash"|"zsh"|"dash"|"sh")
+            echo "🐚 Detected $CURRENT_SHELL shell - using Bash-compatible syntax"
+            create_custom_bash
+            ;;
+        *)
+            echo "⚠️  Unknown shell: $CURRENT_SHELL - defaulting to Bash-compatible syntax"
+            create_custom_bash
+            ;;
+    esac
+    
+# Function to setup keyboard layout
+setup_keyboard_layout() {
+    # Keyboard layout selection
+    echo
+    print_status "Keyboard Layout Configuration"
+    echo "Select your keyboard layout (this will be applied to Hyprland):"
+    echo "1) us - United States (default)"
+    echo "2) gb - United Kingdom"
+    echo "3) de - Germany"
+    echo "4) fr - France"
+    echo "5) es - Spain"
+    echo "6) it - Italy"
+    echo "7) cn - China"
+    echo "8) ru - Russia"
+    echo "9) jp - Japan"
+    echo "10) kr - South Korea"
+    echo "11) ar - Arabic"
+    echo "12) il - Israel"
+    echo "13) in - India"
+    echo "14) tr - Turkey"
+    echo "15) uz - Uzbekistan"
+    echo "16) br - Brazil"
+    echo "17) no - Norway"
+    echo "18) pl - Poland"
+    echo "19) nl - Netherlands"
+    echo "20) se - Sweden"
+    echo "21) fi - Finland"
+    echo "22) custom - Enter your own layout code"
+    echo
+    echo -e "${CYAN}Note: For other countries not listed above, use option 22 (custom)${NC}"
+    echo -e "${CYAN}Common examples: 'dvorak', 'colemak', 'ca' (Canada), 'au' (Australia), etc.${NC}"
+    echo
+    
+    KEYBOARD_LAYOUT="us"  # Default layout
+    
+    while true; do
+        echo -e "${YELLOW}Enter your choice (1-22, or press Enter for default 'us'):${NC}"
+        read -r layout_choice
+        
+        # If empty input, use default
+        if [ -z "$layout_choice" ]; then
+            layout_choice=1
+        fi
+        
+        case $layout_choice in
+            1)
+                KEYBOARD_LAYOUT="us"
+                print_status "Selected: United States (us)"
+                break
+                ;;
+            2)
+                KEYBOARD_LAYOUT="gb"
+                print_status "Selected: United Kingdom (gb)"
+                break
+                ;;
+            3)
+                KEYBOARD_LAYOUT="de"
+                print_status "Selected: Germany (de)"
+                break
+                ;;
+            4)
+                KEYBOARD_LAYOUT="fr"
+                print_status "Selected: France (fr)"
+                break
+                ;;
+            5)
+                KEYBOARD_LAYOUT="es"
+                print_status "Selected: Spain (es)"
+                break
+                ;;
+            6)
+                KEYBOARD_LAYOUT="it"
+                print_status "Selected: Italy (it)"
+                break
+                ;;
+            7)
+                KEYBOARD_LAYOUT="cn"
+                print_status "Selected: China (cn)"
+                break
+                ;;
+            8)
+                KEYBOARD_LAYOUT="ru"
+                print_status "Selected: Russia (ru)"
+                break
+                ;;
+            9)
+                KEYBOARD_LAYOUT="jp"
+                print_status "Selected: Japan (jp)"
+                break
+                ;;
+            10)
+                KEYBOARD_LAYOUT="kr"
+                print_status "Selected: South Korea (kr)"
+                break
+                ;;
+            11)
+                KEYBOARD_LAYOUT="ar"
+                print_status "Selected: Arabic (ar)"
+                break
+                ;;
+            12)
+                KEYBOARD_LAYOUT="il"
+                print_status "Selected: Israel (il)"
+                break
+                ;;
+            13)
+                KEYBOARD_LAYOUT="in"
+                print_status "Selected: India (in)"
+                break
+                ;;
+            14)
+                KEYBOARD_LAYOUT="tr"
+                print_status "Selected: Turkey (tr)"
+                break
+                ;;
+            15)
+                KEYBOARD_LAYOUT="uz"
+                print_status "Selected: Uzbekistan (uz)"
+                break
+                ;;
+            16)
+                KEYBOARD_LAYOUT="br"
+                print_status "Selected: Brazil (br)"
+                break
+                ;;
+            17)
+                KEYBOARD_LAYOUT="no"
+                print_status "Selected: Norway (no)"
+                break
+                ;;
+            18)
+                KEYBOARD_LAYOUT="pl"
+                print_status "Selected: Poland (pl)"
+                break
+                ;;
+            19)
+                KEYBOARD_LAYOUT="nl"
+                print_status "Selected: Netherlands (nl)"
+                break
+                ;;
+            20)
+                KEYBOARD_LAYOUT="se"
+                print_status "Selected: Sweden (se)"
+                break
+                ;;
+            21)
+                KEYBOARD_LAYOUT="fi"
+                print_status "Selected: Finland (fi)"
+                break
+                ;;
+            22)
+                echo -e "${YELLOW}Enter your custom keyboard layout code (e.g., 'dvorak', 'colemak', 'ca', 'au'):${NC}"
+                read -r custom_layout
+                if [ -n "$custom_layout" ]; then
+                    KEYBOARD_LAYOUT="$custom_layout"
+                    print_status "Selected: Custom layout ($custom_layout)"
+                    break
+                else
+                    print_error "Custom layout cannot be empty. Please try again."
+                fi
+                ;;
+            *)
+                print_error "Invalid choice. Please enter a number between 1-22."
+                ;;
+        esac
+    done
+}
+
 # Function to prompt for reboot
 prompt_reboot() {
     echo
@@ -1870,6 +1880,9 @@ main() {
     
     # Enable display manager
     enable_display_manager
+
+    # Setup keyboard layout
+    setup_keyboard_layout
     
     # Configuration management tips
     echo
