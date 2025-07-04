@@ -1627,7 +1627,6 @@ end
             create_custom_bash
             ;;
     esac
-}
 
 # Function to setup keyboard layout
 setup_keyboard_layout() {
