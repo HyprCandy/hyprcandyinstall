@@ -776,7 +776,7 @@ EOF
 }
 
 # Function to setup default custom.conf
-custom_setup () {
+custom_setup() {
     # Detect the current shell
     CURRENT_SHELL=$(basename "$SHELL")
         # Create the custom settings directory and file if it doesn't already exist
