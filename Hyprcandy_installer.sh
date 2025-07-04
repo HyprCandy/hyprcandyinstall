@@ -101,8 +101,8 @@ choose_display_manager() {
 # Function to choose shell
 choose_shell() {
     print_status "Choose your shell: you can also rerun the script to switch from either or regenerate HyprCandy's default shell setup"
-    echo "1) Fish - A fast modern shell with intelligent autosuggestions and syntax highlighting"
-    echo "2) Zsh - Powerful shell with extensive customization (Oh My Zsh + Powerlevel10k)"
+    echo "1) Fish - A modern shell with builtin fzf search, intelligent autosuggestions and syntax highlighting (Fisher plugins + Starship prompt)"
+    echo "2) Zsh - Powerful shell with extensive customization (Zsh plugins + Oh My Zsh + Starship prompt)"
     echo
     
     while true; do
@@ -111,12 +111,12 @@ choose_shell() {
         case $shell_choice in
             1)
                 SHELL_CHOICE="fish"
-                print_status "Selected Fish shell with modern configuration"
+                print_status "Selected Fish shell with builtin features, plugins and Starship configuration"
                 break
                 ;;
             2)
                 SHELL_CHOICE="zsh"
-                print_status "Selected Zsh with Oh My Zsh and Powerlevel10k"
+                print_status "Selected Zsh with plugins, Oh My Zsh integration and Starship configuration"
                 break
                 ;;
             *)
@@ -343,14 +343,13 @@ build_package_list() {
         packages+=(
             "zsh"
             "zsh-completions"
-            "zsh-autocomplete"
             "zsh-autosuggestions"
             "zsh-history-substring-search"
             "zsh-syntax-highlighting"
-            "zsh-theme-powerlevel10k"
+            "starship"
             "oh-my-zsh-git"
         )
-        print_status "Added Zsh and Oh My Zsh ecosystem to package list"
+        print_status "Added Zsh and Oh My Zsh ecosystem with Starship to package list"
     fi
 }
 
@@ -614,158 +613,163 @@ setup_zsh() {
         print_success "Oh My Zsh installed"
     fi
     
-    # Configure Powerlevel10k theme
-    if [ -f "/usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme" ]; then
-        print_status "Configuring Powerlevel10k theme..."
+    # Configure Starship prompt
+    if command -v starship &> /dev/null; then
+        print_status "Configuring Starship prompt for Zsh..."
         
-        # Create .zshrc with comprehensive configuration
+        # Create Starship config (same as Fish setup)
+        mkdir -p "$HOME/.config"
+        cat > "$HOME/.config/starship.toml" << 'EOF'
+# Starship Configuration for HyprCandy
+format = """
+$username\
+$hostname\
+$directory\
+$git_branch\
+$git_state\
+$git_status\
+$git_metrics\
+$fill\
+$nodejs\
+$python\
+$rust\
+$golang\
+$php\
+$java\
+$kotlin\
+$haskell\
+$swift\
+$cmd_duration $jobs $time\
+$line_break\
+$character"""
+
+[directory]
+style = "blue"
+read_only = " 🔒"
+truncation_length = 4
+truncate_to_repo = false
+
+[character]
+success_symbol = "[✔](green)"
+error_symbol = "[x](red)"
+vimcmd_symbol = "[❮](green)"
+
+[git_branch]
+symbol = "🌱 "
+truncation_length = 4
+truncation_symbol = ""
+style = "bold green"
+
+[git_status]
+ahead = "⇡${count}"
+diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+behind = "⇣${count}"
+deleted = "x"
+
+[nodejs]
+symbol = "💠 "
+style = "bold green"
+
+[python]
+symbol = "🐍 "
+style = "bold yellow"
+
+[rust]
+symbol = "⚙️ "
+style = "bold red"
+
+[time]
+format = '🕙[\[ $time \]]($style) '
+time_format = "%T"
+disabled = false
+style = "bright-white"
+
+[cmd_duration]
+format = "⏱️ [$duration]($style) "
+style = "yellow"
+
+[jobs]
+symbol = "+ "
+style = "bold blue"
+EOF
+        
+        # Create .zshrc with Starship configuration
         cat > "$HOME/.zshrc" << 'EOF'
-# HyprCandy Zsh Configuration with Oh My Zsh and Powerlevel10k
+# HyprCandy Zsh Configuration with Oh My Zsh and Starship
 
 # Oh My Zsh configuration
 export ZSH="$HOME/.oh-my-zsh"
 
-# Source HyprCandy Zsh setup
-source ~/.hyprcandy-zsh.zsh
+# Set environment variables
+export EDITOR=nano
+export BROWSER=firefox
+export TERMINAL=kitty
 
-# Start fastfetch
+# Add local bin to PATH
+if [ -d "$HOME/.local/bin" ]; then
+    export PATH="$HOME/.local/bin:$PATH"
+fi
+
+# Initialize Starship prompt
+if command -v starship > /dev/null 2>&1; then
+    eval "$(starship init zsh)"
+fi
+
+# Source Oh My Zsh
+source $ZSH/oh-my-zsh.sh
+
+# Aliases
+alias ll="ls -alF"
+alias la="ls -A"
+alias l="ls -CF"
+alias ..="cd .."
+alias ...="cd ../.."
+alias grep="grep --color=auto"
+alias fgrep="fgrep --color=auto"
+alias egrep="egrep --color=auto"
+alias update="sudo pacman -Syu"
+alias install="sudo pacman -S"
+alias search="pacman -Ss"
+alias remove="sudo pacman -R"
+alias autoremove="sudo pacman -Rs $(pacman -Qtdq)"
+alias c="clear"
+alias h="history"
+alias j="jobs -l"
+alias df="df -h"
+alias du="du -h"
+alias mkdir="mkdir -pv"
+alias wget="wget -c"
+
+# Git aliases
+alias g="git clone"
+alias ga="git add ."
+alias gc="git commit -m"
+alias gp="git push"
+alias gl="git pull"
+alias gs="git status"
+alias gd="git diff"
+alias gco="git checkout"
+alias gb="git branch"
+alias glog="git log --oneline --graph --decorate"
+
+# System information
+alias sysinfo="fastfetch"
+alias weather="curl wttr.in"
+
+# Fun stuff
+alias matrix="cmatrix"
+alias pipes="pipes.sh"
+
+# Start HyprCandy fastfetch
 fastfetch
+
+# Source HyprCandy Zsh setup if it exists
+if [ -f ~/.hyprcandy-zsh.zsh ]; then
+    source ~/.hyprcandy-zsh.zsh
+fi
 EOF
         
-        # Create a basic Powerlevel10k configuration
-        cat > "$HOME/.p10k.zsh" << 'EOF'
-# Powerlevel10k configuration for HyprCandy
-
-# Temporarily change options.
-'builtin' 'local' '-a' 'p10k_config_opts'
-[[ ! -o 'aliases'         ]] || p10k_config_opts+=('aliases')
-[[ ! -o 'sh_glob'         ]] || p10k_config_opts+=('sh_glob')
-[[ ! -o 'no_brace_expand' ]] || p10k_config_opts+=('no_brace_expand')
-'builtin' 'setopt' 'no_aliases' 'no_sh_glob' 'brace_expand'
-
-() {
-  emulate -L zsh -o extended_glob
-
-  # Unset all configuration options.
-  unset POWERLEVEL10K_*
-
-  # Left prompt segments.
-  typeset -g POWERLEVEL10K_LEFT_PROMPT_ELEMENTS=(
-    os_icon
-    dir
-    vcs
-    prompt_char
-  )
-
-  # Right prompt segments.
-  typeset -g POWERLEVEL10K_RIGHT_PROMPT_ELEMENTS=(
-    status
-    command_execution_time
-    background_jobs
-    time
-  )
-
-  # Basic style options.
-  typeset -g POWERLEVEL10K_MODE='nerdfont-complete'
-  typeset -g POWERLEVEL10K_ICON_PADDING=moderate
-  typeset -g POWERLEVEL10K_PROMPT_ADD_NEWLINE=true
-  typeset -g POWERLEVEL10K_MULTILINE_FIRST_PROMPT_PREFIX=''
-  typeset -g POWERLEVEL10K_MULTILINE_NEWLINE_PROMPT_PREFIX=''
-  typeset -g POWERLEVEL10K_MULTILINE_LAST_PROMPT_PREFIX=''
-  typeset -g POWERLEVEL10K_MULTILINE_FIRST_PROMPT_SUFFIX=''
-  typeset -g POWERLEVEL10K_MULTILINE_NEWLINE_PROMPT_SUFFIX=''
-  typeset -g POWERLEVEL10K_MULTILINE_LAST_PROMPT_SUFFIX=''
-  typeset -g POWERLEVEL10K_LEFT_SUBSEGMENT_SEPARATOR=''
-  typeset -g POWERLEVEL10K_RIGHT_SUBSEGMENT_SEPARATOR=''
-  typeset -g POWERLEVEL10K_LEFT_SEGMENT_SEPARATOR=''
-  typeset -g POWERLEVEL10K_RIGHT_SEGMENT_SEPARATOR=''
-  typeset -g POWERLEVEL10K_LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL=''
-  typeset -g POWERLEVEL10K_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL=''
-  typeset -g POWERLEVEL10K_LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL=''
-  typeset -g POWERLEVEL10K_RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL=''
-  typeset -g POWERLEVEL10K_EMPTY_LINE_LEFT_PROMPT_FIRST_SEGMENT_END_SYMBOL='%{%G═╮%}'
-  typeset -g POWERLEVEL10K_EMPTY_LINE_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL='%{%G╭═%}'
-  typeset -g POWERLEVEL10K_EMPTY_LINE_LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL='%{%G═╯%}'
-  typeset -g POWERLEVEL10K_EMPTY_LINE_RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL='%{%G╰═%}'
-
-  # OS icon
-  typeset -g POWERLEVEL10K_OS_ICON_FOREGROUND=232
-  typeset -g POWERLEVEL10K_OS_ICON_BACKGROUND=7
-
-  # Directory
-  typeset -g POWERLEVEL10K_DIR_FOREGROUND=232
-  typeset -g POWERLEVEL10K_DIR_BACKGROUND=4
-  typeset -g POWERLEVEL10K_SHORTEN_STRATEGY=truncate_to_last
-  typeset -g POWERLEVEL10K_SHORTEN_DIR_LENGTH=1
-
-  # VCS (Git)
-  typeset -g POWERLEVEL10K_VCS_BRANCH_ICON=''
-  typeset -g POWERLEVEL10K_VCS_UNTRACKED_ICON='?'
-  typeset -g POWERLEVEL10K_VCS_UNSTAGED_ICON='!'
-  typeset -g POWERLEVEL10K_VCS_STAGED_ICON='+'
-  typeset -g POWERLEVEL10K_VCS_INCOMING_CHANGES_ICON='⇣'
-  typeset -g POWERLEVEL10K_VCS_OUTGOING_CHANGES_ICON='⇡'
-  typeset -g POWERLEVEL10K_VCS_COMMIT_ICON=''
-  typeset -g POWERLEVEL10K_VCS_CLEAN_FOREGROUND=232
-  typeset -g POWERLEVEL10K_VCS_CLEAN_BACKGROUND=2
-  typeset -g POWERLEVEL10K_VCS_MODIFIED_FOREGROUND=232
-  typeset -g POWERLEVEL10K_VCS_MODIFIED_BACKGROUND=3
-  typeset -g POWERLEVEL10K_VCS_UNTRACKED_FOREGROUND=232
-  typeset -g POWERLEVEL10K_VCS_UNTRACKED_BACKGROUND=1
-
-  # Prompt character
-  typeset -g POWERLEVEL10K_PROMPT_CHAR_OK_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND=76
-  typeset -g POWERLEVEL10K_PROMPT_CHAR_ERROR_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND=196
-  typeset -g POWERLEVEL10K_PROMPT_CHAR_{OK,ERROR}_VIINS_CONTENT_EXPANSION='❯'
-  typeset -g POWERLEVEL10K_PROMPT_CHAR_{OK,ERROR}_VICMD_CONTENT_EXPANSION='❮'
-  typeset -g POWERLEVEL10K_PROMPT_CHAR_{OK,ERROR}_VIVIS_CONTENT_EXPANSION='V'
-  typeset -g POWERLEVEL10K_PROMPT_CHAR_{OK,ERROR}_VIOWR_CONTENT_EXPANSION='▶'
-  typeset -g POWERLEVEL10K_PROMPT_CHAR_BACKGROUND=''
-  typeset -g POWERLEVEL10K_PROMPT_CHAR_LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL=''
-  typeset -g POWERLEVEL10K_PROMPT_CHAR_LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL=''
-
-  # Command execution time
-  typeset -g POWERLEVEL10K_COMMAND_EXECUTION_TIME_THRESHOLD=3
-  typeset -g POWERLEVEL10K_COMMAND_EXECUTION_TIME_PRECISION=0
-  typeset -g POWERLEVEL10K_COMMAND_EXECUTION_TIME_FOREGROUND=232
-  typeset -g POWERLEVEL10K_COMMAND_EXECUTION_TIME_BACKGROUND=3
-
-  # Time
-  typeset -g POWERLEVEL10K_TIME_FOREGROUND=232
-  typeset -g POWERLEVEL10K_TIME_BACKGROUND=7
-  typeset -g POWERLEVEL10K_TIME_FORMAT='%D{%H:%M:%S}'
-
-  # Status
-  typeset -g POWERLEVEL10K_STATUS_EXTENDED_STATES=true
-  typeset -g POWERLEVEL10K_STATUS_OK=false
-  typeset -g POWERLEVEL10K_STATUS_OK_FOREGROUND=2
-  typeset -g POWERLEVEL10K_STATUS_OK_BACKGROUND=''
-  typeset -g POWERLEVEL10K_STATUS_OK_VISUAL_IDENTIFIER_EXPANSION='✓'
-  typeset -g POWERLEVEL10K_STATUS_ERROR_FOREGROUND=9
-  typeset -g POWERLEVEL10K_STATUS_ERROR_BACKGROUND=''
-  typeset -g POWERLEVEL10K_STATUS_ERROR_VISUAL_IDENTIFIER_EXPANSION='✗'
-
-  # Background jobs
-  typeset -g POWERLEVEL10K_BACKGROUND_JOBS_FOREGROUND=6
-  typeset -g POWERLEVEL10K_BACKGROUND_JOBS_BACKGROUND=''
-  typeset -g POWERLEVEL10K_BACKGROUND_JOBS_VISUAL_IDENTIFIER_EXPANSION='⚙'
-
-  # Instant prompt mode.
-  typeset -g POWERLEVEL10K_INSTANT_PROMPT=verbose
-
-  # Hot reload.
-  typeset -g POWERLEVEL10K_DISABLE_HOT_RELOAD=true
-
-  # If p10k is already loaded, reload configuration.
-  (( ! $+functions[p10k] )) || p10k reload
-}
-
-# Restore options.
-(( ${#p10k_config_opts} )) && setopt ${p10k_config_opts[@]}
-'builtin' 'unset' 'p10k_config_opts'
-EOF
-        
-        print_success "Powerlevel10k configured"
+        print_success "Starship configured for Zsh"
     fi
     
     print_success "Zsh shell configuration completed!"
@@ -803,13 +807,18 @@ setup_hyprcandy() {
     # Remove present .zshrc file (removed .zshrc from list since it's now handled by the script) 
     rm -rf .face.icon .hyprcandy-zsh.zsh .icons HyprCandy
 
-    # Create the custom settings directory and file if it doesn't already exist 
-if [ ! -d "$HOME/.config/hyprcustom" ]; then
-    mkdir -p "$HOME/.config/hyprcustom" && touch "$HOME/.config/hyprcustom/custom.conf"
-    echo "📁 Created the custom settings directory and 'custom.conf' file for your personal settings..."
+    # Detect the current shell
+    CURRENT_SHELL=$(basename "$SHELL")
     
-    # Add default content to the custom.conf file
-    cat > "$HOME/.config/hyprcustom/custom.conf" << 'EOF'
+    # Function to create custom settings for bash-compatible shells (bash, zsh, dash)
+    create_custom_bash() {
+        # Create the custom settings directory and file if it doesn't already exist
+        if [ ! -d "$HOME/.config/hyprcustom" ]; then
+            mkdir -p "$HOME/.config/hyprcustom" && touch "$HOME/.config/hyprcustom/custom.conf"
+            echo "📁 Created the custom settings directory and 'custom.conf' file for your personal settings..."
+            
+            # Add default content to the custom.conf file
+            cat > "$HOME/.config/hyprcustom/custom.conf" << 'EOF'
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 # ┃                         Env-variables                       ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
@@ -835,9 +844,288 @@ $EDITOR = gedit # Change from the default editor to your prefered editor
 #### Applications ####
 #bind = $mainMod CTRL, S, exec, spotify
 #bind = $mainMod, D, exec, $DISCORD
-#bind = $mainMod, W, exec, warp-terminal 
+#bind = $mainMod, W, exec, warp-terminal
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                           Keyboard                          ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+input {
+    kb_layout = $LAYOUT
+    kb_variant = 
+    kb_model =
+    kb_options =
+    numlock_by_default = true
+    mouse_refocus = false
+
+    follow_mouse = 1
+    touchpad {
+        # for desktop
+        natural_scroll = false
+
+        # for laptop
+        # natural_scroll = yes
+        # middle_button_emulation = true
+        # clickfinger_behavior = false
+        scroll_factor = 1.0  # Touchpad scroll factor
+    }
+    sensitivity = 0 # Pointer speed: -1.0 - 1.0, 0 means no modification. 
 EOF
-fi
+        fi
+    }
+    
+    # Function to create custom settings for fish shell
+    create_custom_fish() {
+        # Create the custom settings directory and file if it doesn't already exist
+        if not test -d "$HOME/.config/hyprcustom"
+            mkdir -p "$HOME/.config/hyprcustom"
+            echo "📁 Created the custom settings directory and 'custom.conf' file for your personal settings..."
+            
+            # Add default content to the custom.conf file
+            echo '
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                           Env-variables                     ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+# After using nwg-look, also change the cursor settings here to maintain changes after every reboot
+env = XCURSOR_THEME,Bibata-Modern-Classic
+env = XCURSOR_SIZE,18
+env = HYPRCURSOR_THEME,Bibata-Modern-Classic
+env = HYPRCURSOR_SIZE,18
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                         Keybindings                         ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+#### $ ####
+
+$mainMod = SUPER
+$HYPRSCRIPTS = ~/.config/hypr/scripts
+$SCRIPTS = ~/.config/hyprcandy/scripts
+$EDITOR = gedit # Change from the default editor to your prefered editor
+#$DISCORD = equibop
+
+#### Applications ####
+#bind = $mainMod CTRL, S, exec, spotify
+#bind = $mainMod, D, exec, $DISCORD
+#bind = $mainMod, W, exec, warp-terminal 
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                           Keyboard                          ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+input {
+    kb_layout = $LAYOUT
+    kb_variant = 
+    kb_model =
+    kb_options =
+    numlock_by_default = true
+    mouse_refocus = false
+
+    follow_mouse = 1
+    touchpad {
+        # for desktop
+        natural_scroll = false
+
+        # for laptop
+        # natural_scroll = yes
+        # middle_button_emulation = true
+        # clickfinger_behavior = false
+        scroll_factor = 1.0  # Touchpad scroll factor
+    }
+    sensitivity = 0 # Pointer speed: -1.0 - 1.0, 0 means no modification. ' > "$HOME/.config/hyprcustom/custom.conf"
+        end
+    }
+    
+    # Execute the appropriate function based on the detected shell
+    case "$CURRENT_SHELL" in
+        "fish")
+            echo "🐟 Detected Fish shell - using Fish syntax"
+            create_custom_fish
+            ;;
+        "bash"|"zsh"|"dash"|"sh")
+            echo "🐚 Detected $CURRENT_SHELL shell - using Bash-compatible syntax"
+            create_custom_bash
+            ;;
+        *)
+            echo "⚠️  Unknown shell: $CURRENT_SHELL - defaulting to Bash-compatible syntax"
+            create_custom_bash
+            ;;
+    esac
+
+    # Keyboard layout selection
+    echo
+    print_status "Keyboard Layout Configuration"
+    echo "Select your keyboard layout (this will be applied to Hyprland):"
+    echo "1) us - United States (default)"
+    echo "2) gb - United Kingdom"
+    echo "3) de - Germany"
+    echo "4) fr - France"
+    echo "5) es - Spain"
+    echo "6) it - Italy"
+    echo "7) cn - China"
+    echo "8) ru - Russia"
+    echo "9) jp - Japan"
+    echo "10) kr - South Korea"
+    echo "11) ar - Arabic"
+    echo "12) il - Israel"
+    echo "13) in - India"
+    echo "14) tr - Turkey"
+    echo "15) uz - Uzbekistan"
+    echo "16) br - Brazil"
+    echo "17) no - Norway"
+    echo "18) pl - Poland"
+    echo "19) nl - Netherlands"
+    echo "20) se - Sweden"
+    echo "21) fi - Finland"
+    echo "22) custom - Enter your own layout code"
+    echo
+    echo -e "${CYAN}Note: For other countries not listed above, use option 22 (custom)${NC}"
+    echo -e "${CYAN}Common examples: 'dvorak', 'colemak', 'ca' (Canada), 'au' (Australia), etc.${NC}"
+    echo
+    
+    KEYBOARD_LAYOUT="us"  # Default layout
+    
+    while true; do
+        echo -e "${YELLOW}Enter your choice (1-22, or press Enter for default 'us'):${NC}"
+        read -r layout_choice
+        
+        # If empty input, use default
+        if [ -z "$layout_choice" ]; then
+            layout_choice=1
+        fi
+        
+        case $layout_choice in
+            1)
+                KEYBOARD_LAYOUT="us"
+                print_status "Selected: United States (us)"
+                break
+                ;;
+            2)
+                KEYBOARD_LAYOUT="gb"
+                print_status "Selected: United Kingdom (gb)"
+                break
+                ;;
+            3)
+                KEYBOARD_LAYOUT="de"
+                print_status "Selected: Germany (de)"
+                break
+                ;;
+            4)
+                KEYBOARD_LAYOUT="fr"
+                print_status "Selected: France (fr)"
+                break
+                ;;
+            5)
+                KEYBOARD_LAYOUT="es"
+                print_status "Selected: Spain (es)"
+                break
+                ;;
+            6)
+                KEYBOARD_LAYOUT="it"
+                print_status "Selected: Italy (it)"
+                break
+                ;;
+            7)
+                KEYBOARD_LAYOUT="cn"
+                print_status "Selected: China (cn)"
+                break
+                ;;
+            8)
+                KEYBOARD_LAYOUT="ru"
+                print_status "Selected: Russia (ru)"
+                break
+                ;;
+            9)
+                KEYBOARD_LAYOUT="jp"
+                print_status "Selected: Japan (jp)"
+                break
+                ;;
+            10)
+                KEYBOARD_LAYOUT="kr"
+                print_status "Selected: South Korea (kr)"
+                break
+                ;;
+            11)
+                KEYBOARD_LAYOUT="ar"
+                print_status "Selected: Arabic (ar)"
+                break
+                ;;
+            12)
+                KEYBOARD_LAYOUT="il"
+                print_status "Selected: Israel (il)"
+                break
+                ;;
+            13)
+                KEYBOARD_LAYOUT="in"
+                print_status "Selected: India (in)"
+                break
+                ;;
+            14)
+                KEYBOARD_LAYOUT="tr"
+                print_status "Selected: Turkey (tr)"
+                break
+                ;;
+            15)
+                KEYBOARD_LAYOUT="uz"
+                print_status "Selected: Uzbekistan (uz)"
+                break
+                ;;
+            16)
+                KEYBOARD_LAYOUT="br"
+                print_status "Selected: Brazil (br)"
+                break
+                ;;
+            17)
+                KEYBOARD_LAYOUT="no"
+                print_status "Selected: Norway (no)"
+                break
+                ;;
+            18)
+                KEYBOARD_LAYOUT="pl"
+                print_status "Selected: Poland (pl)"
+                break
+                ;;
+            19)
+                KEYBOARD_LAYOUT="nl"
+                print_status "Selected: Netherlands (nl)"
+                break
+                ;;
+            20)
+                KEYBOARD_LAYOUT="se"
+                print_status "Selected: Sweden (se)"
+                break
+                ;;
+            21)
+                KEYBOARD_LAYOUT="fi"
+                print_status "Selected: Finland (fi)"
+                break
+                ;;
+            22)
+                echo -e "${YELLOW}Enter your custom keyboard layout code (e.g., 'dvorak', 'colemak', 'ca', 'au'):${NC}"
+                read -r custom_layout
+                if [ -n "$custom_layout" ]; then
+                    KEYBOARD_LAYOUT="$custom_layout"
+                    print_status "Selected: Custom layout ($custom_layout)"
+                    break
+                else
+                    print_error "Custom layout cannot be empty. Please try again."
+                fi
+                ;;
+            *)
+                print_error "Invalid choice. Please enter a number between 1-22."
+                ;;
+        esac
+    done
+    
+    # Apply the keyboard layout to custom.conf
+    if [ -f "$HOME/.config/hyprcustom/custom.conf" ]; then
+        print_status "Applying keyboard layout '$KEYBOARD_LAYOUT' to Hyprland configuration..."
+        sed -i "s/\$LAYOUT/$KEYBOARD_LAYOUT/g" "$HOME/.config/hyprcustom/custom.conf"
+        print_success "Keyboard layout '$KEYBOARD_LAYOUT' applied successfully!"
+    else
+        print_warning "custom.conf file not found. Keyboard layout not applied."
+    fi
 
     # Ensure ~/.config exists, then remove specified subdirectories
     [ -d "$HOME/.config" ] || mkdir -p "$HOME/.config"
