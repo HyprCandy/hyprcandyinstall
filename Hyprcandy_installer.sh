@@ -806,15 +806,6 @@ setup_hyprcandy() {
 
     # Remove present .zshrc file (removed .zshrc from list since it's now handled by the script) 
     rm -rf .face.icon .hyprcandy-zsh.zsh .icons HyprCandy
-    
-    # Apply the keyboard layout to custom.conf
-    if [ -f "$HOME/.config/hyprcustom/custom.conf" ]; then
-        print_status "Applying keyboard layout '$KEYBOARD_LAYOUT' to Hyprland configuration..."
-        sed -i "s/\$LAYOUT/$KEYBOARD_LAYOUT/g" "$HOME/.config/hyprcustom/custom.conf"
-        print_success "Keyboard layout '$KEYBOARD_LAYOUT' applied successfully!"
-    else
-        print_warning "custom.conf file not found. Keyboard layout not applied."
-    fi
 
     # Ensure ~/.config exists, then remove specified subdirectories
     [ -d "$HOME/.config" ] || mkdir -p "$HOME/.config"
