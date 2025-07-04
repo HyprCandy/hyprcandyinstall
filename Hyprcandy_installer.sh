@@ -1103,8 +1103,6 @@ decoration {
 # ┃                      Window & layer rules                   ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ ' > "$HOME/.config/hyprcustom/custom.conf"
 
-}
-    
     # Execute the appropriate function based on the detected shell
     case "$CURRENT_SHELL" in
         "fish")
@@ -1285,7 +1283,6 @@ decoration {
                 ;;
         esac
     done
-}
     
 # Function to automatically setup Hyprcandy configuration
 setup_hyprcandy() {
