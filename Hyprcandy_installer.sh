@@ -774,17 +774,9 @@ EOF
     
     print_success "Zsh shell configuration completed!"
 }
-    
-# Function to automatically setup Hyprcandy configuration
-setup_hyprcandy() {
-    print_status "Setting up Hyprcandy configuration..."
-    
-    # Check if stow is available
-    if ! command -v stow &> /dev/null; then
-        print_error "stow is not installed. Cannot proceed with configuration setup."
-        return 1
-    fi
 
+# Function to setup default custom.conf
+custom_setup () {
     # Detect the current shell
     CURRENT_SHELL=$(basename "$SHELL")
         # Create the custom settings directory and file if it doesn't already exist
@@ -1287,6 +1279,17 @@ decoration {
                 ;;
         esac
     done
+}
+    
+# Function to automatically setup Hyprcandy configuration
+setup_hyprcandy() {
+    print_status "Setting up Hyprcandy configuration..."
+    
+    # Check if stow is available
+    if ! command -v stow &> /dev/null; then
+        print_error "stow is not installed. Cannot proceed with configuration setup."
+        return 1
+    fi
     
     # In case of updates, remove existing .hyprcandy folder before cloning
     if [ -d "$HOME/.hyprcandy" ]; then
