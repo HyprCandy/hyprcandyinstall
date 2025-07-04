@@ -1223,57 +1223,7 @@ echo "✅ All set! Both services are running and monitoring for changes."
         echo "⚠️  'hyprctl' not found. Skipping Hyprland reload."
     fi
 
-    print_success "HyprCandy configuration setup completed!"  
-}
-
-# Function to enable display manager and prompt for reboot
-enable_display_manager() {
-    print_status "Enabling $DISPLAY_MANAGER display manager..."
-    
-    # Disable other display managers first
-    print_status "Disabling other display managers..."
-    sudo systemctl disable lightdm 2>/dev/null || true
-    sudo systemctl disable lxdm 2>/dev/null || true
-    if [ "$DISPLAY_MANAGER" != "sddm" ]; then
-        sudo systemctl disable sddm 2>/dev/null || true
-    fi
-    if [ "$DISPLAY_MANAGER" != "gdm" ]; then
-        sudo systemctl disable gdm 2>/dev/null || true
-    fi
-    
-    # Enable the selected display manager
-    if sudo systemctl enable "$DISPLAY_MANAGER_SERVICE"; then
-        print_success "$DISPLAY_MANAGER has been enabled successfully!"
-    else
-        print_error "Failed to enable $DISPLAY_MANAGER. You may need to enable it manually."
-        print_status "Run: sudo systemctl enable $DISPLAY_MANAGER_SERVICE"
-    fi
-    
-    # Additional SDDM configuration if selected
-    if [ "$DISPLAY_MANAGER" = "sddm" ]; then
-        print_status "Configuring SDDM with Sugar Candy theme..."
-        
-        # Create SDDM config directory if it doesn't exist
-        sudo mkdir -p /etc/sddm.conf.d/
-        
-        # Configure SDDM to use Sugar Candy theme
-        if [ -d "/usr/share/sddm/themes/sugar-candy" ]; then
-            sudo tee /etc/sddm.conf.d/sugar-candy.conf > /dev/null << EOF
-[Theme]
-Current=sugar-candy
-
-[General]
-Background=$HOME/.config/background.png
-EOF
-            
-            print_success "SDDM configured to use Sugar Candy theme with custom auto-updating background"
-        else
-            print_warning "Sugar Candy theme not found. SDDM will use default theme."
-        fi
-    fi
-}
-
-# Function to setup default "custom.conf" file
+    # Function to setup default "custom.conf" file
     # Detect the current shell
     CURRENT_SHELL=$(basename "$SHELL")
 
@@ -1611,6 +1561,56 @@ decoration {
     end
 end
 
+    print_success "HyprCandy configuration setup completed!"  
+}
+
+# Function to enable display manager and prompt for reboot
+enable_display_manager() {
+    print_status "Enabling $DISPLAY_MANAGER display manager..."
+    
+    # Disable other display managers first
+    print_status "Disabling other display managers..."
+    sudo systemctl disable lightdm 2>/dev/null || true
+    sudo systemctl disable lxdm 2>/dev/null || true
+    if [ "$DISPLAY_MANAGER" != "sddm" ]; then
+        sudo systemctl disable sddm 2>/dev/null || true
+    fi
+    if [ "$DISPLAY_MANAGER" != "gdm" ]; then
+        sudo systemctl disable gdm 2>/dev/null || true
+    fi
+    
+    # Enable the selected display manager
+    if sudo systemctl enable "$DISPLAY_MANAGER_SERVICE"; then
+        print_success "$DISPLAY_MANAGER has been enabled successfully!"
+    else
+        print_error "Failed to enable $DISPLAY_MANAGER. You may need to enable it manually."
+        print_status "Run: sudo systemctl enable $DISPLAY_MANAGER_SERVICE"
+    fi
+    
+    # Additional SDDM configuration if selected
+    if [ "$DISPLAY_MANAGER" = "sddm" ]; then
+        print_status "Configuring SDDM with Sugar Candy theme..."
+        
+        # Create SDDM config directory if it doesn't exist
+        sudo mkdir -p /etc/sddm.conf.d/
+        
+        # Configure SDDM to use Sugar Candy theme
+        if [ -d "/usr/share/sddm/themes/sugar-candy" ]; then
+            sudo tee /etc/sddm.conf.d/sugar-candy.conf > /dev/null << EOF
+[Theme]
+Current=sugar-candy
+
+[General]
+Background=$HOME/.config/background.png
+EOF
+            
+            print_success "SDDM configured to use Sugar Candy theme with custom auto-updating background"
+        else
+            print_warning "Sugar Candy theme not found. SDDM will use default theme."
+        fi
+    fi
+}
+
 # Function to setup keyboard layout
 setup_keyboard_layout() {
     # Keyboard layout selection
@@ -1864,9 +1864,6 @@ main() {
     
     # Enable display manager
     enable_display_manager
-
-    # Function to setup default "custom.conf" file
-    setup_custom_cnfig
 
     # Setup keyboard layout
     setup_keyboard_layout
