@@ -1603,6 +1603,17 @@ setup_keyboard_layout() {
                 ;;
         esac
     done
+    
+        # Apply the keyboard layout to the custom.conf file
+    CUSTOM_CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
+    
+    if [ -f "$CUSTOM_CONFIG_FILE" ]; then
+        sed -i "s/\$LAYOUT/$KEYBOARD_LAYOUT/g" "$CUSTOM_CONFIG_FILE"
+        print_status "Keyboard layout '$KEYBOARD_LAYOUT' has been applied to custom.conf"
+    else
+        print_error "Custom config file not found at $CUSTOM_CONFIG_FILE"
+        print_error "Please run setup_custom_config() first"
+    fi
 }
 
 # Function to prompt for reboot
