@@ -1604,13 +1604,17 @@ setup_keyboard_layout() {
         print_error "Please run setup_custom_config() first"
     fi
 
-        # 🔄 Reload Hyprland
+    # 🔄 Reload Hyprland
     echo
     echo "🔄 Reloading Hyprland with 'hyprctl reload'..."
     if command -v hyprctl > /dev/null 2>&1; then
-        hyprctl reload && echo "✅ Hyprland reloaded successfully." || echo "❌ Failed to reload Hyprland."
+        if pgrep -x "Hyprland" > /dev/null; then
+            hyprctl reload && echo "✅ Hyprland reloaded successfully." || echo "❌ Failed to reload Hyprland."
+        else
+            echo "ℹ️  Hyprland is not currently running. Configuration will be applied on next start and Hyprland login."
+        fi
     else
-        echo "⚠️  'hyprctl' not found. Skipping Hyprland reload."
+        echo "⚠️  'hyprctl' not found. Skipping Hyprland. Configuration will be applied on next start and Hyprland login."
     fi
 
     print_success "HyprCandy configuration setup completed!"  
