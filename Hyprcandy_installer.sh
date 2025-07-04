@@ -1127,6 +1127,8 @@ input {
         print_warning "custom.conf file not found. Keyboard layout not applied."
     fi
 
+    cd "$HOME"
+
     # Ensure ~/.config exists, then remove specified subdirectories
     [ -d "$HOME/.config" ] || mkdir -p "$HOME/.config"
     cd "$HOME/.config" || exit 1
@@ -1692,7 +1694,7 @@ main() {
     print_status "• Launch it from the application menu or run: ${CYAN}nwg-displays${NC}"
     print_status "• Adjust scaling for HiDPI displays if needed"
     echo
-    echo -e "${PURPLE}🪄 Zsh Configuration:${NC}"
+    echo -e "${PURPLE}🐚 Zsh Configuration:${NC}"
     print_status "• IMPORTANT: If you chose Zsh-shell then use ${CYAN}SUPER + Q${NC} to toggle Kitty and go through the Zsh setup"
     print_status "• IMPORTANT: (Remember to type ${YELLOW}n${NC}o at the end when asked to Apply changes to .zshrc since HyprCandy already has them applied)"
     print_status "• To configure Zsh, in the ${CYAN}Home${NC} directory edit ${CYAN}.hyprcandy-zsh.zsh${NC} or ${CYAN}.zshrc${NC}"
