@@ -1108,13 +1108,61 @@ TimeoutStopSec=10
 WantedBy=graphical-session.target
 EOF
 
-### 🔄 Reload and enable services
-echo "🔄 Reloading and enabling background-watcher.service to generate backgrounds and hyprpanel-idle-monitor.service for idle-inibitor configuration depending on hyprpanel status..."
+### 🔧 Create hyprpanel restart script for keybind compatibility
+cat > "$HOME/.config/hyprcandy/hooks/restart_hyprpanel.sh" << 'EOF'
+#!/bin/bash
+
+# Script to properly restart hyprpanel via systemd
+# This ensures clean shutdown and restart, compatible with your keybind
+
+echo "🔄 Restarting hyprpanel via systemd..."
+
+# Stop the service (this will kill hyprpanel cleanly)
+systemctl --user stop hyprpanel.service
+
+# Wait a moment for clean shutdown
+sleep 0.5
+
+# Start the service again
+systemctl --user start hyprpanel.service
+
+echo "✅ Hyprpanel restarted"
+EOF
+chmod +x "$HOME/.config/hyprcandy/hooks/restart_hyprpanel.sh"
+
+### 🎛️ Create hyprpanel.service for faster startup
+cat > "$HOME/.config/systemd/user/hyprpanel.service" << 'EOF'
+[Unit]
+Description=Hyprpanel - Modern Hyprland panel
+After=graphical-session.target hyprland-session.target
+Wants=graphical-session.target
+PartOf=graphical-session.target
+Requisite=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/hyprpanel
+Restart=on-failure
+RestartSec=1
+Environment=DISPLAY=:0
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStopSec=5
+# Don't restart if manually stopped (allows keybind control)
+RestartPreventExitStatus=143
+
+[Install]
+WantedBy=graphical-session.target
+EOF
+
+### 🔄 Update existing reload section to include hyprpanel service
+echo "🔄 Reloading and enabling all services (background-watcher, hyprpanel-idle-monitor, and hyprpanel)..."
 systemctl --user daemon-reexec
 systemctl --user daemon-reload
 systemctl --user enable --now background-watcher.service &>/dev/null
 systemctl --user enable --now hyprpanel-idle-monitor.service &>/dev/null
-echo "✅ All set! Both services are running and monitoring for changes."
+systemctl --user enable --now hyprpanel.service &>/dev/null
+echo "✅ All set! All 3 services are running and monitoring for changes."
 
     # 🛠️ GNOME Window Button Layout Adjustment
     echo
@@ -1255,7 +1303,7 @@ EOF
 
 # Function to setup default "custom.conf" file
 setup_custom_config() {
-        # Create the custom settings directory and files if it doesn't already exist
+# Create the custom settings directory and files if it doesn't already exist
         if [ ! -d "$HOME/.config/hyprcustom" ]; then
             mkdir -p "$HOME/.config/hyprcustom" && touch "$HOME/.config/hyprcustom/custom.conf" && touch "$HOME/.config/hyprcustom/custom_lock.conf"
             echo "📁 Created the custom settings directory with 'custom.conf' and 'custom_lock.conf' files to keep your personal Hyprland and Hyprlock changes safe ..."
@@ -1283,12 +1331,12 @@ exec-once = bash -c "mkfifo /tmp/$HYPRLAND_INSTANCE_SIGNATURE.wob && tail -f /tm
 exec-once = dbus-update-activation-environment --systemd DBUS_SESSION_BUS_ADDRESS DISPLAY XAUTHORITY &
 exec-once = hash dbus-update-activation-environment 2>/dev/null &
 exec-once = systemctl --user import-environment &
+# Panel
+exec-once = systemctl --user start hyprpanel &
 # Start Polkit
 exec-once = systemctl --user start hyprpolkitagent &
 # Using hypridle to start hyprlock
 exec-once = hypridle &
-# Panel
-exec-once = hyprpanel &
 # Dock
 exec-once = ~/.config/nwg-dock-hyprland/launch.sh &
 # Pyprland
@@ -1835,7 +1883,7 @@ label {
 
 label {
     monitor =
-    text = ✝    👑    ✝ # $USER
+    text = ✝    👑    ✝ #  $USER
     color = $secondary
     font_size = 20
     font_family = Fira Semibold
