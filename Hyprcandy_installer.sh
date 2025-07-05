@@ -1772,6 +1772,7 @@ source = ~/.config/hypr/colors.conf
 
 general {
     ignore_empty_input = true
+    hide_cursor = true
 }
 
 background {
