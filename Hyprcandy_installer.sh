@@ -1365,6 +1365,7 @@ $EDITOR = gedit # Change from the default editor to your prefered editor
 #$DISCORD = equibop
 
 #### Applications ####
+
 #bind = $mainMod CTRL, S, exec, spotify
 #bind = $mainMod, D, exec, $DISCORD
 #bind = $mainMod, W, exec, warp-terminal
