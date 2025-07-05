@@ -1257,8 +1257,8 @@ EOF
 setup_custom_config() {
         # Create the custom settings directory and file if it doesn't already exist
         if [ ! -d "$HOME/.config/hyprcustom" ]; then
-            mkdir -p "$HOME/.config/hyprcustom" && touch "$HOME/.config/hyprcustom/custom.conf"
-            echo "📁 Created the custom settings directory and 'custom.conf' file for your personal settings..."
+            mkdir -p "$HOME/.config/hyprcustom" && touch "$HOME/.config/hyprcustom/custom.conf" && touch "$HOME/.config/hyprcustom/custom_lock.conf"
+            echo "📁 Created the custom settings directory with 'custom.conf' and 'custom_lock.conf' files to keep your personal Hyprland and Hyprlock changes safe ..."
             
             # Add default content to the custom.conf file
             cat > "$HOME/.config/hyprcustom/custom.conf" << 'EOF'
@@ -1755,6 +1755,113 @@ misc {
     disable_hyprland_logo = true
     disable_splash_rendering = false
     initial_workspace_tracking = 1
+}
+EOF
+
+            # Add default content to the custom_lock.conf file
+            cat > "$HOME/.config/hyprcustom/custom_lock.conf" << 'EOF'
+#  _                      _            _
+# | |__  _   _ _ __  _ __| | ___   ___| | __
+# | '_ \| | | | '_ \| '__| |/ _ \ / __| |/ /
+# | | | | |_| | |_) | |  | | (_) | (__|   <
+# |_| |_|\__, | .__/|_|  |_|\___/ \___|_|\_\
+#        |___/|_|
+#
+
+source = ~/.config/hyprcustom/custom_lock.conf
+
+general {
+    ignore_empty_input = true
+}
+
+background {
+    monitor =
+    path = ~/.config/background.png
+    blur_passes = 3
+    blur_sizes = 1
+    vibrancy = 0.1696s
+    noise = 0.01
+    contrast = 0.8916
+}
+
+input-field {
+    monitor =
+    size = 200, 50
+    outline_thickness = 3
+    dots_size = 0.33 # Scale of input-field height, 0.2 - 0.8
+    dots_spacing = 0.15 # Scale of dots' absolute size, 0.0 - 1.0
+    dots_center = true
+    dots_rounding = -1 # -1 default circle, -2 follow input-field rounding
+    outer_color = $source_color
+    inner_color = $background
+    font_color = $source_color
+    fade_on_empty = false
+    fade_timeout = 1000 # Milliseconds before fade_on_empty is triggered.
+    placeholder_text = <i><span> Password</span></i># Text rendered in the input box when it's empty. # foreground="$source_color" ##ffffff99
+    hide_input = false
+    rounding = 40 # -1 means complete rounding (circle/oval)
+    check_color = $primary
+    fail_color = $error # if authentication failed, changes outer_color and fail message color
+    fail_text = <i>$FAIL <b>($ATTEMPTS)</b></i> # can be set to empty
+    fail_transition = 300 # transition time in ms between normal outer_color and fail_color
+    capslock_color = -1
+    numlock_color = -1
+    bothlock_color = -1 # when both locks are active. -1 means don't change outer color (same for above)
+    invert_numlock = false # change color if numlock is off
+    swap_font_color = false # see below
+    position = 0, -80
+    halign = center
+    valign = center
+    shadow_passes = 10
+    shadow_size = 20
+    shadow_color = $shadow
+    shadow_boost = 1.6
+}
+
+label {
+    monitor =
+    #clock
+    text = cmd[update:1000] echo "$TIME"
+    color = $secondary
+    font_size = 55
+    font_family = Fira Semibold
+    position = 0, 70
+    halign = center
+    valign = bottom
+    shadow_passes = 5
+    shadow_size = 10
+}
+
+label {
+    monitor =
+    text = ✝    👑    ✝ # $USER
+    color = $secondary
+    font_size = 20
+    font_family = Fira Semibold
+    position = 0, 360
+    halign = center
+    valign = bottom
+    shadow_passes = 5
+    shadow_size = 10
+}
+
+image {
+    monitor =
+    path = .face.icon
+    size = 160 # lesser side if not 1:1 ratio
+    rounding = 75 # negative values mean circle
+    border_size = 4
+    border_color = $source_color
+    rotate = 0 # degrees, counter-clockwise
+    reload_time = -1 # seconds between reloading, 0 to reload with SIGUSR2
+#    reload_cmd =  # command to get new path. if empty, old path will be used. don't run "follow" commands like tail -F
+    position = 0, -100
+    halign = center
+    valign = top
+    shadow_passes = 10
+    shadow_size = 20
+    shadow_color = $shadow
+    shadow_boost = 1.6
 }
 EOF
         fi
