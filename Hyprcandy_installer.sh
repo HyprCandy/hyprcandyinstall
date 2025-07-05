@@ -1313,6 +1313,32 @@ env = XCURSOR_SIZE,18
 env = HYPRCURSOR_THEME,Bibata-Modern-Classic
 env = HYPRCURSOR_SIZE,18
 
+# XDG Desktop Portal
+env = XDG_CURRENT_DESKTOP,Hyprland
+env = XDG_SESSION_TYPE,wayland
+env = XDG_SESSION_DESKTOP,Hyprland
+# GTK
+env = GTK_USE_PORTAL,1
+# QT
+env = QT_QPA_PLATFORM,wayland;xcb
+env = QT_QPA_PLATFORMTHEME,gtk3
+env = QT_WAYLAND_DISABLE_WINDOWDECORATION,0
+env = QT_AUTO_SCREEN_SCALE_FACTOR,1
+# GDK
+env = GDK_DEBUG,portals
+env = GDK_SCALE,1
+# Toolkit Backend
+env = GDK_BACKEND,wayland,x11,*
+env = CLUTTER_BACKEND,wayland
+# Mozilla
+env = MOZ_ENABLE_WAYLAND,1
+# Ozone
+env = OZONE_PLATFORM,wayland
+env = ELECTRON_OZONE_PLATFORM_HINT,wayland
+# Extra
+env = GTK_THEME,adw-gtk3-dark
+env = WLR_DRM_NO_ATOMIC,1
+
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 # ┃                         Keybindings                         ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
@@ -1706,6 +1732,16 @@ layerrule = blur,hyprmenu
 layerrule = ignorezero,hyprmenu
 # layerrule = animation popin 50%, waybar
 # Layers Rules End #
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                         Misc-settings                       ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+misc {
+    disable_hyprland_logo = true
+    disable_splash_rendering = false
+    initial_workspace_tracking = 1
+}
 EOF
         fi
 }
