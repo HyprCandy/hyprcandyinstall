@@ -529,7 +529,7 @@ if type -q starship
 end
 
 # Set environment variables
-set -x EDITOR nano
+set -x EDITOR micro
 set -x BROWSER firefox
 set -x TERMINAL kitty
 
@@ -701,7 +701,7 @@ EOF
 export ZSH="$HOME/.oh-my-zsh"
 
 # Set environment variables
-export EDITOR=nano
+export EDITOR=micro
 export BROWSER=firefox
 export TERMINAL=kitty
 
