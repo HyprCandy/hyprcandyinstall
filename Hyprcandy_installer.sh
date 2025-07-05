@@ -1768,7 +1768,7 @@ EOF
 #        |___/|_|
 #
 
-source = ~/.config/hyprcustom/custom_lock.conf
+source = ~/.config/hypr/colors.conf
 
 general {
     ignore_empty_input = true
