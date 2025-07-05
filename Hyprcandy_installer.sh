@@ -1262,6 +1262,19 @@ setup_custom_config() {
             
             # Add default content to the custom.conf file
             cat > "$HOME/.config/hyprcustom/custom.conf" << 'EOF'
+#  _   _                  _                 _
+# | | | |_   _ _ __  _ __| | __ _ _ __   __| |
+# | |_| | | | | '_ \| '__| |/ _` | '_ \ / _` |
+# |  _  | |_| | |_) | |  | | (_| | | | | (_| |
+# |_| |_|\__, | .__/|_|  |_|\__,_|_| |_|\__,_|
+#        |___/|_|
+#
+
+#[IMPORTANT]#
+# Your custom settings mad in this file are safe from resets after rerunning the script.
+# To reset, delete the 'hyprcustom' folder (not just the 'custom.conf' file) before rerunning the script to regenerate the default setup.
+#[IMPORTANT]#
+
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 # ┃                           Autostart                         ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
