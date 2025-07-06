@@ -280,6 +280,9 @@ build_package_list() {
         "eog"
         "pyprland"
         "inotify-tools"
+
+        # Fallback notification daemon (when hyprpanel isn't running)
+        "mako"
         
         # Fonts and emojis
         "nerd-fonts"
@@ -1842,6 +1845,8 @@ env = XCURSOR_SIZE,18
 env = HYPRCURSOR_THEME,Bibata-Modern-Classic
 env = HYPRCURSOR_SIZE,18
 
+# DISPLAY
+env = WAYLAND_DISPLAY,wayland-0
 # XDG Desktop Portal
 env = XDG_CURRENT_DESKTOP,Hyprland
 env = XDG_SESSION_TYPE,wayland
