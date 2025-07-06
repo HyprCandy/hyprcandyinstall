@@ -1251,10 +1251,10 @@ wait_for_hyprpanel() {
         if pgrep -f "gjs" > /dev/null 2>&1; then
             echo "✅ hyprpanel is running"
             # Give it a bit more time to fully initialize swww
-            sleep 2
+            sleep 0.5
             return 0
         fi
-        sleep 1
+        sleep 0.5
         ((count++))
     done
     
@@ -1287,7 +1287,7 @@ start_hyprpanel
 # Wait for hyprpanel to be ready
 if wait_for_hyprpanel; then
     # Additional wait to ensure swww is initialized by hyprpanel
-    sleep 2
+    sleep 0.5
     restart_swww
 else
     echo "⚠️ Proceeding with swww restart anyway..."
@@ -1295,6 +1295,14 @@ else
 fi
 
 echo "🎯 All services started successfully"
+EOF
+chmod +x "$HOME/.config/hyprcandy/hooks/startup_services.sh"
+
+### 🧹 Create clear_swww.sh
+cat > "$HOME/.config/hyprcandy/hooks/clear_swww.sh" << 'EOF'
+#!/bin/bash
+CACHE_DIR="$HOME/.cache/swww"
+[ -d "$CACHE_DIR" ] && rm -rf "$CACHE_DIR"
 EOF
 chmod +x "$HOME/.config/hyprcandy/hooks/clear_swww.sh"
 
@@ -1376,21 +1384,10 @@ cat > "$HOME/.config/systemd/user/background-watcher.service" << 'EOF'
 [Unit]
 Description=Watch ~/.config/background, clear swww cache and update background images
 After=graphical-session.target hyprland-session.target
-Wants=graphical-session.target
-PartOf=graphical-session.target
-Requisite=graphical-session.target
 
 [Service]
-Type=simple
 ExecStart=%h/.config/hyprcandy/hooks/watch_background.sh
 Restart=on-failure
-RestartSec=3
-KillMode=mixed
-KillSignal=SIGTERM
-TimeoutStopSec=10
-Environment=WAYLAND_DISPLAY=wayland-0
-Environment=XDG_CURRENT_DESKTOP=Hyprland
-Environment=XDG_SESSION_TYPE=wayland
 
 [Install]
 WantedBy=graphical-session.target
@@ -1440,9 +1437,6 @@ start_mako() {
     
     # Give mako a moment to start up
     sleep 1
-    
-    # Send a test notification to confirm it's working
-    notify-send "Notification System" "Mako started - notifications active" -t 3000 2>/dev/null || true
 }
 
 # Function to stop mako (only our instance)
@@ -1584,11 +1578,9 @@ chmod +x "$HOME/.config/hyprcandy/hooks/hyprpanel_idle_monitor.sh"
 ### 🔧 Create hyprpanel-idle-monitor.service
 cat > "$HOME/.config/systemd/user/hyprpanel-idle-monitor.service" << 'EOF'
 [Unit]
-Description=Monitor hyprpanel and manage idle inhibitor + mako
-After=graphical-session.target hyprland-session.target
+Description=Monitor hyprpanel and manage idle inhibitor
+After=graphical-session.target
 Wants=graphical-session.target
-PartOf=graphical-session.target
-Requisite=graphical-session.target
 
 [Service]
 Type=simple
@@ -1598,12 +1590,9 @@ RestartSec=10
 KillMode=mixed
 KillSignal=SIGTERM
 TimeoutStopSec=15
-Environment=WAYLAND_DISPLAY=wayland-0
-Environment=XDG_CURRENT_DESKTOP=Hyprland
-Environment=XDG_SESSION_TYPE=wayland
 
 [Install]
-WantedBy=graphical-session.target
+WantedBy=default.target
 EOF
 
 ### 🛡️ Create safe hyprpanel killer script
@@ -1665,7 +1654,7 @@ echo "🔄 Restarting hyprpanel via systemd..."
 systemctl --user stop hyprpanel.service
 
 # Wait a moment for clean shutdown
-sleep 0.5
+sleep 5
 
 # Start the service again
 systemctl --user start hyprpanel.service
@@ -1687,13 +1676,10 @@ Requisite=graphical-session.target
 Type=simple
 ExecStart=/usr/bin/hyprpanel
 Restart=on-failure
-RestartSec=1
+RestartSec=6
 KillMode=mixed
 KillSignal=SIGTERM
-TimeoutStopSec=5
-Environment=WAYLAND_DISPLAY=wayland-0
-Environment=XDG_CURRENT_DESKTOP=Hyprland
-Environment=XDG_SESSION_TYPE=wayland
+TimeoutStopSec=10
 # Don't restart if manually stopped (allows keybind control)
 RestartPreventExitStatus=143
 
@@ -1706,8 +1692,8 @@ echo "🔄 Reloading and enabling all services (background-watcher, hyprpanel-id
 systemctl --user daemon-reexec
 systemctl --user daemon-reload
 systemctl --user enable --now background-watcher.service &>/dev/null
-systemctl --user enable --now hyprpanel-idle-monitor.service &>/dev/null
 systemctl --user enable --now hyprpanel.service &>/dev/null
+systemctl --user enable --now hyprpanel-idle-monitor.service &>/dev/null
 echo "✅ All set! All 3 services are running and monitoring for changes."
 
     # 🛠️ GNOME Window Button Layout Adjustment
