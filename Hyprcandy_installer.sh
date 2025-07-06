@@ -886,9 +886,142 @@ setup_hyprcandy() {
         echo "❌ Failed to install: ${stow_failed[*]}"
     fi
 
-### ✅ Setup Background Hooks
+### ✅ Setup hook scripts and needed services
 echo "📁 Creating background hook scripts..."
 mkdir -p "$HOME/.config/hyprcandy/hooks" "$HOME/.config/systemd/user"
+
+#!/bin/bash
+
+# ═══════════════════════════════════════════════════════════════
+#                    Gaps OUT Increase Script
+# ═══════════════════════════════════════════════════════════════
+
+# File: ~/.config/hyprcandy/hooks/hyprland_gaps_out_increase.sh
+cat > "$HOME/.config/hyprcandy/hooks/hyprland_gaps_out_increase.sh" << 'EOF'
+#!/bin/bash
+
+CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
+
+# Get current gaps_out value
+CURRENT_GAPS_OUT=$(grep -E "^\s*gaps_out\s*=" "$CONFIG_FILE" | sed 's/.*gaps_out\s*=\s*\([0-9]*\).*/\1/')
+
+# Increment value
+NEW_GAPS_OUT=$((CURRENT_GAPS_OUT + 1))
+
+# Update the file
+sed -i "s/^\(\s*gaps_out\s*=\s*\)[0-9]*/\1$NEW_GAPS_OUT/" "$CONFIG_FILE"
+
+# Force apply gaps using hyprctl (immediate effect)
+hyprctl keyword general:gaps_out $NEW_GAPS_OUT
+
+# Also reload config to ensure persistence
+hyprctl reload
+
+echo "🔼 Gaps OUT increased: gaps_out=$NEW_GAPS_OUT"
+notify-send "Gaps OUT Increased" "gaps_out: $NEW_GAPS_OUT" -t 2000
+EOF
+
+# ═══════════════════════════════════════════════════════════════
+#                    Gaps OUT Decrease Script
+# ═══════════════════════════════════════════════════════════════
+
+# File: ~/.config/hyprcandy/hooks/hyprland_gaps_out_decrease.sh
+cat > "$HOME/.config/hyprcandy/hooks/hyprland_gaps_out_decrease.sh" << 'EOF'
+#!/bin/bash
+
+CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
+
+# Get current gaps_out value
+CURRENT_GAPS_OUT=$(grep -E "^\s*gaps_out\s*=" "$CONFIG_FILE" | sed 's/.*gaps_out\s*=\s*\([0-9]*\).*/\1/')
+
+# Decrement value (minimum 0)
+NEW_GAPS_OUT=$((CURRENT_GAPS_OUT > 0 ? CURRENT_GAPS_OUT - 1 : 0))
+
+# Update the file
+sed -i "s/^\(\s*gaps_out\s*=\s*\)[0-9]*/\1$NEW_GAPS_OUT/" "$CONFIG_FILE"
+
+# Force apply gaps using hyprctl (immediate effect)
+hyprctl keyword general:gaps_out $NEW_GAPS_OUT
+
+# Also reload config to ensure persistence
+hyprctl reload
+
+echo "🔽 Gaps OUT decreased: gaps_out=$NEW_GAPS_OUT"
+notify-send "Gaps OUT Decreased" "gaps_out: $NEW_GAPS_OUT" -t 2000
+EOF
+
+# ═══════════════════════════════════════════════════════════════
+#                    Gaps IN Increase Script
+# ═══════════════════════════════════════════════════════════════
+
+# File: ~/.config/hyprcandy/hooks/hyprland_gaps_in_increase.sh
+cat > "$HOME/.config/hyprcandy/hooks/hyprland_gaps_in_increase.sh" << 'EOF'
+#!/bin/bash
+
+CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
+
+# Get current gaps_in value
+CURRENT_GAPS_IN=$(grep -E "^\s*gaps_in\s*=" "$CONFIG_FILE" | sed 's/.*gaps_in\s*=\s*\([0-9]*\).*/\1/')
+
+# Increment value
+NEW_GAPS_IN=$((CURRENT_GAPS_IN + 1))
+
+# Update the file
+sed -i "s/^\(\s*gaps_in\s*=\s*\)[0-9]*/\1$NEW_GAPS_IN/" "$CONFIG_FILE"
+
+# Force apply gaps using hyprctl (immediate effect)
+hyprctl keyword general:gaps_in $NEW_GAPS_IN
+
+# Also reload config to ensure persistence
+hyprctl reload
+
+echo "🔼 Gaps IN increased: gaps_in=$NEW_GAPS_IN"
+notify-send "Gaps IN Increased" "gaps_in: $NEW_GAPS_IN" -t 2000
+EOF
+
+# ═══════════════════════════════════════════════════════════════
+#                    Gaps IN Decrease Script
+# ═══════════════════════════════════════════════════════════════
+
+# File: ~/.config/hyprcandy/hooks/hyprland_gaps_in_decrease.sh
+cat > "$HOME/.config/hyprcandy/hooks/hyprland_gaps_in_decrease.sh" << 'EOF'
+#!/bin/bash
+
+CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
+
+# Get current gaps_in value
+CURRENT_GAPS_IN=$(grep -E "^\s*gaps_in\s*=" "$CONFIG_FILE" | sed 's/.*gaps_in\s*=\s*\([0-9]*\).*/\1/')
+
+# Decrement value (minimum 0)
+NEW_GAPS_IN=$((CURRENT_GAPS_IN > 0 ? CURRENT_GAPS_IN - 1 : 0))
+
+# Update the file
+sed -i "s/^\(\s*gaps_in\s*=\s*\)[0-9]*/\1$NEW_GAPS_IN/" "$CONFIG_FILE"
+
+# Force apply gaps using hyprctl (immediate effect)
+hyprctl keyword general:gaps_in $NEW_GAPS_IN
+
+# Also reload config to ensure persistence
+hyprctl reload
+
+echo "🔽 Gaps IN decreased: gaps_in=$NEW_GAPS_IN"
+notify-send "Gaps IN Decreased" "gaps_in: $NEW_GAPS_IN" -t 2000
+EOF
+
+# ═══════════════════════════════════════════════════════════════
+#                     Make scripts executable
+# ═══════════════════════════════════════════════════════════════
+
+chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_gaps_out_increase.sh"
+chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_gaps_out_decrease.sh"
+chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_gaps_in_increase.sh"
+chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_gaps_in_decrease.sh"
+chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_border_increase.sh"
+chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_border_decrease.sh"
+chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_rounding_increase.sh"
+chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_rounding_decrease.sh"
+
+echo "✅ Hyprland adjustment scripts created and made executable!"
 
 ### 🧹 Create clear_swww.sh
 cat > "$HOME/.config/hyprcandy/hooks/clear_swww.sh" << 'EOF'
@@ -1476,8 +1609,9 @@ input {
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 general {
-    gaps_in = 2
-    gaps_out = 6
+    gaps_in = 4
+    gaps_out = 6	
+    gaps_workspaces = 50    # Gaps between workspaces
     border_size = 2
     col.active_border = $primary $source_color $source_color $primary 90deg
     col.inactive_border = $background
@@ -1543,10 +1677,10 @@ decoration {
     }
 
     shadow {
-        enabled = false
-        range = 15
+        enabled = true
+        range = 6
         render_power = 4
-        color = 0x66000000
+        color = $source_color
     }
 }
 
@@ -1554,8 +1688,7 @@ decoration {
 # ┃                      Window & layer rules                   ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-windowrule = suppressevent maximize, class:.*
-windowrule = nofocus,class:^$,title:^$,xwayland:1,floating:1,fullscreen:0,pinned:0
+windowrule = suppressevent maximize, class:.* #nofocus,class:^$,title:^$,xwayland:1,floating:1,fullscreen:0,pinned:0
 # Pavucontrol floating
 windowrule = float,class:(.*org.pulseaudio.pavucontrol.*)
 windowrule = size 700 600,class:(.*org.pulseaudio.pavucontrol.*)
@@ -1639,12 +1772,12 @@ windowrule = rounding 5, title:^(danmufloat|termfloat)$
 windowrule = animation slide right, class:^(kitty|Alacritty)$
 windowrule = noblur, class:^(org.mozilla.firefox)$
 # Decorations related to floating windows on workspaces 1 to 10
-windowrule = bordersize 2, floating:1, onworkspace:w[fv1-10]
+##windowrule = bordersize 2, floating:1, onworkspace:w[fv1-10]
 windowrule = bordercolor $primary, floating:1, onworkspace:w[fv1-10]
-windowrule = rounding 8, floating:1, onworkspace:w[fv1-10]
+##windowrule = rounding 8, floating:1, onworkspace:w[fv1-10]
 # Decorations related to tiling windows on workspaces 1 to 10
-windowrule = bordersize 3, floating:0, onworkspace:f[1-10]
-windowrule = rounding 4, floating:0, onworkspace:f[1-10]
+##windowrule = bordersize 3, floating:0, onworkspace:f[1-10]
+##windowrule = rounding 4, floating:0, onworkspace:f[1-10]
 windowrule = tile, title:^(Microsoft-edge)$
 windowrule = tile, title:^(Brave-browser)$
 windowrule = tile, title:^(Chromium)$
@@ -1758,18 +1891,18 @@ windowrulev2 = float,class:^(xdg-desktop-portal-gtk)$
 # workspace = special:scratchpad, on-created-empty:$applauncher
 # no_gaps_when_only deprecated instead workspaces rules with selectors can do the same
 # Smart gaps from 0.45.0 https://wiki.hyprland.org/0.45.0/Configuring/Workspace-Rules/#smart-gaps
-workspace = w[t1], gapsout:0, gapsin:0
-workspace = w[tg1], gapsout:0, gapsin:0
+#workspace = w[t1], gapsout:0, gapsin:0
+#workspace = w[tg1], gapsout:0, gapsin:0
 workspace = f[1], gapsout:0, gapsin:0
-windowrulev2 = bordersize 2, floating:0, onworkspace:w[t1]
-windowrulev2 = rounding 10, floating:0, onworkspace:w[t1]
-windowrulev2 = bordersize 2, floating:0, onworkspace:w[tg1]
-windowrulev2 = rounding 10, floating:0, onworkspace:w[tg1]
-windowrulev2 = bordersize 2, floating:0, onworkspace:f[1]
-windowrulev2 = rounding 10, floating:0, onworkspace:f[1]
-windowrulev2 = rounding 0, fullscreen:1
+#windowrulev2 = bordersize 2, floating:0, onworkspace:w[t1]
+#windowrulev2 = rounding 10, floating:0, onworkspace:w[t1]
+#windowrulev2 = bordersize 2, floating:0, onworkspace:w[tg1]
+#windowrulev2 = rounding 10, floating:0, onworkspace:w[tg1]
+#windowrulev2 = bordersize 2, floating:0, onworkspace:f[1]
+#windowrulev2 = rounding 10, floating:0, onworkspace:f[1]
+#windowrulev2 = rounding 0, fullscreen:1
 windowrulev2 = noborder, fullscreen:1
-workspace = w[tv1-10], gapsout:6, gapsin:2
+#workspace = w[tv1-10], gapsout:6, gapsin:2
 #workspace = f[1], gapsout:6, gapsin:2
 
 workspace = 1, layoutopt:orientation:left
@@ -1961,6 +2094,24 @@ $EDITOR = gedit # Change from the default editor to your prefered editor
 
 bind = $mainMod, Escape, killactive #Kill single active window
 bind = $mainMod SHIFT, Escape, exec, hyprctl activewindow | grep pid | tr -d 'pid:' | xargs kill #Quit active window and all similar open instances
+
+#### Gaps OUT controls (outer gaps - screen edges) ####
+bind = $mainMod ALT, equal, exec, ~/.config/hyprcandy/hooks/hyprland_gaps_out_increase.sh  # $mainMod+Alt+= (Gap increase)
+bind = $mainMod ALT, minus, exec, ~/.config/hyprcandy/hooks/hyprland_gaps_out_decrease.sh  # $mainMod+Alt+- (Gap decrease)
+
+#### Gaps IN controls (inner gaps - between windows) ####
+bind = ALT, equal, exec, ~/.config/hyprcandy/hooks/hyprland_gaps_in_increase.sh            # Alt+= (Gap increase)
+bind = ALT, minus, exec, ~/.config/hyprcandy/hooks/hyprland_gaps_in_decrease.sh            # Alt+- (Gap decrease)
+
+#### Border controls #### 
+
+bind = $mainMod SHIFT, equal, exec, ~/.config/hyprcandy/hooks/hyprland_border_increase.sh  # $mainMod+Shift+= (Border increase)
+bind = $mainMod SHIFT, minus, exec, ~/.config/hyprcandy/hooks/hyprland_border_decrease.sh  # $mainMod+Shift+- (Border decrease)
+
+#### Rounding controls ####
+
+bind = $mainMod CTRL, equal, exec, ~/.config/hyprcandy/hooks/hyprland_rounding_increase.sh # $mainMod+Ctrl+= (Rounding increase)
+bind = $mainMod CTRL, minus, exec, ~/.config/hyprcandy/hooks/hyprland_rounding_decrease.sh # $mainMod+Ctrl+- (Rounding decrease)
 
 #### Rofi Menus ####
 
