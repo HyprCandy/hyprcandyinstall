@@ -1124,6 +1124,92 @@ notify-send "Rounding Decreased" "rounding: $NEW_ROUNDING" -t 2000
 EOF
 
 # ═══════════════════════════════════════════════════════════════
+#                    Enhanced Gap Control with Presets
+# ═══════════════════════════════════════════════════════════════
+
+# File: ~/.config/hyprcandy/hooks/hyprland_gap_presets.sh
+cat > "$HOME/.config/hyprcandy/hooks/hyprland_gap_presets.sh" << 'EOF'
+#!/bin/bash
+
+CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
+
+case "$1" in
+    "minimal")
+        GAPS_OUT=3
+        GAPS_IN=1
+        BORDER=2
+        ROUNDING=3
+        ;;
+    "balanced")
+        GAPS_OUT=6
+        GAPS_IN=4
+        BORDER=3
+        ROUNDING=10
+        ;;
+    "spacious")
+        GAPS_OUT=10
+        GAPS_IN=6
+        BORDER=3
+        ROUNDING=10
+        ;;
+    "zero")
+        GAPS_OUT=0
+        GAPS_IN=0
+        BORDER=0
+        ROUNDING=0
+        ;;
+    *)
+        echo "Usage: $0 {minimal|balanced|spacious|zero}"
+        exit 1
+        ;;
+esac
+
+# Apply all settings
+sed -i "s/^\(\s*gaps_out\s*=\s*\)[0-9]*/\1$GAPS_OUT/" "$CONFIG_FILE"
+sed -i "s/^\(\s*gaps_in\s*=\s*\)[0-9]*/\1$GAPS_IN/" "$CONFIG_FILE"
+sed -i "s/^\(\s*border_size\s*=\s*\)[0-9]*/\1$BORDER/" "$CONFIG_FILE"
+sed -i "s/^\(\s*rounding\s*=\s*\)[0-9]*/\1$ROUNDING/" "$CONFIG_FILE"
+
+# Apply immediately
+hyprctl keyword general:gaps_out $GAPS_OUT
+hyprctl keyword general:gaps_in $GAPS_IN
+hyprctl keyword general:border_size $BORDER
+hyprctl keyword decoration:rounding $ROUNDING
+
+echo "🎨 Applied $1 preset: gaps_out=$GAPS_OUT, gaps_in=$GAPS_IN, border=$BORDER, rounding=$ROUNDING"
+notify-send "Visual Preset Applied" "$1: OUT=$GAPS_OUT IN=$GAPS_IN BORDER=$BORDER ROUND=$ROUNDING" -t 3000
+EOF
+
+# ═══════════════════════════════════════════════════════════════
+#                    Status Display Script
+# ═══════════════════════════════════════════════════════════════
+
+# File: ~/.config/hyprcandy/hooks/hyprland_status_display.sh
+cat > "$HOME/.config/hyprcandy/hooks/hyprland_status_display.sh" << 'EOF'
+#!/bin/bash
+
+CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
+
+# Get current values
+GAPS_OUT=$(grep -E "^\s*gaps_out\s*=" "$CONFIG_FILE" | sed 's/.*gaps_out\s*=\s*\([0-9]*\).*/\1/')
+GAPS_IN=$(grep -E "^\s*gaps_in\s*=" "$CONFIG_FILE" | sed 's/.*gaps_in\s*=\s*\([0-9]*\).*/\1/')
+BORDER=$(grep -E "^\s*border_size\s*=" "$CONFIG_FILE" | sed 's/.*border_size\s*=\s*\([0-9]*\).*/\1/')
+ROUNDING=$(grep -E "^\s*rounding\s*=" "$CONFIG_FILE" | sed 's/.*rounding\s*=\s*\([0-9]*\).*/\1/')
+
+# Create status display
+STATUS="🎨 Hyprland Visual Settings
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔲 Gaps OUT (screen edges): $GAPS_OUT
+🔳 Gaps IN (between windows): $GAPS_IN
+🔸 Border size: $BORDER
+🔘 Corner rounding: $ROUNDING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+echo "$STATUS"
+notify-send "Visual Settings Status" "OUT:$GAPS_OUT IN:$GAPS_IN BORDER:$BORDER ROUND:$ROUNDING" -t 5000
+EOF
+
+# ═══════════════════════════════════════════════════════════════
 #                     Make scripts executable
 # ═══════════════════════════════════════════════════════════════
 
@@ -1135,6 +1221,8 @@ chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_border_increase.sh"
 chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_border_decrease.sh"
 chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_rounding_increase.sh"
 chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_rounding_decrease.sh"
+chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_gap_presets.sh"
+chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_status_display.sh"
 
 echo "✅ Hyprland adjustment scripts created and made executable!"
 
@@ -2210,24 +2298,6 @@ $EDITOR = gedit # Change from the default editor to your prefered editor
 bind = $mainMod, Escape, killactive #Kill single active window
 bind = $mainMod SHIFT, Escape, exec, hyprctl activewindow | grep pid | tr -d 'pid:' | xargs kill #Quit active window and all similar open instances
 
-#### Gaps OUT controls (outer gaps - screen edges) ####
-bind = $mainMod ALT, equal, exec, ~/.config/hyprcandy/hooks/hyprland_gaps_out_increase.sh  # $mainMod+Alt+= (Gap increase)
-bind = $mainMod ALT, minus, exec, ~/.config/hyprcandy/hooks/hyprland_gaps_out_decrease.sh  # $mainMod+Alt+- (Gap decrease)
-
-#### Gaps IN controls (inner gaps - between windows) ####
-bind = ALT, equal, exec, ~/.config/hyprcandy/hooks/hyprland_gaps_in_increase.sh            # Alt+= (Gap increase)
-bind = ALT, minus, exec, ~/.config/hyprcandy/hooks/hyprland_gaps_in_decrease.sh            # Alt+- (Gap decrease)
-
-#### Border controls #### 
-
-bind = $mainMod SHIFT, equal, exec, ~/.config/hyprcandy/hooks/hyprland_border_increase.sh  # $mainMod+Shift+= (Border increase)
-bind = $mainMod SHIFT, minus, exec, ~/.config/hyprcandy/hooks/hyprland_border_decrease.sh  # $mainMod+Shift+- (Border decrease)
-
-#### Rounding controls ####
-
-bind = $mainMod CTRL, equal, exec, ~/.config/hyprcandy/hooks/hyprland_rounding_increase.sh # $mainMod+Ctrl+= (Rounding increase)
-bind = $mainMod CTRL, minus, exec, ~/.config/hyprcandy/hooks/hyprland_rounding_decrease.sh # $mainMod+Ctrl+- (Rounding decrease)
-
 #### Rofi Menus ####
 
 bind = $mainMod, A, exec, rofi -show drun || pkill rofi      #Launch or kill rofi application finder
@@ -2248,6 +2318,36 @@ bind = $mainMod, Return, exec, kitty #Launch normal kitty instances
 bind = $mainMod, O, exec, DRI_PRIME=1 /usr/bin/octopi #Launch octopi application finder
 bind = $mainMod, E, exec, DRI_PRIME=1 nautilus #pypr toggle filemanager #Launch the filemanager 
 bind = $mainMod CTRL, C, exec, DRI_PRIME=1 gnome-calculator #Launch the calculator
+
+
+#### Gaps OUT controls (outer gaps - screen edges) ####
+bind = $mainMod ALT, equal, exec, ~/.config/hyprcandy/hooks/hyprland_gaps_out_increase.sh  # $mainMod+Alt+= (Gap increase)
+bind = $mainMod ALT, minus, exec, ~/.config/hyprcandy/hooks/hyprland_gaps_out_decrease.sh  # $mainMod+Alt+- (Gap decrease)
+
+#### Gaps IN controls (inner gaps - between windows) ####
+bind = ALT, equal, exec, ~/.config/hyprcandy/hooks/hyprland_gaps_in_increase.sh            # Alt+= (Gap increase)
+bind = ALT, minus, exec, ~/.config/hyprcandy/hooks/hyprland_gaps_in_decrease.sh            # Alt+- (Gap decrease)
+
+#### Border controls #### 
+
+bind = $mainMod SHIFT, equal, exec, ~/.config/hyprcandy/hooks/hyprland_border_increase.sh  # $mainMod+Shift+= (Border increase)
+bind = $mainMod SHIFT, minus, exec, ~/.config/hyprcandy/hooks/hyprland_border_decrease.sh  # $mainMod+Shift+- (Border decrease)
+
+#### Rounding controls ####
+
+bind = $mainMod CTRL, equal, exec, ~/.config/hyprcandy/hooks/hyprland_rounding_increase.sh # $mainMod+Ctrl+= (Rounding increase)
+bind = $mainMod CTRL, minus, exec, ~/.config/hyprcandy/hooks/hyprland_rounding_decrease.sh # $mainMod+Ctrl+- (Rounding decrease)
+
+#### Visual presets ####
+
+bind = $mainMod, F1, exec, ~/.config/hyprcandy/hooks/hyprland_gap_presets.sh minimal
+bind = $mainMod, F2, exec, ~/.config/hyprcandy/hooks/hyprland_gap_presets.sh balanced
+bind = $mainMod, F3, exec, ~/.config/hyprcandy/hooks/hyprland_gap_presets.sh spacious
+bind = $mainMod, F4, exec, ~/.config/hyprcandy/hooks/hyprland_gap_presets.sh zero
+
+#### Status display ####
+
+bind = $mainMod, I, exec, ~/.config/hyprcandy/hooks/hyprland_status_display.sh"
 
 #### Dock keybinds ####
 
