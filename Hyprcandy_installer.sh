@@ -1863,7 +1863,7 @@ exec-once = dbus-update-activation-environment --systemd DBUS_SESSION_BUS_ADDRES
 exec-once = hash dbus-update-activation-environment 2>/dev/null &
 exec-once = systemctl --user import-environment &
 # Panel
-exec-once = systemctl --user start hyprpanel &
+exec-once = ~/.config/hyprcandy/hooks/startup_services.sh &
 # Start Polkit
 exec-once = systemctl --user start hyprpolkitagent &
 # Using hypridle to start hyprlock
@@ -1905,8 +1905,6 @@ env = XCURSOR_SIZE,18
 env = HYPRCURSOR_THEME,Bibata-Modern-Classic
 env = HYPRCURSOR_SIZE,18
 
-# DISPLAY
-env = WAYLAND_DISPLAY,wayland-0
 # XDG Desktop Portal
 env = XDG_CURRENT_DESKTOP,Hyprland
 env = XDG_SESSION_TYPE,wayland
@@ -1914,7 +1912,7 @@ env = XDG_SESSION_DESKTOP,Hyprland
 # GTK
 env = GTK_USE_PORTAL,1
 # QT
-env = QT_QPA_PLATFORM,wayland;xcb
+env = QT_QPA_PLATFORM,wayland
 env = QT_QPA_PLATFORMTHEME,gtk3
 env = QT_WAYLAND_DISABLE_WINDOWDECORATION,0
 env = QT_AUTO_SCREEN_SCALE_FACTOR,1
@@ -1922,7 +1920,7 @@ env = QT_AUTO_SCREEN_SCALE_FACTOR,1
 env = GDK_DEBUG,portals
 env = GDK_SCALE,1
 # Toolkit Backend
-env = GDK_BACKEND,wayland,x11,*
+env = GDK_BACKEND,wayland
 env = CLUTTER_BACKEND,wayland
 # Mozilla
 env = MOZ_ENABLE_WAYLAND,1
@@ -1938,7 +1936,7 @@ env = WLR_DRM_NO_ATOMIC,1
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 input {
-    kb_layout = $LAYOUT
+    kb_layout = us
     kb_variant = 
     kb_model =
     kb_options =
@@ -1975,8 +1973,8 @@ general {
     allow_tearing = true
 }
 
-group:groupbar:col.active = $primary
-group:groupbar:col.inactive = $source_color
+group:groupbar:col.active =  $source_color $primary $primary $source_color 90deg
+group:groupbar:col.inactive = $background
 
 dwindle {
     pseudotile = true
