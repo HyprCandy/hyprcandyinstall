@@ -1325,11 +1325,12 @@ EOF
 cat > "$HOME/.config/hyprcandy/hooks/hyprpanel_idle_monitor.sh" << 'EOF'
 #!/bin/bash
 
-# Script to monitor hyprpanel and manage idle inhibitor accordingly
-# When hyprpanel is not running, enable idle inhibitor
-# When hyprpanel is running, disable idle inhibitor (only our own, not hyprpanel's)
+# Enhanced script to monitor hyprpanel and manage idle inhibitor + mako accordingly
+# When hyprpanel is not running: enable idle inhibitor + start mako
+# When hyprpanel is running: disable idle inhibitor + stop mako (hyprpanel handles both)
 
 IDLE_INHIBITOR_PID=""
+MAKO_PID=""
 CHECK_INTERVAL=5  # Check every 5 seconds
 INHIBITOR_WHO="HyprCandy-Monitor"  # Unique identifier for our inhibitor
 
@@ -1343,6 +1344,47 @@ has_hyprpanel_inhibitor() {
 # Function to check if our specific inhibitor is running
 has_our_inhibitor() {
     systemd-inhibit --list 2>/dev/null | grep "$INHIBITOR_WHO" >/dev/null 2>&1
+}
+
+# Function to check if mako is running
+is_mako_running() {
+    pgrep -x "mako" > /dev/null 2>&1
+}
+
+# Function to start mako
+start_mako() {
+    if is_mako_running; then
+        echo "$(date): Mako is already running"
+        return
+    fi
+    
+    echo "$(date): Starting mako..."
+    mako &
+    MAKO_PID=$!
+    echo "$(date): Mako started with PID: $MAKO_PID"
+    
+    # Give mako a moment to start up
+    sleep 1
+    
+    # Send a test notification to confirm it's working
+    notify-send "Notification System" "Mako started - notifications active" -t 3000 2>/dev/null || true
+}
+
+# Function to stop mako (only our instance)
+stop_mako() {
+    if [ -n "$MAKO_PID" ] && kill -0 "$MAKO_PID" 2>/dev/null; then
+        echo "$(date): Stopping our mako instance..."
+        kill "$MAKO_PID"
+        MAKO_PID=""
+        echo "$(date): Our mako instance stopped"
+    else
+        # If we don't have a PID, try to stop any running mako
+        if is_mako_running; then
+            echo "$(date): Stopping running mako instance..."
+            pkill -x "mako"
+            echo "$(date): Mako stopped"
+        fi
+    fi
 }
 
 # Function to start idle inhibitor (only if hyprpanel doesn't have one)
@@ -1382,37 +1424,79 @@ is_hyprpanel_running() {
     pgrep -f "gjs" > /dev/null 2>&1
 }
 
+# Function to start fallback services (when hyprpanel is not running)
+start_fallback_services() {
+    echo "$(date): Starting fallback services..."
+    start_idle_inhibitor
+    start_mako
+}
+
+# Function to stop fallback services (when hyprpanel is running)
+stop_fallback_services() {
+    echo "$(date): Stopping fallback services..."
+    stop_idle_inhibitor
+    stop_mako
+}
+
 # Cleanup function
 cleanup() {
     echo "$(date): Cleaning up..."
     stop_idle_inhibitor
+    stop_mako
     exit 0
 }
 
 # Set up signal handlers
 trap cleanup SIGTERM SIGINT
 
-echo "$(date): Starting hyprpanel idle monitor..."
-echo "$(date): Will only manage our own inhibitor (WHO=$INHIBITOR_WHO)"
+echo "$(date): Starting enhanced hyprpanel monitor..."
+echo "$(date): Will manage idle inhibitor (WHO=$INHIBITOR_WHO) and mako"
+echo "$(date): Fallback services when hyprpanel is not running:"
+echo "$(date): - Idle inhibitor: Prevents system sleep"
+echo "$(date): - Mako: Provides notifications"
+
+# Initial state check
+if is_hyprpanel_running; then
+    echo "$(date): Hyprpanel is currently running - ensuring fallback services are stopped"
+    stop_fallback_services
+else
+    echo "$(date): Hyprpanel is not running - starting fallback services"
+    start_fallback_services
+fi
 
 # Main monitoring loop
 while true; do
     if is_hyprpanel_running; then
-        # Hyprpanel is running, stop our idle inhibitor if it's running
-        # (hyprpanel can manage its own inhibitor)
+        # Hyprpanel is running, stop our fallback services
         if [ -n "$IDLE_INHIBITOR_PID" ] && kill -0 "$IDLE_INHIBITOR_PID" 2>/dev/null; then
-            echo "$(date): Hyprpanel detected, stopping our idle inhibitor"
-            stop_idle_inhibitor
+            echo "$(date): Hyprpanel detected, stopping fallback services"
+            stop_fallback_services
         fi
     else
-        # Hyprpanel is not running, start our idle inhibitor if needed
-        # But only if hyprpanel doesn't have its own inhibitor still active
+        # Hyprpanel is not running, start our fallback services if needed
+        needs_inhibitor=false
+        needs_mako=false
+        
+        # Check if we need to start idle inhibitor
         if [ -z "$IDLE_INHIBITOR_PID" ] || ! kill -0 "$IDLE_INHIBITOR_PID" 2>/dev/null; then
             if ! has_hyprpanel_inhibitor; then
-                echo "$(date): Hyprpanel not detected and no hyprpanel inhibitor found, starting our idle inhibitor"
+                needs_inhibitor=true
+            fi
+        fi
+        
+        # Check if we need to start mako
+        if ! is_mako_running; then
+            needs_mako=true
+        fi
+        
+        # Start services if needed
+        if $needs_inhibitor || $needs_mako; then
+            echo "$(date): Hyprpanel not detected, starting needed fallback services"
+            if $needs_inhibitor; then
                 start_idle_inhibitor
-            else
-                echo "$(date): Hyprpanel not running but hyprpanel inhibitor still active, waiting..."
+            fi
+            if $needs_mako; then
+                start_mako
             fi
         fi
     fi
@@ -1425,7 +1509,7 @@ chmod +x "$HOME/.config/hyprcandy/hooks/hyprpanel_idle_monitor.sh"
 ### 🔧 Create hyprpanel-idle-monitor.service
 cat > "$HOME/.config/systemd/user/hyprpanel-idle-monitor.service" << 'EOF'
 [Unit]
-Description=Monitor gjs and manage idle inhibitor
+Description=Monitor hyprpanel and manage idle inhibitor + mako
 After=graphical-session.target hyprland-session.target
 Wants=graphical-session.target
 PartOf=graphical-session.target
@@ -1438,7 +1522,10 @@ Restart=always
 RestartSec=10
 KillMode=mixed
 KillSignal=SIGTERM
-TimeoutStopSec=10
+TimeoutStopSec=15
+Environment=WAYLAND_DISPLAY=wayland-0
+Environment=XDG_CURRENT_DESKTOP=Hyprland
+Environment=XDG_SESSION_TYPE=wayland
 
 [Install]
 WantedBy=graphical-session.target
@@ -2319,7 +2406,6 @@ bind = $mainMod, O, exec, DRI_PRIME=1 /usr/bin/octopi #Launch octopi application
 bind = $mainMod, E, exec, DRI_PRIME=1 nautilus #pypr toggle filemanager #Launch the filemanager 
 bind = $mainMod CTRL, C, exec, DRI_PRIME=1 gnome-calculator #Launch the calculator
 
-
 #### Gaps OUT controls (outer gaps - screen edges) ####
 bind = $mainMod ALT, equal, exec, ~/.config/hyprcandy/hooks/hyprland_gaps_out_increase.sh  # $mainMod+Alt+= (Gap increase)
 bind = $mainMod ALT, minus, exec, ~/.config/hyprcandy/hooks/hyprland_gaps_out_decrease.sh  # $mainMod+Alt+- (Gap decrease)
@@ -2347,7 +2433,7 @@ bind = $mainMod, F4, exec, ~/.config/hyprcandy/hooks/hyprland_gap_presets.sh zer
 
 #### Status display ####
 
-bind = $mainMod, I, exec, ~/.config/hyprcandy/hooks/hyprland_status_display.sh"
+bind = $mainMod, I, exec, ~/.config/hyprcandy/hooks/hyprland_status_display.sh
 
 #### Dock keybinds ####
 
