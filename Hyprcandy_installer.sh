@@ -1862,7 +1862,7 @@ exec-once = bash -c "mkfifo /tmp/$HYPRLAND_INSTANCE_SIGNATURE.wob && tail -f /tm
 exec-once = dbus-update-activation-environment --systemd DBUS_SESSION_BUS_ADDRESS DISPLAY XAUTHORITY &
 exec-once = hash dbus-update-activation-environment 2>/dev/null &
 exec-once = systemctl --user import-environment &
-# Panel
+# Launch panel and reload swww
 exec-once = ~/.config/hyprcandy/hooks/startup_services.sh &
 # Start Polkit
 exec-once = systemctl --user start hyprpolkitagent &
