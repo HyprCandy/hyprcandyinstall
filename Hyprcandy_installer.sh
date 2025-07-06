@@ -1009,6 +1009,123 @@ notify-send "Gaps IN Decreased" "gaps_in: $NEW_GAPS_IN" -t 2000
 EOF
 
 # ═══════════════════════════════════════════════════════════════
+#                Border Increase Script with Force Options
+# ═══════════════════════════════════════════════════════════════
+
+# File: ~/.config/hyprcandy/hooks/hyprland_border_increase.sh
+cat > ~/.config/hyprcandy/hooks/hyprland_border_increase.sh << 'EOF'
+#!/bin/bash
+
+CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
+
+# Get current border_size value
+CURRENT_BORDER=$(grep -E "^\s*border_size\s*=" "$CONFIG_FILE" | sed 's/.*border_size\s*=\s*\([0-9]*\).*/\1/')
+
+# Increment value
+NEW_BORDER=$((CURRENT_BORDER + 1))
+
+# Update the file
+sed -i "s/^\(\s*border_size\s*=\s*\)[0-9]*/\1$NEW_BORDER/" "$CONFIG_FILE"
+
+# Force apply border using hyprctl (immediate effect)
+hyprctl keyword general:border_size $NEW_BORDER
+
+# Also reload config to ensure persistence
+hyprctl reload
+
+echo "🔼 Border increased: border_size=$NEW_BORDER"
+notify-send "Border Increased" "border_size: $NEW_BORDER" -t 2000
+EOF
+
+# ═══════════════════════════════════════════════════════════════
+#                Border Decrease Script with Force Options
+# ═══════════════════════════════════════════════════════════════
+
+# File: ~/.config/hyprcandy/hooks/hyprland_border_decrease.sh
+cat > ~/.config/hyprcandy/hooks/hyprland_border_decrease.sh << 'EOF'
+#!/bin/bash
+
+CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
+
+# Get current border_size value
+CURRENT_BORDER=$(grep -E "^\s*border_size\s*=" "$CONFIG_FILE" | sed 's/.*border_size\s*=\s*\([0-9]*\).*/\1/')
+
+# Decrement value (minimum 0)
+NEW_BORDER=$((CURRENT_BORDER > 0 ? CURRENT_BORDER - 1 : 0))
+
+# Update the file
+sed -i "s/^\(\s*border_size\s*=\s*\)[0-9]*/\1$NEW_BORDER/" "$CONFIG_FILE"
+
+# Force apply border using hyprctl (immediate effect)
+hyprctl keyword general:border_size $NEW_BORDER
+
+# Also reload config to ensure persistence
+hyprctl reload
+
+echo "🔽 Border decreased: border_size=$NEW_BORDER"
+notify-send "Border Decreased" "border_size: $NEW_BORDER" -t 2000
+EOF
+
+# ═══════════════════════════════════════════════════════════════
+#                Rounding Increase Script with Force Options
+# ═══════════════════════════════════════════════════════════════
+
+# File: ~/.config/hyprcandy/hooks/hyprland_rounding_increase.sh
+cat > ~/.config/hyprcandy/hooks/hyprland_rounding_increase.sh << 'EOF'
+#!/bin/bash
+
+CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
+
+
+# Get current rounding value
+CURRENT_ROUNDING=$(grep -E "^\s*rounding\s*=" "$CONFIG_FILE" | sed 's/.*rounding\s*=\s*\([0-9]*\).*/\1/')
+
+# Increment value
+NEW_ROUNDING=$((CURRENT_ROUNDING + 1))
+
+# Update the file
+sed -i "s/^\(\s*rounding\s*=\s*\)[0-9]*/\1$NEW_ROUNDING/" "$CONFIG_FILE"
+
+# Force apply rounding using hyprctl (immediate effect)
+hyprctl keyword decoration:rounding $NEW_ROUNDING
+
+# Also reload config to ensure persistence
+hyprctl reload
+
+echo "🔼 Rounding increased: rounding=$NEW_ROUNDING"
+notify-send "Rounding Increased" "rounding: $NEW_ROUNDING" -t 2000
+EOF
+
+# ═══════════════════════════════════════════════════════════════
+#                Rounding Decrease Script with Force Options
+# ═══════════════════════════════════════════════════════════════
+
+# File: ~/.config/hyprcandy/hooks/hyprland_rounding_decrease.sh
+cat > ~/.config/hyprcandy/hooks/hyprland_rounding_decrease.sh << 'EOF'
+#!/bin/bash
+
+CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
+
+# Get current rounding value
+CURRENT_ROUNDING=$(grep -E "^\s*rounding\s*=" "$CONFIG_FILE" | sed 's/.*rounding\s*=\s*\([0-9]*\).*/\1/')
+
+# Decrement value (minimum 0)
+NEW_ROUNDING=$((CURRENT_ROUNDING > 0 ? CURRENT_ROUNDING - 1 : 0))
+
+# Update the file
+sed -i "s/^\(\s*rounding\s*=\s*\)[0-9]*/\1$NEW_ROUNDING/" "$CONFIG_FILE"
+
+# Force apply rounding using hyprctl (immediate effect)
+hyprctl keyword decoration:rounding $NEW_ROUNDING
+
+# Also reload config to ensure persistence
+hyprctl reload
+
+echo "🔽 Rounding decreased: rounding=$NEW_ROUNDING"
+notify-send "Rounding Decreased" "rounding: $NEW_ROUNDING" -t 2000
+EOF
+
+# ═══════════════════════════════════════════════════════════════
 #                     Make scripts executable
 # ═══════════════════════════════════════════════════════════════
 
