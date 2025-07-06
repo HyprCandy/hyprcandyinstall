@@ -1727,8 +1727,8 @@ general {
     gaps_in = 4
     gaps_out = 6	
     gaps_workspaces = 50    # Gaps between workspaces
-    border_size = 2
-    col.active_border = $primary $source_color $source_color $primary 90deg
+    border_size = 3
+    col.active_border =  $source_color $primary $primary $source_color 90deg
     col.inactive_border = $background
     layout = dwindle
     resize_on_border = true
