@@ -1229,11 +1229,72 @@ chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_status_display.sh"
 
 echo "✅ Hyprland adjustment scripts created and made executable!"
 
-### 🧹 Create clear_swww.sh
-cat > "$HOME/.config/hyprcandy/hooks/clear_swww.sh" << 'EOF'
+### 🔃 Script to launch hyprpanel and reload swww-daemon on startup or login
+cat > "$HOME/.config/hyprcandy/hooks/startup_services.sh" << 'EOF'
 #!/bin/bash
-CACHE_DIR="$HOME/.cache/swww"
-[ -d "$CACHE_DIR" ] && rm -rf "$CACHE_DIR"
+# Enhanced startup script for Hyprland services
+
+# Function to start hyprpanel
+start_hyprpanel() {
+    echo "🚀 Starting hyprpanel..."
+    systemctl --user start hyprpanel
+    echo "✅ hyprpanel started"
+}
+
+# Function to wait for hyprpanel to fully initialize
+wait_for_hyprpanel() {
+    echo "⏳ Waiting for hyprpanel to initialize..."
+    local max_wait=30
+    local count=0
+    
+    while [ $count -lt $max_wait ]; do
+        if pgrep -f "gjs" > /dev/null 2>&1; then
+            echo "✅ hyprpanel is running"
+            # Give it a bit more time to fully initialize swww
+            sleep 2
+            return 0
+        fi
+        sleep 1
+        ((count++))
+    done
+    
+    echo "⚠️ hyprpanel may not have started properly"
+    return 1
+}
+
+# Function to restart swww-daemon cleanly
+restart_swww() {
+    echo "🔄 Restarting swww-daemon..."
+    
+    # Kill existing daemon
+    pkill swww-daemon 2>/dev/null
+    
+    # Wait for clean shutdown
+    sleep 0.5
+    
+    # Start fresh daemon
+    swww-daemon &
+    
+    # Wait for daemon to initialize
+    sleep 1
+    
+    echo "✅ swww-daemon restarted"
+}
+
+# Main execution
+start_hyprpanel
+
+# Wait for hyprpanel to be ready
+if wait_for_hyprpanel; then
+    # Additional wait to ensure swww is initialized by hyprpanel
+    sleep 2
+    restart_swww
+else
+    echo "⚠️ Proceeding with swww restart anyway..."
+    restart_swww
+fi
+
+echo "🎯 All services started successfully"
 EOF
 chmod +x "$HOME/.config/hyprcandy/hooks/clear_swww.sh"
 
