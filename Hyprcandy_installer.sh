@@ -1108,6 +1108,52 @@ TimeoutStopSec=10
 WantedBy=graphical-session.target
 EOF
 
+### 🛡️ Create safe hyprpanel killer script
+cat > "$HOME/.config/hyprcandy/hooks/kill_hyprpanel_safe.sh" << 'EOF'
+#!/bin/bash
+
+# Safe hyprpanel killer - preserves swww-daemon
+
+echo "🔄 Safely closing hyprpanel while preserving swww-daemon..."
+
+# Method 1: Try graceful shutdown first
+if pgrep -f "hyprpanel" > /dev/null; then
+    echo "📱 Attempting graceful shutdown..."
+    hyprpanel -q
+    sleep 1
+    
+    # Check if it's still running
+    if pgrep -f "hyprpanel" > /dev/null; then
+        echo "⚠️  Graceful shutdown failed, trying systemd stop..."
+        systemctl --user stop hyprpanel.service
+        sleep 1
+        
+        # If still running, force kill (but only hyprpanel processes)
+        if pgrep -f "hyprpanel" > /dev/null; then
+            echo "🔨 Force killing hyprpanel processes..."
+            # Kill only gjs processes that are running hyprpanel
+            pkill -f "gjs.*hyprpanel"
+        fi
+    fi
+fi
+
+# Verify swww-daemon is still running
+if ! pgrep -f "swww-daemon" > /dev/null; then
+    echo "🔄 swww-daemon not found, restarting it..."
+    swww-daemon &
+    sleep 1
+    
+    # Restore current wallpaper if it exists
+    if [ -f "$HOME/.config/background" ]; then
+        echo "🖼️  Restoring wallpaper..."
+        swww img "$HOME/.config/background" --transition-type fade --transition-duration 1
+    fi
+fi
+
+echo "✅ hyprpanel safely closed, swww-daemon preserved"
+EOF
+chmod +x "$HOME/.config/hyprcandy/hooks/kill_hyprpanel_safe.sh"
+
 ### 🔧 Create hyprpanel restart script for keybind compatibility
 cat > "$HOME/.config/hyprcandy/hooks/restart_hyprpanel.sh" << 'EOF'
 #!/bin/bash
