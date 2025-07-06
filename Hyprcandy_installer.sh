@@ -1314,14 +1314,25 @@ chmod +x "$HOME/.config/hyprcandy/hooks/watch_background.sh"
 cat > "$HOME/.config/systemd/user/background-watcher.service" << 'EOF'
 [Unit]
 Description=Watch ~/.config/background, clear swww cache and update background images
-After=graphical-session.target
+After=graphical-session.target hyprland-session.target
+Wants=graphical-session.target
+PartOf=graphical-session.target
+Requisite=graphical-session.target
 
 [Service]
+Type=simple
 ExecStart=%h/.config/hyprcandy/hooks/watch_background.sh
 Restart=on-failure
+RestartSec=3
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStopSec=10
+Environment=WAYLAND_DISPLAY=wayland-0
+Environment=XDG_CURRENT_DESKTOP=Hyprland
+Environment=XDG_SESSION_TYPE=wayland
 
 [Install]
-WantedBy=default.target
+WantedBy=graphical-session.target
 EOF
 
 ### 🎮 Create hyprpanel_idle_monitor.sh
@@ -1616,10 +1627,12 @@ Type=simple
 ExecStart=/usr/bin/hyprpanel
 Restart=on-failure
 RestartSec=1
-Environment=DISPLAY=:0
 KillMode=mixed
 KillSignal=SIGTERM
 TimeoutStopSec=5
+Environment=WAYLAND_DISPLAY=wayland-0
+Environment=XDG_CURRENT_DESKTOP=Hyprland
+Environment=XDG_SESSION_TYPE=wayland
 # Don't restart if manually stopped (allows keybind control)
 RestartPreventExitStatus=143
 
