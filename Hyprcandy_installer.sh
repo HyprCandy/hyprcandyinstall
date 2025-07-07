@@ -889,9 +889,136 @@ setup_hyprcandy() {
         echo "❌ Failed to install: ${stow_failed[*]}"
     fi
 
-### ✅ Setup hook scripts and needed services
+### ✅ Setup mako config, hook scripts and needed services
 echo "📁 Creating background hook scripts..."
-mkdir -p "$HOME/.config/hyprcandy/hooks" "$HOME/.config/systemd/user"
+mkdir -p "$HOME/.config/hyprcandy/hooks" "$HOME/.config/systemd/user" "$HOME/.config/mako"
+
+### 🪧 Setup mako config
+cat > "$HOME/.config/mako" << 'EOF'
+# Mako Configuration with Material You Colors
+# Colors directly embedded (since include might not work)
+
+# Default notification appearance
+background-color=#353434
+text-color=#ffffff
+border-color=#c0bec3
+progress-color=#e2dfe7
+
+# Notification positioning and layout
+anchor=top-right
+margin=20,20,0,0
+padding=15,20
+border-size=2
+border-radius=12
+
+# Typography
+font=Inter 11
+markup=1
+format=<b>%s</b>\n%b
+
+# Notification dimensions
+width=400
+height=150
+max-visible=5
+
+# Behavior
+default-timeout=5000
+ignore-timeout=0
+group-by=app-name
+sort=-time
+
+# Icon settings
+icon-path=/usr/share/icons/Papirus-Dark
+max-icon-size=48
+
+# Urgency levels with Material You colors
+[urgency=low]
+background-color=#2a292a
+text-color=#ffffff
+border-color=#9c9a9f
+default-timeout=3000
+
+[urgency=normal]
+background-color=#353434
+text-color=#ffffff
+border-color=#c0bec3
+default-timeout=5000
+
+[urgency=critical]
+background-color=#ff6b5e
+text-color=#000000
+border-color=#ffd7d2
+default-timeout=0
+
+# App-specific styling
+[app-name=Spotify]
+background-color=#9b9aa1
+text-color=#000000
+border-color=#e2dfe7
+
+[app-name=Discord]
+background-color=#9c9a9d
+text-color=#000000
+border-color=#e2dfe3
+
+[app-name="Volume Control"]
+background-color=#9b9b9b
+text-color=#000000
+border-color=#e0e0e0
+progress-color=#e2dfe7
+
+[app-name="Brightness Control"]
+background-color=#484647
+text-color=#ffffff
+border-color=#c8c5ce
+progress-color=#e0e0e0
+
+# Network notifications
+[app-name="NetworkManager"]
+background-color=#2a292a
+text-color=#ffffff
+border-color=#e2dfe7
+
+# Battery notifications
+[app-name="Power Management"]
+background-color=#2a292a
+text-color=#ffffff
+border-color=#e2dfe7
+
+[app-name="Power Management" urgency=critical]
+background-color=#ff6b5e
+text-color=#000000
+border-color=#ffd7d2
+
+# System notifications
+[app-name="System"]
+background-color=#353434
+text-color=#ffffff
+border-color=#c0bec3
+
+# Screenshot notifications
+[app-name="Screenshot"]
+background-color=#9b9aa1
+text-color=#000000
+border-color=#e2dfe7
+
+# Media player notifications
+[category=media]
+background-color=#403f3f
+text-color=#ffffff
+border-color=#e2dfe7
+default-timeout=3000
+
+# Animation and effects
+on-button-left=dismiss
+on-button-middle=none
+on-button-right=dismiss-all
+on-touch=dismiss
+
+# Layer shell settings (for Wayland compositors)
+layer=overlay
+anchor=top-right
+EOF
 
 # ═══════════════════════════════════════════════════════════════
 #                    Gaps OUT Increase Script
@@ -2649,14 +2776,21 @@ bind = , XF86AudioMicMute, exec, pactl set-source-mute @DEFAULT_SOURCE@ toggle #
 bind = , XF86Calculator, exec, ~/.config/hyprcandy/settings/calculator.sh  #Open calculator
 bind = , XF86Lock, exec, hyprlock #Open screenlock
 
-bind = , code:236, exec, brightnessctl -d smc::kbd_backlight s +10 #Increase kbd-brightness by 10%
-bind = , code:237, exec, brightnessctl -d smc::kbd_backlight s 10- #Reduce kbd-brightness by 10%
+# Keyboard backlight controls with notifications
+bind = , code:236, exec, brightnessctl -d smc::kbd_backlight s +10 && notify-send "Keyboard Backlight" "$(brightnessctl -d smc::kbd_backlight | grep -o '[0-9]*%' | head -1)" -t 1000
+bind = , code:237, exec, brightnessctl -d smc::kbd_backlight s 10- && notify-send "Keyboard Backlight" "$(brightnessctl -d smc::kbd_backlight | grep -o '[0-9]*%' | head -1)" -t 1000
 
-bind = , F2, exec, brightnessctl -q s +10% #Increase brightness by 10%
-bind = , F1, exec, brightnessctl -q s 10%- #Reduce brightness by 10%
-bind = Shift, F9, exec, amixer sset Master toggle | sed -En '/\[on\]/ s/.*\[([0-9]+)%\].*/\1/ p; /\[off\]/ s/.*/0/p' | head -1 > /tmp/$HYPRLAND_INSTANCE_SIGNATURE.wob\	#Mutes player audio
-bind = , F8, exec, pactl set-sink-mute @DEFAULT_SINK@ 0 && pactl set-sink-volume @DEFAULT_SINK@ +5% #Increase volume by 5%
-bind = , F7, exec, pactl set-sink-mute @DEFAULT_SINK@ 0 && pactl set-sink-volume @DEFAULT_SINK@ -5% #Reduce volume by 5%
+# Screen brightness controls with notifications
+bind = , F2, exec, brightnessctl -q s +10% && notify-send "Screen Brightness" "$(brightnessctl | grep -o '[0-9]*%' | head -1)" -t 1000
+bind = , F1, exec, brightnessctl -q s 10%- && notify-send "Screen Brightness" "$(brightnessctl | grep -o '[0-9]*%' | head -1)" -t 1000
+
+# Volume mute toggle with notification
+bind = Shift, F9, exec, amixer sset Master toggle | sed -En '/\[on\]/ s/.*\[([0-9]+)%\].*/\1/ p; /\[off\]/ s/.*/0/p' | head -1 > /tmp/$HYPRLAND_INSTANCE_SIGNATURE.wob && if amixer sget Master | grep -q '\[off\]'; then notify-send "Volume" "Muted" -t 1000; else notify-send "Volume" "$(amixer sget Master | grep -o '[0-9]*%' | head -1)" -t 1000; fi
+
+# Volume controls with notifications
+bind = , F8, exec, pactl set-sink-mute @DEFAULT_SINK@ 0 && pactl set-sink-volume @DEFAULT_SINK@ +5% && notify-send "Volume" "$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o '[0-9]*%' | head -1)" -t 1000
+bind = , F7, exec, pactl set-sink-mute @DEFAULT_SINK@ 0 && pactl set-sink-volume @DEFAULT_SINK@ -5% && notify-send "Volume" "$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o '[0-9]*%' | head -1)" -t 1000
+
 bind = , F4, exec, playerctl play-pause #Toggle play/pause
 bind = , F6, exec, playerctl next #Play next video/song
 bind = , F5, exec, playerctl previous #Play previous video/song
