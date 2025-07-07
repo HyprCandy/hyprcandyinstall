@@ -1838,10 +1838,34 @@ chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_status_display.sh"
 
 echo "✅ Hyprland adjustment scripts created and made executable!"
 
-### 🔃 Script to launch hyprpanel, reload swww-daemon and restart the background-watcher service on startup or login
+### 🔃 Script to initialize colors file, launch hyprpanel, reload swww-daemon and restart the background-watcher service on startup or login
 cat > "$HOME/.config/hyprcandy/hooks/startup_services.sh" << 'EOF'
 #!/bin/bash
 # Enhanced startup script for Hyprland services
+
+# Define colors file path
+COLORS_FILE="$HOME/.config/hyprcandy/nwg_dock_colors.conf"
+
+# Function to initialize colors file
+initialize_colors_file() {
+    echo "🎨 Initializing colors file..."
+    
+    # Create directory if it doesn't exist
+    mkdir -p "$(dirname "$COLORS_FILE")"
+    
+    # Source CSS file
+    local css_file="$HOME/.config/nwg-dock-hyprland/colors.css"
+    
+    if [ -f "$css_file" ]; then
+        # Extract the specific colors we're monitoring
+        grep -E "@define-color (blur_background8|primary)" "$css_file" > "$COLORS_FILE"
+        echo "✅ Colors file initialized with current values"
+    else
+        # Create empty file if CSS doesn't exist yet
+        touch "$COLORS_FILE"
+        echo "⚠️ CSS file not found, created empty colors file"
+    fi
+}
 
 # Function to start hyprpanel
 start_hyprpanel() {
@@ -1899,6 +1923,8 @@ restart_background_watcher() {
 }
 
 # Main execution
+initialize_colors_file
+
 start_hyprpanel
 
 # Wait for hyprpanel to be ready
@@ -1912,7 +1938,6 @@ else
 fi
 
 restart_background_watcher
-
 echo "🎯 All services started successfully"
 EOF
 chmod +x "$HOME/.config/hyprcandy/hooks/startup_services.sh"
@@ -1929,9 +1954,51 @@ chmod +x "$HOME/.config/hyprcandy/hooks/clear_swww.sh"
 cat > "$HOME/.config/hyprcandy/hooks/update_background.sh" << 'EOF'
 #!/bin/bash
 
+# Define colors file path
+COLORS_FILE="$HOME/.config/hyprcandy/nwg_dock_colors.conf"
+
 # Update local background.png
 if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
     magick "$HOME/.config/background[0]" "$HOME/.config/background.png"
+    
+    # Check if colors have changed and launch dock if different
+    colors_file="$HOME/.config/nwg-dock-hyprland/colors.css"
+    
+    # Get current colors from CSS file
+    get_current_colors() {
+        if [ -f "$colors_file" ]; then
+            grep -E "@define-color (blur_background8|primary)" "$colors_file"
+        fi
+    }
+    
+    # Get stored colors from our tracking file
+    get_stored_colors() {
+        if [ -f "$COLORS_FILE" ]; then
+            cat "$COLORS_FILE"
+        fi
+    }
+    
+    # Compare colors and launch dock if different
+    if [ -f "$colors_file" ]; then
+        current_colors=$(get_current_colors)
+        stored_colors=$(get_stored_colors)
+        
+        if [ "$current_colors" != "$stored_colors" ]; then
+            # Colors have changed, launch dock
+            "$HOME/.config/nwg-dock-hyprland/launch.sh" > /dev/null 2>&1 &
+            
+            # Update stored colors file with new colors
+            mkdir -p "$(dirname "$COLORS_FILE")"
+            echo "$current_colors" > "$COLORS_FILE"
+            echo "🎨 Updated dock colors and launched dock"
+        else
+            echo "🎨 Colors unchanged, skipping dock launch"
+        fi
+    else
+        # Fallback if colors.css doesn't exist
+        "$HOME/.config/nwg-dock-hyprland/launch.sh" > /dev/null 2>&1 &
+        echo "🎨 Colors file not found, launched dock anyway"
+    fi
 fi
 
 sleep 1
@@ -1939,8 +2006,7 @@ sleep 1
 # Update SDDM background with sudo and reload the dock
 if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
     sudo magick "$HOME/.config/background[0]" "/usr/share/sddm/themes/sugar-candy/Backgrounds/Mountain.jpg"
-    sleep 5
-    "$HOME/.config/nwg-dock-hyprland/launch.sh" > /dev/null 2>&1 &
+    sleep 1
 fi
 
 sleep 1
@@ -1982,9 +2048,32 @@ chmod +x "$HOME/.config/hyprcandy/hooks/update_background.sh"
 ### 👀 Create watch_background.sh
 cat > "$HOME/.config/hyprcandy/hooks/watch_background.sh" << 'EOF'
 #!/bin/bash
-
 CONFIG_BG="$HOME/.config/background"
 HOOKS_DIR="$HOME/.config/hyprcandy/hooks"
+COLORS_CSS="$HOME/.config/nwg-dock-hyprland/colors.css"
+
+# Function to execute hooks
+execute_hooks() {
+    echo "🎯 Executing hooks..."
+    "$HOOKS_DIR/clear_swww.sh"
+    "$HOOKS_DIR/update_background.sh"
+}
+
+# Function to monitor matugen process
+monitor_matugen() {
+    echo "🎨 Matugen detected, waiting for completion..."
+    
+    # Wait for matugen to finish
+    while pgrep -x "matugen" > /dev/null 2>&1; do
+        sleep 0.1
+    done
+    
+    # Additional 3-second wait for file writes to complete
+    sleep 3
+    
+    echo "✅ Matugen finished, executing hooks"
+    execute_hooks
+}
 
 # ⏳ Wait for background file to exist
 while [ ! -f "$CONFIG_BG" ]; do
@@ -1992,11 +2081,38 @@ while [ ! -f "$CONFIG_BG" ]; do
     sleep 0.5
 done
 
-inotifywait -m -e close_write "$CONFIG_BG" | while read -r file; do
-    echo "🎯 Detected background update: $file"
-    "$HOOKS_DIR/clear_swww.sh"
-    "$HOOKS_DIR/update_background.sh"
-done
+echo "🚀 Starting background and matugen monitoring..."
+
+# Start background monitoring in background
+{
+    inotifywait -m -e close_write "$CONFIG_BG" | while read -r file; do
+        echo "🎯 Detected background update: $file"
+        
+        # Check if matugen is running
+        if pgrep -x "matugen" > /dev/null 2>&1; then
+            echo "🎨 Matugen is running, will wait for completion..."
+            monitor_matugen
+        else
+            execute_hooks
+        fi
+    done
+} &
+
+# Start matugen process monitoring
+{
+    while true; do
+        # Wait for matugen to start
+        while ! pgrep -x "matugen" > /dev/null 2>&1; do
+            sleep 0.5
+        done
+        
+        echo "🎨 Matugen process detected!"
+        monitor_matugen
+    done
+} &
+
+# Wait for any child process to exit
+wait
 EOF
 chmod +x "$HOME/.config/hyprcandy/hooks/watch_background.sh"
 
