@@ -542,6 +542,7 @@ if test -d ~/.local/bin
 end
 
 # Aliases
+alias hyprcandy="cd .hyprcandy && git pull && stow */"
 alias ll="ls -alF"
 alias la="ls -A"
 alias l="ls -CF"
@@ -722,6 +723,7 @@ fi
 source $ZSH/oh-my-zsh.sh
 
 # Aliases
+alias hyprcandy="cd .hyprcandy && git pull && stow */"
 alias ll="ls -alF"
 alias la="ls -A"
 alias l="ls -CF"
