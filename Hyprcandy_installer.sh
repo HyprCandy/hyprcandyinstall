@@ -2627,10 +2627,10 @@ bind = $mainMod CTRL, minus, exec, ~/.config/hyprcandy/hooks/hyprland_rounding_d
 
 #### Visual presets ####
 
-bind = SHIFT, 1, exec, ~/.config/hyprcandy/hooks/hyprland_gap_presets.sh minimal
-bind = SHIFT, 2, exec, ~/.config/hyprcandy/hooks/hyprland_gap_presets.sh balanced
-bind = SHIFT, 3, exec, ~/.config/hyprcandy/hooks/hyprland_gap_presets.sh spacious
-bind = SHIFT, 4, exec, ~/.config/hyprcandy/hooks/hyprland_gap_presets.sh zero
+bind = ALT, 1, exec, ~/.config/hyprcandy/hooks/hyprland_gap_presets.sh minimal
+bind = ALT, 2, exec, ~/.config/hyprcandy/hooks/hyprland_gap_presets.sh balanced
+bind = ALT, 3, exec, ~/.config/hyprcandy/hooks/hyprland_gap_presets.sh spacious
+bind = ALT, 4, exec, ~/.config/hyprcandy/hooks/hyprland_gap_presets.sh zero
 
 #### Status display ####
 
