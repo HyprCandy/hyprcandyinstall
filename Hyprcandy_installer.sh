@@ -1930,7 +1930,7 @@ sleep 1
 if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
     sudo magick "$HOME/.config/background[0]" "/usr/share/sddm/themes/sugar-candy/Backgrounds/Mountain.jpg"
     sleep 3
-    "$HOME/.config/nwg-dock-hyprland/launch.sh" &
+    "$HOME/.config/nwg-dock-hyprland/launch.sh" > /dev/null 2>&1 &
 fi
 
 sleep 1
