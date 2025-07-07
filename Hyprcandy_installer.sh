@@ -894,7 +894,7 @@ echo "📁 Creating background hook scripts..."
 mkdir -p "$HOME/.config/hyprcandy/hooks" "$HOME/.config/systemd/user" "$HOME/.config/mako"
 
 ### 🪧 Setup mako config
-cat > "$HOME/.config/mako" << 'EOF'
+cat > "$HOME/.config/mako/config" << 'EOF'
 # Mako Configuration with Material You Colors
 # Colors directly embedded (since include might not work)
 
