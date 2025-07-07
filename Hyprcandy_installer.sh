@@ -1032,6 +1032,477 @@ anchor=top-right
 EOF
 
 # ═══════════════════════════════════════════════════════════════
+#                    Icon Size Increase Script
+# ═══════════════════════════════════════════════════════════════
+
+cat > "$HOME/.config/hyprcandy/hooks/nwg_dock_icon_size_increase.sh" << 'EOF'
+#!/bin/bash
+
+LAUNCH_SCRIPT="$HOME/.config/nwg-dock-hyprland/launch.sh"
+KEYBINDS_FILE="$HOME/.config/hyprcustom/custom_keybinds.conf"
+SETTINGS_FILE="$HOME/.config/hyprcandy/nwg_dock_settings.conf"
+
+# Create settings file if it doesn't exist
+if [ ! -f "$SETTINGS_FILE" ]; then
+    echo "ICON_SIZE=28" > "$SETTINGS_FILE"
+    echo "BORDER_RADIUS=16" >> "$SETTINGS_FILE"
+    echo "BORDER_WIDTH=2" >> "$SETTINGS_FILE"
+fi
+
+# Source current settings
+source "$SETTINGS_FILE"
+
+# Increment icon size
+NEW_SIZE=$((ICON_SIZE + 2))
+
+# Update settings file
+sed -i "s/ICON_SIZE=.*/ICON_SIZE=$NEW_SIZE/" "$SETTINGS_FILE"
+
+# Update launch script
+sed -i "s/-i [0-9]\+/-i $NEW_SIZE/g" "$LAUNCH_SCRIPT"
+
+# Update keybinds file
+sed -i "s/-i [0-9]\+/-i $NEW_SIZE/g" "$KEYBINDS_FILE"
+
+# Restart dock with current position detection
+if pgrep -f "nwg-dock-hyprland.*-p left" > /dev/null; then
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    nwg-dock-hyprland -p left -lp start -i $NEW_SIZE -w 10 -ml 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" > /dev/null 2>&1 &
+elif pgrep -f "nwg-dock-hyprland.*-p top" > /dev/null; then
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    nwg-dock-hyprland -p top -lp start -i $NEW_SIZE -w 10 -mt 6 -ml 10 -mr 10 -x -r -s "style.css" -c "rofi -show drun" > /dev/null 2>&1 &
+elif pgrep -f "nwg-dock-hyprland.*-p right" > /dev/null; then
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    nwg-dock-hyprland -p right -lp start -i $NEW_SIZE -w 10 -mr 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" > /dev/null 2>&1 &
+else
+    # Default to bottom (launch script)
+    "$LAUNCH_SCRIPT" > /dev/null 2>&1 &
+fi
+
+echo "🔼 Icon size increased: $NEW_SIZE px"
+notify-send "Dock Icon Size Increased" "Size: ${NEW_SIZE}px" -t 2000
+EOF
+
+# ═══════════════════════════════════════════════════════════════
+#                    Icon Size Decrease Script
+# ═══════════════════════════════════════════════════════════════
+
+cat > "$HOME/.config/hyprcandy/hooks/nwg_dock_icon_size_decrease.sh" << 'EOF'
+#!/bin/bash
+
+LAUNCH_SCRIPT="$HOME/.config/nwg-dock-hyprland/launch.sh"
+KEYBINDS_FILE="$HOME/.config/hyprcustom/custom_keybinds.conf"
+SETTINGS_FILE="$HOME/.config/hyprcandy/nwg_dock_settings.conf"
+
+# Create settings file if it doesn't exist
+if [ ! -f "$SETTINGS_FILE" ]; then
+    echo "ICON_SIZE=28" > "$SETTINGS_FILE"
+    echo "BORDER_RADIUS=16" >> "$SETTINGS_FILE"
+    echo "BORDER_WIDTH=2" >> "$SETTINGS_FILE"
+fi
+
+# Source current settings
+source "$SETTINGS_FILE"
+
+# Decrement icon size (minimum 16)
+NEW_SIZE=$((ICON_SIZE > 16 ? ICON_SIZE - 2 : 16))
+
+# Update settings file
+sed -i "s/ICON_SIZE=.*/ICON_SIZE=$NEW_SIZE/" "$SETTINGS_FILE"
+
+# Update launch script
+sed -i "s/-i [0-9]\+/-i $NEW_SIZE/g" "$LAUNCH_SCRIPT"
+
+# Update keybinds file
+sed -i "s/-i [0-9]\+/-i $NEW_SIZE/g" "$KEYBINDS_FILE"
+
+# Restart dock with current position detection
+if pgrep -f "nwg-dock-hyprland.*-p left" > /dev/null; then
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    nwg-dock-hyprland -p left -lp start -i $NEW_SIZE -w 10 -ml 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" > /dev/null 2>&1 &
+elif pgrep -f "nwg-dock-hyprland.*-p top" > /dev/null; then
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    nwg-dock-hyprland -p top -lp start -i $NEW_SIZE -w 10 -mt 6 -ml 10 -mr 10 -x -r -s "style.css" -c "rofi -show drun" > /dev/null 2>&1 &
+elif pgrep -f "nwg-dock-hyprland.*-p right" > /dev/null; then
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    nwg-dock-hyprland -p right -lp start -i $NEW_SIZE -w 10 -mr 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" > /dev/null 2>&1 &
+else
+    # Default to bottom (launch script)
+    "$LAUNCH_SCRIPT" > /dev/null 2>&1 &
+fi
+
+echo "🔽 Icon size decreased: $NEW_SIZE px"
+notify-send "Dock Icon Size Decreased" "Size: ${NEW_SIZE}px" -t 2000
+EOF
+
+# ═══════════════════════════════════════════════════════════════
+#                    Border Radius Increase Script (WITH RELOAD)
+# ═══════════════════════════════════════════════════════════════
+
+cat > "$HOME/.config/hyprcandy/hooks/nwg_dock_border_radius_increase.sh" << 'EOF'
+#!/bin/bash
+
+STYLE_FILE="$HOME/.config/nwg-dock-hyprland/style.css"
+SETTINGS_FILE="$HOME/.config/hyprcandy/nwg_dock_settings.conf"
+
+# Create settings file if it doesn't exist
+if [ ! -f "$SETTINGS_FILE" ]; then
+    echo "ICON_SIZE=28" > "$SETTINGS_FILE"
+    echo "BORDER_RADIUS=16" >> "$SETTINGS_FILE"
+    echo "BORDER_WIDTH=2" >> "$SETTINGS_FILE"
+fi
+
+# Source current settings
+source "$SETTINGS_FILE"
+
+# Increment border radius
+NEW_RADIUS=$((BORDER_RADIUS + 2))
+
+# Update settings file
+sed -i "s/BORDER_RADIUS=.*/BORDER_RADIUS=$NEW_RADIUS/" "$SETTINGS_FILE"
+
+# Update style.css file
+sed -i "s/border-radius: [0-9]\+px/border-radius: ${NEW_RADIUS}px/" "$STYLE_FILE"
+
+# Reload dock to apply CSS changes
+if pgrep -f "nwg-dock-hyprland.*-p left" > /dev/null; then
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    nwg-dock-hyprland -p left -lp start -i $ICON_SIZE -w 10 -ml 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" > /dev/null 2>&1 &
+elif pgrep -f "nwg-dock-hyprland.*-p top" > /dev/null; then
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    nwg-dock-hyprland -p top -lp start -i $ICON_SIZE -w 10 -mt 6 -ml 10 -mr 10 -x -r -s "style.css" -c "rofi -show drun" > /dev/null 2>&1 &
+elif pgrep -f "nwg-dock-hyprland.*-p right" > /dev/null; then
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    nwg-dock-hyprland -p right -lp start -i $ICON_SIZE -w 10 -mr 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" > /dev/null 2>&1 &
+elif pgrep -f "nwg-dock-hyprland" > /dev/null; then
+    # Default to bottom - get current icon size from launch script
+    LAUNCH_SCRIPT="$HOME/.config/nwg-dock-hyprland/launch.sh"
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    "$LAUNCH_SCRIPT" > /dev/null 2>&1 &
+fi
+
+echo "🔼 Border radius increased: $NEW_RADIUS px"
+notify-send "Dock Border Radius Increased" "Radius: ${NEW_RADIUS}px" -t 2000
+EOF
+
+# ═══════════════════════════════════════════════════════════════
+#                    Border Radius Decrease Script (WITH RELOAD)
+# ═══════════════════════════════════════════════════════════════
+
+cat > "$HOME/.config/hyprcandy/hooks/nwg_dock_border_radius_decrease.sh" << 'EOF'
+#!/bin/bash
+
+STYLE_FILE="$HOME/.config/nwg-dock-hyprland/style.css"
+SETTINGS_FILE="$HOME/.config/hyprcandy/nwg_dock_settings.conf"
+
+# Create settings file if it doesn't exist
+if [ ! -f "$SETTINGS_FILE" ]; then
+    echo "ICON_SIZE=28" > "$SETTINGS_FILE"
+    echo "BORDER_RADIUS=16" >> "$SETTINGS_FILE"
+    echo "BORDER_WIDTH=2" >> "$SETTINGS_FILE"
+fi
+
+# Source current settings
+source "$SETTINGS_FILE"
+
+# Decrement border radius (minimum 0)
+NEW_RADIUS=$((BORDER_RADIUS > 0 ? BORDER_RADIUS - 2 : 0))
+
+# Update settings file
+sed -i "s/BORDER_RADIUS=.*/BORDER_RADIUS=$NEW_RADIUS/" "$SETTINGS_FILE"
+
+# Update style.css file
+sed -i "s/border-radius: [0-9]\+px/border-radius: ${NEW_RADIUS}px/" "$STYLE_FILE"
+
+# Reload dock to apply CSS changes
+if pgrep -f "nwg-dock-hyprland.*-p left" > /dev/null; then
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    nwg-dock-hyprland -p left -lp start -i $ICON_SIZE -w 10 -ml 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" > /dev/null 2>&1 &
+elif pgrep -f "nwg-dock-hyprland.*-p top" > /dev/null; then
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    nwg-dock-hyprland -p top -lp start -i $ICON_SIZE -w 10 -mt 6 -ml 10 -mr 10 -x -r -s "style.css" -c "rofi -show drun" > /dev/null 2>&1 &
+elif pgrep -f "nwg-dock-hyprland.*-p right" > /dev/null; then
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    nwg-dock-hyprland -p right -lp start -i $ICON_SIZE -w 10 -mr 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" > /dev/null 2>&1 &
+elif pgrep -f "nwg-dock-hyprland" > /dev/null; then
+    # Default to bottom - get current icon size from launch script
+    LAUNCH_SCRIPT="$HOME/.config/nwg-dock-hyprland/launch.sh"
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    "$LAUNCH_SCRIPT" > /dev/null 2>&1 &
+fi
+
+echo "🔽 Border radius decreased: $NEW_RADIUS px"
+notify-send "Dock Border Radius Decreased" "Radius: ${NEW_RADIUS}px" -t 2000
+EOF
+
+# ═══════════════════════════════════════════════════════════════
+#                    Border Width Increase Script (WITH RELOAD)
+# ═══════════════════════════════════════════════════════════════
+
+cat > "$HOME/.config/hyprcandy/hooks/nwg_dock_border_width_increase.sh" << 'EOF'
+#!/bin/bash
+
+STYLE_FILE="$HOME/.config/nwg-dock-hyprland/style.css"
+SETTINGS_FILE="$HOME/.config/hyprcandy/nwg_dock_settings.conf"
+
+# Create settings file if it doesn't exist
+if [ ! -f "$SETTINGS_FILE" ]; then
+    echo "ICON_SIZE=28" > "$SETTINGS_FILE"
+    echo "BORDER_RADIUS=16" >> "$SETTINGS_FILE"
+    echo "BORDER_WIDTH=2" >> "$SETTINGS_FILE"
+fi
+
+# Source current settings
+source "$SETTINGS_FILE"
+
+# Increment border width
+NEW_WIDTH=$((BORDER_WIDTH + 1))
+
+# Update settings file
+sed -i "s/BORDER_WIDTH=.*/BORDER_WIDTH=$NEW_WIDTH/" "$SETTINGS_FILE"
+
+# Update style.css file
+sed -i "s/border-width: [0-9]\+px/border-width: ${NEW_WIDTH}px/" "$STYLE_FILE"
+
+# Reload dock to apply CSS changes
+if pgrep -f "nwg-dock-hyprland.*-p left" > /dev/null; then
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    nwg-dock-hyprland -p left -lp start -i $ICON_SIZE -w 10 -ml 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" > /dev/null 2>&1 &
+elif pgrep -f "nwg-dock-hyprland.*-p top" > /dev/null; then
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    nwg-dock-hyprland -p top -lp start -i $ICON_SIZE -w 10 -mt 6 -ml 10 -mr 10 -x -r -s "style.css" -c "rofi -show drun" > /dev/null 2>&1 &
+elif pgrep -f "nwg-dock-hyprland.*-p right" > /dev/null; then
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    nwg-dock-hyprland -p right -lp start -i $ICON_SIZE -w 10 -mr 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" > /dev/null 2>&1 &
+elif pgrep -f "nwg-dock-hyprland" > /dev/null; then
+    # Default to bottom - get current icon size from launch script
+    LAUNCH_SCRIPT="$HOME/.config/nwg-dock-hyprland/launch.sh"
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    "$LAUNCH_SCRIPT" > /dev/null 2>&1 &
+fi
+
+echo "🔼 Border width increased: $NEW_WIDTH px"
+notify-send "Dock Border Width Increased" "Width: ${NEW_WIDTH}px" -t 2000
+EOF
+
+# ═══════════════════════════════════════════════════════════════
+#                    Border Width Decrease Script (WITH RELOAD)
+# ═══════════════════════════════════════════════════════════════
+
+cat > "$HOME/.config/hyprcandy/hooks/nwg_dock_border_width_decrease.sh" << 'EOF'
+#!/bin/bash
+
+STYLE_FILE="$HOME/.config/nwg-dock-hyprland/style.css"
+SETTINGS_FILE="$HOME/.config/hyprcandy/nwg_dock_settings.conf"
+
+# Create settings file if it doesn't exist
+if [ ! -f "$SETTINGS_FILE" ]; then
+    echo "ICON_SIZE=28" > "$SETTINGS_FILE"
+    echo "BORDER_RADIUS=16" >> "$SETTINGS_FILE"
+    echo "BORDER_WIDTH=2" >> "$SETTINGS_FILE"
+fi
+
+# Source current settings
+source "$SETTINGS_FILE"
+
+# Decrement border width (minimum 0)
+NEW_WIDTH=$((BORDER_WIDTH > 0 ? BORDER_WIDTH - 1 : 0))
+
+# Update settings file
+sed -i "s/BORDER_WIDTH=.*/BORDER_WIDTH=$NEW_WIDTH/" "$SETTINGS_FILE"
+
+# Update style.css file
+sed -i "s/border-width: [0-9]\+px/border-width: ${NEW_WIDTH}px/" "$STYLE_FILE"
+
+# Reload dock to apply CSS changes
+if pgrep -f "nwg-dock-hyprland.*-p left" > /dev/null; then
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    nwg-dock-hyprland -p left -lp start -i $ICON_SIZE -w 10 -ml 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" > /dev/null 2>&1 &
+elif pgrep -f "nwg-dock-hyprland.*-p top" > /dev/null; then
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    nwg-dock-hyprland -p top -lp start -i $ICON_SIZE -w 10 -mt 6 -ml 10 -mr 10 -x -r -s "style.css" -c "rofi -show drun" > /dev/null 2>&1 &
+elif pgrep -f "nwg-dock-hyprland.*-p right" > /dev/null; then
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    nwg-dock-hyprland -p right -lp start -i $ICON_SIZE -w 10 -mr 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" > /dev/null 2>&1 &
+elif pgrep -f "nwg-dock-hyprland" > /dev/null; then
+    # Default to bottom - get current icon size from launch script
+    LAUNCH_SCRIPT="$HOME/.config/nwg-dock-hyprland/launch.sh"
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    "$LAUNCH_SCRIPT" > /dev/null 2>&1 &
+fi
+
+echo "🔽 Border width decreased: $NEW_WIDTH px"
+notify-send "Dock Border Width Decreased" "Width: ${NEW_WIDTH}px" -t 2000
+EOF
+
+# ═══════════════════════════════════════════════════════════════
+#                    Dock Presets Script
+# ═══════════════════════════════════════════════════════════════
+
+cat > "$HOME/.config/hyprcandy/hooks/nwg_dock_presets.sh" << 'EOF'
+#!/bin/bash
+
+LAUNCH_SCRIPT="$HOME/.config/nwg-dock-hyprland/launch.sh"
+KEYBINDS_FILE="$HOME/.config/hyprcustom/custom_keybinds.conf"
+STYLE_FILE="$HOME/.config/nwg-dock-hyprland/style.css"
+SETTINGS_FILE="$HOME/.config/hyprcandy/nwg_dock_settings.conf"
+
+case "$1" in
+    "minimal")
+        ICON_SIZE=20
+        BORDER_RADIUS=8
+        BORDER_WIDTH=1
+        ;;
+    "balanced")
+        ICON_SIZE=28
+        BORDER_RADIUS=16
+        BORDER_WIDTH=2
+        ;;
+    "prominent")
+        ICON_SIZE=36
+        BORDER_RADIUS=20
+        BORDER_WIDTH=3
+        ;;
+    "hidden")
+        pkill -f nwg-dock-hyprland
+        echo "🫥 Dock hidden"
+        notify-send "Dock Hidden" "nwg-dock-hyprland stopped" -t 2000
+        exit 0
+        ;;
+    *)
+        echo "Usage: $0 {minimal|balanced|prominent|hidden}"
+        exit 1
+        ;;
+esac
+
+# Update settings file
+cat > "$SETTINGS_FILE" << SETTINGS_EOF
+ICON_SIZE=$ICON_SIZE
+BORDER_RADIUS=$BORDER_RADIUS
+BORDER_WIDTH=$BORDER_WIDTH
+SETTINGS_EOF
+
+# Update launch script
+sed -i "s/-i [0-9]\+/-i $ICON_SIZE/g" "$LAUNCH_SCRIPT"
+
+# Update keybinds file
+sed -i "s/-i [0-9]\+/-i $ICON_SIZE/g" "$KEYBINDS_FILE"
+
+# Update style.css file
+sed -i "s/border-radius: [0-9]\+px/border-radius: ${BORDER_RADIUS}px/" "$STYLE_FILE"
+sed -i "s/border-width: [0-9]\+px/border-width: ${BORDER_WIDTH}px/" "$STYLE_FILE"
+
+# Restart dock with current position detection
+if pgrep -f "nwg-dock-hyprland.*-p left" > /dev/null; then
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    nwg-dock-hyprland -p left -lp start -i $ICON_SIZE -w 10 -ml 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" > /dev/null 2>&1 &
+elif pgrep -f "nwg-dock-hyprland.*-p top" > /dev/null; then
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    nwg-dock-hyprland -p top -lp start -i $ICON_SIZE -w 10 -mt 6 -ml 10 -mr 10 -x -r -s "style.css" -c "rofi -show drun" > /dev/null 2>&1 &
+elif pgrep -f "nwg-dock-hyprland.*-p right" > /dev/null; then
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    nwg-dock-hyprland -p right -lp start -i $ICON_SIZE -w 10 -mr 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" > /dev/null 2>&1 &
+else
+    # Default to bottom (launch script)
+    "$LAUNCH_SCRIPT" > /dev/null 2>&1 &
+fi
+
+echo "🎨 Applied $1 preset: icon_size=$ICON_SIZE, border_radius=$BORDER_RADIUS, border_width=$BORDER_WIDTH"
+notify-send "Dock Preset Applied" "$1: SIZE=$ICON_SIZE RADIUS=$BORDER_RADIUS WIDTH=$BORDER_WIDTH" -t 3000
+EOF
+
+# ═══════════════════════════════════════════════════════════════
+#                    Dock Status Display Script
+# ═══════════════════════════════════════════════════════════════
+
+cat > "$HOME/.config/hyprcandy/hooks/nwg_dock_status_display.sh" << 'EOF'
+#!/bin/bash
+
+SETTINGS_FILE="$HOME/.config/hyprcandy/nwg_dock_settings.conf"
+
+# Create settings file if it doesn't exist
+if [ ! -f "$SETTINGS_FILE" ]; then
+    echo "ICON_SIZE=28" > "$SETTINGS_FILE"
+    echo "BORDER_RADIUS=16" >> "$SETTINGS_FILE"
+    echo "BORDER_WIDTH=2" >> "$SETTINGS_FILE"
+fi
+
+# Source current settings
+source "$SETTINGS_FILE"
+
+# Detect current dock position
+if pgrep -f "nwg-dock-hyprland.*-p left" > /dev/null; then
+    DOCK_POSITION="left"
+elif pgrep -f "nwg-dock-hyprland.*-p top" > /dev/null; then
+    DOCK_POSITION="top"
+elif pgrep -f "nwg-dock-hyprland.*-p right" > /dev/null; then
+    DOCK_POSITION="right"
+elif pgrep -f "nwg-dock-hyprland" > /dev/null; then
+    DOCK_POSITION="bottom"
+else
+    DOCK_POSITION="stopped"
+fi
+
+# Check if dock is running
+if pgrep -f "nwg-dock-hyprland" > /dev/null; then
+    DOCK_STATUS="Running"
+else
+    DOCK_STATUS="Stopped"
+fi
+
+# Create status display
+STATUS="🚢 NWG-Dock Status
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📐 Icon Size: ${ICON_SIZE}px
+🔘 Border Radius: ${BORDER_RADIUS}px
+🔸 Border Width: ${BORDER_WIDTH}px
+📍 Position: $DOCK_POSITION
+🔄 Status: $DOCK_STATUS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+echo "$STATUS"
+notify-send "NWG-Dock Status" "SIZE:${ICON_SIZE} RADIUS:${BORDER_RADIUS} WIDTH:${BORDER_WIDTH} POS:$DOCK_POSITION" -t 5000
+EOF
+
+# ═══════════════════════════════════════════════════════════════
+#                     Make scripts executable
+# ═══════════════════════════════════════════════════════════════
+
+chmod +x "$HOME/.config/hyprcandy/hooks/nwg_dock_icon_size_increase.sh"
+chmod +x "$HOME/.config/hyprcandy/hooks/nwg_dock_icon_size_decrease.sh"
+chmod +x "$HOME/.config/hyprcandy/hooks/nwg_dock_border_radius_increase.sh"
+chmod +x "$HOME/.config/hyprcandy/hooks/nwg_dock_border_radius_decrease.sh"
+chmod +x "$HOME/.config/hyprcandy/hooks/nwg_dock_border_width_increase.sh"
+chmod +x "$HOME/.config/hyprcandy/hooks/nwg_dock_border_width_decrease.sh"
+chmod +x "$HOME/.config/hyprcandy/hooks/nwg_dock_presets.sh"
+chmod +x "$HOME/.config/hyprcandy/hooks/nwg_dock_status_display.sh"
+
+# ═══════════════════════════════════════════════════════════════
 #                    Gaps OUT Increase Script
 # ═══════════════════════════════════════════════════════════════
 
