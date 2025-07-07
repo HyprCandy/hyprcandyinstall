@@ -1838,7 +1838,7 @@ chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_status_display.sh"
 
 echo "✅ Hyprland adjustment scripts created and made executable!"
 
-### 🔃 Script to launch hyprpanel and reload swww-daemon on startup or login
+### 🔃 Script to launch hyprpanel, reload swww-daemon and restart the background-watcher service on startup or login
 cat > "$HOME/.config/hyprcandy/hooks/startup_services.sh" << 'EOF'
 #!/bin/bash
 # Enhanced startup script for Hyprland services
@@ -1890,6 +1890,14 @@ restart_swww() {
     echo "✅ swww-daemon restarted"
 }
 
+# Function to restart background-watcher
+restart_background_watcher() {
+    echo "🚀 Starting background-watcher..."
+    sleep 5
+    systemctl --user restart background-watcher
+    echo "✅ background-watcher started"
+}
+
 # Main execution
 start_hyprpanel
 
@@ -1902,6 +1910,8 @@ else
     echo "⚠️ Proceeding with swww restart anyway..."
     restart_swww
 fi
+
+restart_background_watcher
 
 echo "🎯 All services started successfully"
 EOF
@@ -1926,10 +1936,10 @@ fi
 
 sleep 1
 
-# Update SDDM background with sudo
+# Update SDDM background with sudo and reload the dock
 if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
     sudo magick "$HOME/.config/background[0]" "/usr/share/sddm/themes/sugar-candy/Backgrounds/Mountain.jpg"
-    sleep 3
+    sleep 5
     "$HOME/.config/nwg-dock-hyprland/launch.sh" > /dev/null 2>&1 &
 fi
 
