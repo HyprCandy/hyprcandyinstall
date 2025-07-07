@@ -265,8 +265,10 @@ build_package_list() {
         "matugen-bin"
         "python-pywal16"
         
-        # Applications
+        # Editors
         "gedit"
+        "neovim"
+        "micro"
         
         # Utilities
         "zip"
