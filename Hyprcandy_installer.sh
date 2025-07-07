@@ -1929,6 +1929,8 @@ sleep 1
 # Update SDDM background with sudo
 if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
     sudo magick "$HOME/.config/background[0]" "/usr/share/sddm/themes/sugar-candy/Backgrounds/Mountain.jpg"
+    sleep 3
+    "$HOME/.config/nwg-dock-hyprland/launch.sh" &
 fi
 
 sleep 1
