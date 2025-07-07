@@ -2644,6 +2644,27 @@ bind = CTRL SHIFT, I, exec, nwg-dock-hyprland -p top -lp start -i 28 -w 10 -mt 6
 bind = CTRL SHIFT, K, exec, ~/.config/nwg-dock-hyprland/launch.sh #Bottom dock and quick-reload dock
 bind = CTRL SHIFT, L, exec, nwg-dock-hyprland -p right -lp start -i 28 -w 10 -mr 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" #Right dock
 
+#### NWG-Dock Icon Size controls ####
+bind = CTRL SHIFT ALT, equal, exec, ~/.config/hyprcandy/hooks/nwg_dock_icon_size_increase.sh
+bind = CTRL SHIFT ALT, minus, exec, ~/.config/hyprcandy/hooks/nwg_dock_icon_size_decrease.sh
+
+#### NWG-Dock Border Radius controls ####
+bind = CTRL ALT, equal, exec, ~/.config/hyprcandy/hooks/nwg_dock_border_radius_increase.sh
+bind = CTRL ALT, minus, exec, ~/.config/hyprcandy/hooks/nwg_dock_border_radius_decrease.sh
+
+#### NWG-Dock Border Width controls ####
+bind = SHIFT ALT, equal, exec, ~/.config/hyprcandy/hooks/nwg_dock_border_width_increase.sh
+bind = SHIFT ALT, minus, exec, ~/.config/hyprcandy/hooks/nwg_dock_border_width_decrease.sh
+
+#### NWG-Dock Presets ####
+bind = ALT, 5, exec, ~/.config/hyprcandy/hooks/nwg_dock_presets.sh minimal
+bind = ALT, 6, exec, ~/.config/hyprcandy/hooks/nwg_dock_presets.sh balanced
+bind = ALT, 7, exec, ~/.config/hyprcandy/hooks/nwg_dock_presets.sh prominent
+bind = ALT, 8, exec, ~/.config/hyprcandy/hooks/nwg_dock_presets.sh hidden
+
+#### NWG-Dock Status display ####
+bind = CTRL SHIFT, S, exec, ~/.config/hyprcandy/hooks/nwg_dock_status_display.sh
+
 #### Hyprpanel ####
 
 bind = $mainMod, H, exec, DRI_PRIME=1 ~/.config/hyprcandy/hooks/restart_hyprpanel.sh #Restart or reload hyprpanel and stop automatic idle-inhibitor
