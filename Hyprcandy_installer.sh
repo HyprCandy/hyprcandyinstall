@@ -2459,7 +2459,7 @@ setup_custom_config() {
 # ╚═╝  ╚═╝   ╚═╝   ╚═╝     ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝    ╚═╝   
 
 #[IMPORTANT]#
-# Your custom settings mad in this file are safe from resets after rerunning the script.
+# Your custom settings made in this file are safe from resets after rerunning the script.
 # To reset, delete the 'hyprcustom' folder (not just the 'custom.conf' file) before rerunning the script to regenerate the default setup.
 #[IMPORTANT]#
 
