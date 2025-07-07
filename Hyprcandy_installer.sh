@@ -287,7 +287,14 @@ build_package_list() {
         "mako"
         
         # Fonts and emojis
-        "nerd-fonts"
+        "ttf-cascadia-mono-nerd"
+        "ttf-fantasque-nerd"
+        "ttf-firacode-nerd"
+        "ttf-jetbrains-mono-nerd"
+        "ttf-nerd-fonts-symbols"
+        "ttf-nerd-fonts-symbols-common"
+        "ttf-nerd-fonts-symbols-mono"
+        "ttf-meslo-nerd"
         "powerline-fonts"
         "noto-fonts-emoji"
         "noto-color-emoji-fontconfig"
