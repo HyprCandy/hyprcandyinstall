@@ -3200,8 +3200,8 @@ bind = $mainMod CTRL, G, exec, ~/.config/hyprcandy/settings/glyphpicker.sh 		  #
 #bind = $mainMod, W, exec, warp-terminal
 bind = $mainMod, C, exec, DRI_PRIME=1 $EDITOR #Editor
 bind = $mainMod, B, exec, DRI_PRIME=1 xdg-open "http:// &" #Launch your default browser
-bind = $mainMod, Q, exec, DRI_PRIME=1 pypr toggle term #Launch kitty in a pyprland scratchpad
-bind = $mainMod, Return, exec, kitty #Launch normal kitty instances
+bind = $mainMod, Q, exec, DRI_PRIME=1 pypr toggle term #Launch a kitty scratchpad through pyprland
+bind = $mainMod, Return, exec, kitty --class=kitty-normal #Launch normal kitty instances
 bind = $mainMod, O, exec, DRI_PRIME=1 /usr/bin/octopi #Launch octopi application finder
 bind = $mainMod, E, exec, DRI_PRIME=1 nautilus #pypr toggle filemanager #Launch the filemanager 
 bind = $mainMod CTRL, C, exec, DRI_PRIME=1 gnome-calculator #Launch the calculator
