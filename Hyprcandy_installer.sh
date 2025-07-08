@@ -220,8 +220,9 @@ build_package_list() {
         "gnome-software"
         "mutter"
         
-        # Terminal and file manager
+        # Terminals and file manager
         "kitty"
+        "konsole"
         "nautilus"
         
         # Qt and GTK theming
