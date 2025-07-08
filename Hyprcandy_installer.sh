@@ -882,20 +882,17 @@ setup_hyprcandy() {
         rm -rf "$item"
     done
 
-    # Stow all configurations at once
-    if stow -v -t "$HOME" . 2>/dev/null; then
-        echo "✅ Successfully stowed all configurations"
-        sleep 2
-        rm -rf "$HOME/HyprCandy"
+# Stow all configurations at once, ignoring HyprCandy folder
+if stow -v -t "$HOME" --ignore='HyprCandy' . 2>/dev/null; then
+    echo "✅ Successfully stowed all configurations"
+else
+    echo "⚠️  Stow operation failed — attempting restow..."
+    if stow -R -v -t "$HOME" --ignore='HyprCandy' . 2>/dev/null; then
+        echo "✅ Successfully restowed all configurations"
     else
-        echo "⚠️  Stow operation failed — attempting restow..."
-        if stow -R -v -t "$HOME" . 2>/dev/null; then
-            echo "✅ Successfully restowed all configurations"
-        else
-            echo "❌ Failed to stow configurations"
-        fi
+        echo "❌ Failed to stow configurations"
     fi
-
+fi
     # Final summary
     echo
     echo "✅ Installation completed. Successfully installed: $stow_success"
