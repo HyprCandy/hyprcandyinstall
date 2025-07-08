@@ -3195,7 +3195,7 @@ bind = $mainMod CTRL, G, exec, ~/.config/hyprcandy/settings/glyphpicker.sh 		  #
 
 #### Applications ####
 
-#bind = $mainMod CTRL, S, exec, spotify
+#bind = $mainMod, S, exec, spotify
 #bind = $mainMod, D, exec, $DISCORD
 #bind = $mainMod, W, exec, warp-terminal
 bind = $mainMod, C, exec, DRI_PRIME=1 $EDITOR #Editor
