@@ -552,7 +552,7 @@ if test -d ~/.local/bin
 end
 
 # Aliases
-alias hyprcandy="cd .hyprcandy && git pull && stow */"
+alias hyprcandy="cd .hyprcandy && git pull && stow --ignore='HyprCandy' --ignore='Candy-Images' --ignore='Dock-SVGs' --ignore='Gifs' --ignore='Logo' */"
 alias ll="ls -alF"
 alias la="ls -A"
 alias l="ls -CF"
@@ -733,7 +733,7 @@ fi
 source $ZSH/oh-my-zsh.sh
 
 # Aliases
-alias hyprcandy="cd .hyprcandy && git pull && stow */"
+alias hyprcandy="cd .hyprcandy && git pull && stow --ignore='HyprCandy' --ignore='Candy-Images' --ignore='Dock-SVGs' --ignore='Gifs' --ignore='Logo' */"
 alias ll="ls -alF"
 alias la="ls -A"
 alias l="ls -CF"
@@ -885,6 +885,8 @@ setup_hyprcandy() {
     # Stow all configurations at once
     if stow -v -t "$HOME" . 2>/dev/null; then
         echo "✅ Successfully stowed all configurations"
+        sleep 2
+        rm -rf "$HOME/HyprCandy"
     else
         echo "⚠️  Stow operation failed — attempting restow..."
         if stow -R -v -t "$HOME" . 2>/dev/null; then
