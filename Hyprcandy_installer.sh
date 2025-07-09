@@ -3429,6 +3429,38 @@ EOF
         fi
 }
 
+# ═══════════════════════════════════════════════════════════════
+#    Set panel keybinds in ~/.config/hyprcustom/custom_keybinds.conf
+# ═══════════════════════════════════════════════════════════════
+setup_panel_keybinds() {
+    local keybinds_file="$HOME/.config/hyprcustom/custom_keybinds.conf"
+    mkdir -p "$(dirname "$keybinds_file")"
+
+    if [ "$PANEL_CHOICE" = "waybar" ]; then
+        RESTART="restart_waybar.sh"
+        KILL="kill_waybar_safe.sh"
+    else
+        RESTART="restart_hyprpanel.sh"
+        KILL="kill_hyprpanel_safe.sh"
+    fi
+
+    echo "⚙️  Setting panel keybinds in: $keybinds_file"
+
+    # Remove any existing panel-related keybinds
+    sed -i '/#Restart or reload hyprpanel/d' "$keybinds_file"
+    sed -i '/#Hide or kill panel and start automatic idle-inhibitor/d' "$keybinds_file"
+    sed -i '/bind = \$mainMod, H, exec, .*restart.*\.sh/d' "$keybinds_file"
+    sed -i '/bind = \$mainMod Alt, H, exec, .*kill.*\.sh/d' "$keybinds_file"
+
+    # Append updated keybinds
+    {
+        echo "bind = \$mainMod, H, exec, DRI_PRIME=1 ~/.config/hyprcandy/hooks/$RESTART #Restart or reload hyprpanel and stop automatic idle-inhibitor"
+        echo "bind = \$mainMod Alt, H, exec, ~/.config/hyprcandy/hooks/$KILL #Hide or kill panel and start automatic idle-inhibitor"
+    } >> "$keybinds_file"
+
+    echo "✅ Keybinds updated based on panel: $PANEL_CHOICE"
+}
+
 # Function to setup keyboard layout
 setup_keyboard_layout() {
     # Keyboard layout selection
@@ -3607,6 +3639,27 @@ setup_keyboard_layout() {
         print_error "Please run setup_custom_config() first"
     fi
 
+    # ═══════════════════════════════════════════════════════════════
+#         Conditional Service Enablement Based on Panel
+# ═══════════════════════════════════════════════════════════════
+
+if [ "$PANEL_CHOICE" = "waybar" ]; then
+    systemctl --user daemon-reexec
+    systemctl --user daemon-reload
+    systemctl --user enable --now background-watcher.service &>/dev/null
+    systemctl --user enable --now waybar.service &>/dev/null
+    systemctl --user enable --now waybar-idle-monitor.service &>/dev/null
+    systemctl --user enable --now rofi-font-watcher.service &>/dev/null
+    systemctl --user enable --now eww.service &>/dev/null
+else
+    systemctl --user daemon-reexec
+    systemctl --user daemon-reload
+    systemctl --user enable --now background-watcher.service &>/dev/null
+    systemctl --user enable --now hyprpanel.service &>/dev/null
+    systemctl --user enable --now hyprpanel-idle-monitor.service &>/dev/null
+    systemctl --user enable --now rofi-font-watcher.service &>/dev/null
+fi
+
     # 🔄 Reload Hyprland
     echo
     echo "🔄 Reloading Hyprland with 'hyprctl reload'..."
@@ -3711,6 +3764,9 @@ main() {
 
     # Setup default "custom.conf" file
     setup_custom_config
+
+    # Setup keybinds for the chosen panel
+    setup_panel_keybinds
 
     # Setup keyboard layout
     setup_keyboard_layout
