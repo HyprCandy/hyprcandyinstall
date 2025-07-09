@@ -3266,8 +3266,8 @@ bind = CTRL SHIFT, S, exec, ~/.config/hyprcandy/hooks/nwg_dock_status_display.sh
 
 #### Hyprpanel ####
 
-bind = $mainMod, H, exec, DRI_PRIME=1 ~/.config/hyprcandy/hooks/restart_hyprpanel.sh #Restart or reload hyprpanel and stop automatic idle-inhibitor
-bind = $mainMod Alt, H, exec, ~/.config/hyprcandy/hooks/kill_hyprpanel_safe.sh #Close panel and start automatic idle-inhibitor
+bind = $mainMod, H, exec, DRI_PRIME=1 ~/.config/hyprcandy/hooks/$RESTART #Restart or reload hyprpanel and stop automatic idle-inhibitor
+bind = $mainMod Alt, H, exec, ~/.config/hyprcandy/hooks/$KILL #Close panel and start automatic idle-inhibitor
 
 #### Recorder ####
 
