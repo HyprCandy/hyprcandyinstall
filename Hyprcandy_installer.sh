@@ -1933,8 +1933,9 @@ wait_for_hyprpanel() {
 # Function to restart background-watcher
 restart_background_watcher() {
     echo "🚀 Starting background-watcher..."
-    sleep 3 
-    
+    sleep 2 
+    systemctl --user stop background-watcher.service &>/dev/null
+     
     # Kill existing daemon
     pkill swww-daemon 2>/dev/null
     
@@ -1946,7 +1947,7 @@ restart_background_watcher() {
     
     # Wait for daemon to initialize
     sleep 1
-    systemctl --user restart background-watcher.service &>/dev/null
+    systemctl --user start background-watcher.service &>/dev/null
     echo "✅ background-watcher started"
 }
 
@@ -2584,6 +2585,11 @@ EOF
 echo "🔄 Loading services (font_watcher, cursor_watcher, background-watcher, hyprpanel-idle-monitor, and hyprpanel)..."
     systemctl --user daemon-reexec
     systemctl --user daemon-reload
+    systemctl --user enable --now background-watcher.service &>/dev/null
+    systemctl --user enable --now hyprpanel.service &>/dev/null
+    systemctl --user enable --now hyprpanel-idle-monitor.service &>/dev/null
+    systemctl --user enable --now rofi-font-watcher.service &>/dev/null
+    systemctl --user enable --now cusor-theme-watcher.service &>/dev/null
 echo "✅ All set! All services set and will be enabled post reboot or after loging out and back in."
 
     # 🛠️ GNOME Window Button Layout Adjustment
