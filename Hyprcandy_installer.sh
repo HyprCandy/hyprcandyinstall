@@ -1916,7 +1916,7 @@ restart_swww() {
 }
 
 # Function to restart background-watcher
-restart_background_watcher() {
+start_background_watcher() {
     echo "🚀 Starting background-watcher..."
     sleep 5
     systemctl --user enable --now background-watcher.service &>/dev/null
@@ -1950,7 +1950,7 @@ else
     restart_swww
 fi
 
-restart_background_watcher
+start_background_watcher
 
 start_font_watcher
 
@@ -2783,7 +2783,7 @@ exec-once = hypridle &
 # Dock
 exec-once = ~/.config/nwg-dock-hyprland/launch.sh &
 # Pyprland
-exec-once = /usr/bin/pypr &
+#exec-once = /usr/bin/pypr &
 # Launch updater
 exec-once = /usr/bin/octopi-notifier &
 # Systrat-networkmanager
@@ -2792,8 +2792,6 @@ exec-once = nm-applet &
 exec-once = wl-paste --watch cliphist store
 # Restart xdg
 exec-once = ~/.config/hpr/scripts/xdg.sh
-# Restore wallaper
-#exec-once = ~/.config/hpr/scripts/wallpaper-restore.sh
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 # ┃                           Animations                        ┃
