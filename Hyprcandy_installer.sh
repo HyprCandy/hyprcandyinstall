@@ -222,7 +222,6 @@ build_package_list() {
         
         # Terminals and file manager
         "kitty"
-        "konsole"
         "nautilus"
         
         # Qt and GTK theming
@@ -288,6 +287,7 @@ build_package_list() {
         "mako"
         
         # Fonts and emojis
+        "ttf-dejavu-sans-code"
         "ttf-cascadia-mono-nerd"
         "ttf-fantasque-nerd"
         "ttf-firacode-nerd"
@@ -928,19 +928,19 @@ markup=1
 format=<b>%s</b>\n%b
 
 # Notification dimensions
-width=400
-height=150
+width=240
+height=120
 max-visible=5
 
 # Behavior
-default-timeout=5000
+default-timeout=3000
 ignore-timeout=0
 group-by=app-name
 sort=-time
 
 # Icon settings
 icon-path=/usr/share/icons/Papirus-Dark
-max-icon-size=48
+max-icon-size=24
 
 # Urgency levels with Material You colors
 [urgency=low]
@@ -1867,11 +1867,12 @@ initialize_colors_file() {
     fi
 }
 
-# Function to start hyprpanel
+# Function to start hyprpanel and its systemd-inhibit monitoring service
 start_hyprpanel() {
-    echo "🚀 Starting hyprpanel..."
-    systemctl --user start hyprpanel
-    echo "✅ hyprpanel started"
+    echo "🚀 Starting hyprpanel service and its systemd-inhibit monitoring service based on hyprpanel activity ..."
+    systemctl --user enable --now hyprpanel.service &>/dev/null
+    systemctl --user enable --now hyprpanel-idle-monitor.service &>/dev/null
+    echo "✅ Both started successfully"
 }
 
 # Function to wait for hyprpanel to fully initialize
@@ -1922,6 +1923,18 @@ restart_background_watcher() {
     echo "✅ background-watcher started"
 }
 
+start_font_watcher() {
+    # Start Rofi font sync watcher
+systemctl --user enable --now rofi-font-watcher.service &>/dev/null
+echo "✅ Rofi font sync service started"
+}
+
+start_cursor_watcher() {
+    # Start cursor settings watcher
+systemctl --user enable --now cursor-theme-watcher.service &>/dev/null
+echo "✅ Cursor settings sync service started"
+}
+
 # Main execution
 initialize_colors_file
 
@@ -1938,6 +1951,10 @@ else
 fi
 
 restart_background_watcher
+
+start_font_watcher
+
+start_cursor_watcher
 echo "🎯 All services started successfully"
 EOF
 chmod +x "$HOME/.config/hyprcandy/hooks/startup_services.sh"
@@ -2424,14 +2441,172 @@ RestartPreventExitStatus=143
 WantedBy=graphical-session.target
 EOF
 
+# ═══════════════════════════════════════════════════════════════
+#      Script: Update Rofi Font from GTK Settings Font Name
+# ═══════════════════════════════════════════════════════════════
+
+cat > "$HOME/.config/hyprcandy/hooks/update_rofi_font.sh" << 'EOF'
+#!/bin/bash
+
+GTK_FILE="$HOME/.config/gtk-3.0/settings.ini"
+ROFI_RASI="$HOME/.config/hyprcandy/settings/rofi-font.rasi"
+
+# Get font name from GTK settings
+GTK_FONT=$(grep "^gtk-font-name=" "$GTK_FILE" | cut -d'=' -f2-)
+
+# Escape double quotes
+GTK_FONT_ESCAPED=$(echo "$GTK_FONT" | sed 's/"/\\"/g')
+
+# Update font line in rofi rasi config
+if [ -f "$ROFI_RASI" ]; then
+    sed -i "s|^.*font:.*|configuration { font: \"$GTK_FONT_ESCAPED\"; }|" "$ROFI_RASI"
+    echo "✅ Updated Rofi font to: $GTK_FONT_ESCAPED"
+else
+    echo "⚠️  Rofi font config not found at: $ROFI_RASI"
+fi
+EOF
+
+chmod +x "$HOME/.config/hyprcandy/hooks/update_rofi_font.sh"
+
+# ═══════════════════════════════════════════════════════════════
+#      Watcher: React to GTK Font Changes via nwg-look
+# ═══════════════════════════════════════════════════════════════
+
+cat > "$HOME/.config/hyprcandy/hooks/watch_gtk_font.sh" << 'EOF'
+#!/bin/bash
+
+GTK_FILE="$HOME/.config/gtk-3.0/settings.ini"
+HOOK_SCRIPT="$HOME/.config/hyprcandy/hooks/update_rofi_font.sh"
+
+# Wait until the GTK file exists
+while [ ! -f "$GTK_FILE" ]; do
+    sleep 1
+done
+
+# Initial update
+"$HOOK_SCRIPT"
+
+# Watch for font name changes
+inotifywait -m -e modify "$GTK_FILE" | while read -r path event file; do
+    if grep -q "^gtk-font-name=" "$GTK_FILE"; then
+        "$HOOK_SCRIPT"
+    fi
+done
+EOF
+
+chmod +x "$HOME/.config/hyprcandy/hooks/watch_gtk_font.sh"
+
+# ═══════════════════════════════════════════════════════════════
+#      Systemd Service: GTK Font → Rofi Font Syncer
+# ═══════════════════════════════════════════════════════════════
+
+cat > "$HOME/.config/systemd/user/rofi-font-watcher.service" << 'EOF'
+[Unit]
+Description=Auto-update Rofi font when GTK font changes via nwg-look
+After=graphical-session.target
+
+[Service]
+ExecStart=%h/.config/hyprcandy/hooks/watch_gtk_font.sh
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+EOF
+
+# ═══════════════════════════════════════════════════════════════
+#                      Cursor Update Script
+# ═══════════════════════════════════════════════════════════════
+
+cat > "$HOME/.config/hyprcandy/hooks/watch_cursor_theme.sh" << 'EOF'
+#!/bin/bash
+
+GTK3_FILE="$HOME/.config/gtk-3.0/settings.ini"
+GTK4_FILE="$HOME/.config/gtk-4.0/settings.ini"
+HYPRCONF="$HOME/.config/hyprcustom/custom.conf"
+
+get_value() {
+    grep -E "^$1=" "$1" 2>/dev/null | cut -d'=' -f2 | tr -d ' '
+}
+
+extract_cursor_theme() {
+    grep -E "^gtk-cursor-theme-name=" "$1" | cut -d'=' -f2 | tr -d ' '
+}
+
+extract_cursor_size() {
+    grep -E "^gtk-cursor-theme-size=" "$1" | cut -d'=' -f2 | tr -d ' '
+}
+
+update_hypr_cursor_env() {
+    local theme="$1"
+    local size="$2"
+
+    [ -z "$theme" ] && return
+    [ -z "$size" ] && return
+
+    # Replace each env line using sed
+    sed -i "s|^env = XCURSOR_THEME,.*|env = XCURSOR_THEME,$theme|" "$HYPRCONF"
+    sed -i "s|^env = XCURSOR_SIZE,.*|env = XCURSOR_SIZE,$size|" "$HYPRCONF"
+    sed -i "s|^env = HYPRCURSOR_THEME,.*|env = HYPRCURSOR_THEME,$theme|" "$HYPRCONF"
+    sed -i "s|^env = HYPRCURSOR_SIZE,.*|env = HYPRCURSOR_SIZE,$size|" "$HYPRCONF"
+
+    echo "✅ Updated cursor theme and size: $theme / $size"
+}
+
+watch_gtk_file() {
+    local file="$1"
+    echo "🔍 Watching $file for cursor changes..."
+    inotifywait -m -e modify "$file" | while read -r; do
+        theme=$(extract_cursor_theme "$file")
+        size=$(extract_cursor_size "$file")
+        update_hypr_cursor_env "$theme" "$size"
+    done
+}
+
+# Initial sync if file exists
+for gtk_file in "$GTK3_FILE" "$GTK4_FILE"; do
+    if [ -f "$gtk_file" ]; then
+        theme=$(extract_cursor_theme "$gtk_file")
+        size=$(extract_cursor_size "$gtk_file")
+        update_hypr_cursor_env "$theme" "$size"
+    fi
+done
+
+# Start watchers in background
+watch_gtk_file "$GTK3_FILE" &
+watch_gtk_file "$GTK4_FILE" &
+wait
+EOF
+
+chmod +x "$HOME/.config/hyprcandy/hooks/watch_cursor_theme.sh"
+
+# ═══════════════════════════════════════════════════════════════
+#                    Cursor Update Service
+# ═══════════════════════════════════════════════════════════════
+
+cat > "$HOME/.config/systemd/user/cursor-theme-watcher.service" << 'EOF'
+[Unit]
+Description=Watch GTK cursor theme and size changes
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=%h/.config/hyprcandy/hooks/watch_cursor_theme.sh
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+EOF
+
 ### 🔄 Update existing reload section to include hyprpanel service
 echo "🔄 Reloading and enabling all services (background-watcher, hyprpanel-idle-monitor, and hyprpanel)..."
-systemctl --user daemon-reexec
-systemctl --user daemon-reload
-systemctl --user enable --now background-watcher.service &>/dev/null
-systemctl --user enable --now hyprpanel.service &>/dev/null
-systemctl --user enable --now hyprpanel-idle-monitor.service &>/dev/null
-echo "✅ All set! All 3 services are running and monitoring for changes."
+    systemctl --user daemon-reexec
+    systemctl --user daemon-reload
+    systemctl --user enable --now background-watcher.service &>/dev/null
+    systemctl --user enable --now hyprpanel.service &>/dev/null
+    systemctl --user enable --now hyprpanel-idle-monitor.service &>/dev/null
+    systemctl --user enable --now cursor-theme-watcher.service &>/dev/null
+    systemctl --user enable --now rofi-font-watcher.service &>/dev/null
+echo "✅ All set! All services are running and monitoring for changes."
 
     # 🛠️ GNOME Window Button Layout Adjustment
     echo
@@ -3794,39 +3969,29 @@ main() {
     print_status "• Adjust scaling for HiDPI displays if needed"
     echo
     echo -e "${PURPLE}🐚 Zsh Configuration:${NC}"
-    print_status "• IMPORTANT: If you chose Zsh-shell then use ${CYAN}SUPER + Q${NC} to toggle Kitty and go through the Zsh setup"
-    print_status "• IMPORTANT: (Remember to type ${YELLOW}n${NC}o at the end when asked to Apply changes to .zshrc since HyprCandy already has them applied)"
     print_status "• To configure Zsh, in the ${CYAN}Home${NC} directory edit ${CYAN}.hyprcandy-zsh.zsh${NC} or ${CYAN}.zshrc${NC}"
-    print_status "• You can also rerun the script to switch from either one or regenerate HyprCandy's default Zsh shell setup"
-    print_status "• You can also rerun the script to install Fish shell"
-    print_status "• When both are installed switch at anytime by running ${CYAN}chsh -s /usr/bin/<name of shell>${NC} then reboot"
+    print_status "• You can also rerun the script to switch from Zsh to Fish or regenerate HyprCandy's default Zsh shell setup"
+    print_status "• When both Fish and Zsh setups are installed switch at anytime by running ${CYAN}chsh -s /usr/bin/<name of shell>${NC} then reboot"
     echo
     echo -e "${PURPLE}🖼️ Wallpaper Setup (Hyprpanel):${NC}"
     print_status "• Through Hyprpanel's configuration interface in the ${CYAN}Theming${NC} section do the following:"
-    print_status "• Under ${YELLOW}General Settings${NC} choose a wallaper to apply where it says None"
-    print_status "• Find default wallpapers check the ${CYAN}~/Pictures/HyprCandy${NC} or ${CYAN}HyprCandy${NC} folder"
+    print_status "• Under ${YELLOW}General Settings${NC} choose a wallaper to apply where it says ${YELLOW}None${NC}"
+    print_status "• Find default wallpapers check the ${CYAN}~/Pictures/HyprCandy${NC} folder"
     print_status "• Under ${YELLOW}Matugen Settings${NC} toggle the button to enable matugen color application"
-    print_status "• If the wallpaper doesn't apply through the configuration interface, then toggle the button to apply wallpapers"
-    print_status "• Ths will quickly reset swww and apply the background"
-    print_status "• Remember to reload the dock with ${CYAN}SHIFT + K${NC} to update its colors"
     echo
     echo -e "${PURPLE}🎨 Font, Icon And Cursor Theming:${NC}"
     print_status "• Open the application-finder with SUPER + A and search for ${YELLOW}GTK Settings${NC} application"
-    print_status "• Prefered font to set through nwg-look is ${CYAN}JetBrainsMono Nerd Font Propo Regular${NC} at size ${CYAN}10${NC}"
-    print_status "• Use ${YELLOW}nwg-look${NC} to configure the system-font, tela-icons and cursor themes"
-    print_status "• Cursor themes take effect after loging out and back in"
+    print_status "• Choose a nerd font of choice and the recommended laptop font size is ${CYAN}10${NC} but set whatever size you prefer"
+    print_status "• Use ${YELLOW}nwg-look${NC} called ${YELLOW}GTK Settings${NC} in rofi app finder to configure the system-font/size, tela-icons and cursor theme/size"
+    print_status "• Cursor changes take effect after loging out and back in"
     echo
     echo -e "${PURPLE}🐟 Fish Configuration:${NC}"
     print_status "• To configure Fish edit, in the ${YELLOW}~/.config/fish${NC} directory edit the ${YELLOW}config.fish${NC} file"
-    print_status "• You can also rerun the script to switch from either one or regenerate HyprCandy's default Fish shell setup"
-    print_status "• You can also rerun the script to install Zsh shell"
-    print_status "• When both are installed switch by running ${CYAN}chsh -s /usr/bin/<name of shell>${NC} then reboot"
+    print_status "• You can also rerun the script to switch from Fish to Zsh one or regenerate HyprCandy's default Fish shell setup"
+    print_status "• When both Fish and Zsh setups are installed switch at anytime by running ${CYAN}chsh -s /usr/bin/<name of shell>${NC} then reboot"
     echo
     echo -e "${PURPLE}🔎 Firefox:${NC}"
     print_status "• Required packages are already installed. Just open firefox, install the ${YELLOW}pywalfox${NC} extension and run ${YELLOW}pywalfox update${NC} in kitty"
-    echo
-    echo -e "${PURPLE}🏠 Clean Home Directory:${NC}"
-    print_status "• You can delete any stowed symlinks made in the 'Home' directory"
     echo
     echo -e "${CYAN}════════════════════════════════════════════════════════════════════════════════════════════════════════════${NC}"
     
