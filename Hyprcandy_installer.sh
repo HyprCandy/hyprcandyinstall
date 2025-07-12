@@ -1874,6 +1874,42 @@ start_hyprpanel_monitor() {
 }
 
 # Function to wait for hyprpanel to fully initialize
+wait_for_hyprpanel() {#!/bin/bash
+# Enhanced startup script for Hyprland services
+
+# Define colors file path
+COLORS_FILE="$HOME/.config/hyprcandy/nwg_dock_colors.conf"
+
+# Function to initialize colors file
+initialize_colors_file() {
+    echo "🎨 Initializing colors file..."
+    
+    # Create directory if it doesn't exist
+    mkdir -p "$(dirname "$COLORS_FILE")"
+    
+    # Source CSS file
+    local css_file="$HOME/.config/nwg-dock-hyprland/colors.css"
+    
+    if [ -f "$css_file" ]; then
+        # Extract the specific colors we're monitoring
+        grep -E "@define-color (blur_background8|primary)" "$css_file" > "$COLORS_FILE"
+        echo "✅ Colors file initialized with current values"
+    else
+        # Create empty file if CSS doesn't exist yet
+        touch "$COLORS_FILE"
+        echo "⚠️ CSS file not found, created empty colors file"
+    fi
+}
+
+# Function to start hyprpanel and its systemd-inhibit monitoring service
+start_hyprpanel_services() {
+    echo "🚀 Starting hyprpanel and its systemd-inhibit monitoring service based on hyprpanel activity ..."
+    systemctl --user enable --now hyprpanel.service &>/dev/null
+    systemctl --user enable --now hyprpanel-idle-monitor.service &>/dev/null
+    echo "✅ Both started successfully"
+}
+
+# Function to wait for hyprpanel to fully initialize
 wait_for_hyprpanel() {
     echo "⏳ Waiting for hyprpanel to initialize..."
     local max_wait=30
@@ -1897,7 +1933,7 @@ wait_for_hyprpanel() {
 # Function to restart background-watcher
 restart_background_watcher() {
     echo "🚀 Starting background-watcher..."
-    sleep 5 
+    sleep 3 
     
     # Kill existing daemon
     pkill swww-daemon 2>/dev/null
@@ -1929,7 +1965,7 @@ echo "✅ Cursor settings sync service started"
 # Main execution
 initialize_colors_file
 
-start_hyprpanel_monitor
+start_hyprpanel_services
 
 restart_background_watcher
 
@@ -2545,15 +2581,10 @@ WantedBy=default.target
 EOF
 
 ### 🔄 Update existing reload section to include hyprpanel service
-echo "🔄 Reloading and enabling all services (background-watcher, hyprpanel-idle-monitor, and hyprpanel)..."
+echo "🔄 Loading services (font_watcher, cursor_watcher, background-watcher, hyprpanel-idle-monitor, and hyprpanel)..."
     systemctl --user daemon-reexec
     systemctl --user daemon-reload
-    systemctl --user enable --now background-watcher.service &>/dev/null
-    systemctl --user enable --now hyprpanel.service &>/dev/null
-    systemctl --user enable --now hyprpanel-idle-monitor.service &>/dev/null
-    systemctl --user enable --now cursor-theme-watcher.service &>/dev/null
-    systemctl --user enable --now rofi-font-watcher.service &>/dev/null
-echo "✅ All set! All services are running and monitoring for changes."
+echo "✅ All set! All services set and will be enabled post reboot or after loging out and back in."
 
     # 🛠️ GNOME Window Button Layout Adjustment
     echo
