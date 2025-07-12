@@ -916,20 +916,20 @@ progress-color=#e2dfe7
 
 # Notification positioning and layout
 anchor=top-right
-margin=20,20,0,0
+margin=15,15,0,0
 padding=15,20
 border-size=2
-border-radius=12
+border-radius=16
 
 # Typography
-font=Inter 11
+font=FantasqueSansM Nerd Font Propo Italic 10
 markup=1
 format=<b>%s</b>\n%b
 
 # Notification dimensions
 width=240
 height=120
-max-visible=5
+max-visible=1
 
 # Behavior
 default-timeout=3000
@@ -939,7 +939,7 @@ sort=-time
 
 # Icon settings
 icon-path=/usr/share/icons/Papirus-Dark
-max-icon-size=24
+max-icon-size=20
 
 # Urgency levels with Material You colors
 [urgency=low]
