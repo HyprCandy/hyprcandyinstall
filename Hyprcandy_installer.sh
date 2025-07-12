@@ -287,7 +287,7 @@ build_package_list() {
         
         # Fonts and emojis
         "ttf-dejavu-sans-code"
-        "ttf-cascadia-mono-nerd"
+        "ttf-cascadia-code-nerd"
         "ttf-fantasque-nerd"
         "ttf-firacode-nerd"
         "ttf-jetbrains-mono-nerd"
