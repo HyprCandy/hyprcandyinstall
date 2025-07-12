@@ -1919,7 +1919,7 @@ restart_swww() {
 restart_background_watcher() {
     echo "🚀 Starting background-watcher..."
     sleep 5
-    systemctl --user restart background-watcher
+    systemctl --user enable --now background-watcher.service &>/dev/null
     echo "✅ background-watcher started"
 }
 
