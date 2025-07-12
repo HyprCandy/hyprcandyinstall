@@ -280,7 +280,6 @@ build_package_list() {
         "fuse"
         "video-trimmer"
         "eog"
-        "pyprland"
         "inotify-tools"
 
         # Fallback notification daemon (when hyprpanel isn't running)
@@ -1868,9 +1867,8 @@ initialize_colors_file() {
 }
 
 # Function to start hyprpanel and its systemd-inhibit monitoring service
-start_hyprpanel() {
-    echo "🚀 Starting hyprpanel service and its systemd-inhibit monitoring service based on hyprpanel activity ..."
-    systemctl --user enable --now hyprpanel.service &>/dev/null
+start_hyprpanel_monitor() {
+    echo "🚀 Starting hyprpanel systemd-inhibit monitoring service based on hyprpanel activity ..."
     systemctl --user enable --now hyprpanel-idle-monitor.service &>/dev/null
     echo "✅ Both started successfully"
 }
@@ -1896,9 +1894,10 @@ wait_for_hyprpanel() {
     return 1
 }
 
-# Function to restart swww-daemon cleanly
-restart_swww() {
-    echo "🔄 Restarting swww-daemon..."
+# Function to restart background-watcher
+restart_background_watcher() {
+    echo "🚀 Starting background-watcher..."
+    sleep 5 
     
     # Kill existing daemon
     pkill swww-daemon 2>/dev/null
@@ -1911,14 +1910,6 @@ restart_swww() {
     
     # Wait for daemon to initialize
     sleep 1
-    
-    echo "✅ swww-daemon restarted"
-}
-
-# Function to restart background-watcher
-restart_background_watcher() {
-    echo "🚀 Starting background-watcher..."
-    sleep 5
     systemctl --user restart background-watcher.service &>/dev/null
     echo "✅ background-watcher started"
 }
@@ -1938,19 +1929,9 @@ echo "✅ Cursor settings sync service started"
 # Main execution
 initialize_colors_file
 
-start_hyprpanel
+start_hyprpanel_monitor
 
-# Wait for hyprpanel to be ready
-if wait_for_hyprpanel; then
-    # Additional wait to ensure swww is initialized by hyprpanel
-    sleep 0.5
-    restart_swww
-else
-    echo "⚠️ Proceeding with swww restart anyway..."
-    restart_swww
-fi
-
-start_background_watcher
+restart_background_watcher
 
 start_font_watcher
 
@@ -2025,40 +2006,6 @@ if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
     sudo magick "$HOME/.config/background[0]" "/usr/share/sddm/themes/sugar-candy/Backgrounds/Mountain.jpg"
     sleep 1
 fi
-
-sleep 1
-
-# Restart portals
-# Setup Timers
-_sleep1="1"
-_sleep2="2"
-_sleep3="3"
-
-# Kill all possible running xdg-desktop-portals
-killall -e xdg-desktop-portal-hyprland
-killall -e xdg-desktop-portal-gtk
-killall -e xdg-desktop-portal
-
-# Set required environment variables
-dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=hyprland
-sleep $_sleep1
-
-# Stop all services
-systemctl --user stop xdg-desktop-portal
-systemctl --user stop xdg-desktop-portal-gtk
-systemctl --user stop xdg-desktop-portal-hyprland
-sleep $_sleep2
-
-# Start xdg-desktop-portal-hyprland
-/usr/lib/xdg-desktop-portal &
-/usr/lib/xdg-desktop-portal-gtk &
-/usr/lib/xdg-desktop-portal-hyprland &
-sleep $_sleep3
-
-# Start required services
-systemctl --user start xdg-desktop-portal
-systemctl --user start xdg-desktop-portal-gtk
-systemctl --user start xdg-desktop-portal-hyprland
 EOF
 chmod +x "$HOME/.config/hyprcandy/hooks/update_background.sh"
 
@@ -2696,6 +2643,16 @@ echo "✅ All set! All services are running and monitoring for changes."
     else
         echo "⚠️  wlogout style.css not found at $WLOGOUT_STYLE"
     fi
+
+    HYPRLAND_CUSTOM="$HOME/.config/hyprcustom/custom.conf"
+    echo "🎨 Updating Hyprland custom.conf with current username..."		
+    
+    if [ -f "$HYPRLAND_CUSTOM" ]; then
+        sed -i "s|\$USERNAME|$USERNAME|g" "$HYPRLAND_CUSTOM"
+        echo "✅ Updated custom.conf PATH with username: $USERNAME"
+    else
+        echo "⚠️  File not found: $HYPRLAND_CUSTOM"
+    fi
 }
 
 # Function to enable display manager and prompt for reboot
@@ -2808,6 +2765,9 @@ source = ~/.config/hypr/colors.conf
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 # ┃                         Env-variables                       ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+# Packages to have full env path access
+env = PATH,$PATH:/usr/local/bin:/usr/bin:/bin:/home/$USERNAME/.cargo/bin
 
 # After using nwg-look, also change the cursor settings here to maintain changes after every reboot
 env = XCURSOR_THEME,Bibata-Modern-Classic
@@ -3373,8 +3333,8 @@ bind = $mainMod CTRL, G, exec, ~/.config/hyprcandy/settings/glyphpicker.sh 		  #
 #bind = $mainMod, W, exec, warp-terminal
 bind = $mainMod, C, exec, DRI_PRIME=1 $EDITOR #Editor
 bind = $mainMod, B, exec, DRI_PRIME=1 xdg-open "http:// &" #Launch your default browser
-bind = $mainMod, Q, exec, DRI_PRIME=1 pypr toggle term #Launch a kitty scratchpad through pyprland
-bind = $mainMod, Return, exec, kitty --class=kitty-normal #Launch normal kitty instances
+bind = $mainMod, Q, exec, kitty #Launch normal kitty instances
+#bind = $mainMod, Return, exec, DRI_PRIME=1 pypr toggle term #Launch a kitty scratchpad through pyprland
 bind = $mainMod, O, exec, DRI_PRIME=1 /usr/bin/octopi #Launch octopi application finder
 bind = $mainMod, E, exec, DRI_PRIME=1 nautilus #pypr toggle filemanager #Launch the filemanager 
 bind = $mainMod CTRL, C, exec, DRI_PRIME=1 gnome-calculator #Launch the calculator
