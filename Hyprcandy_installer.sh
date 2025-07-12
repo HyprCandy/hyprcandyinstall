@@ -1916,10 +1916,10 @@ restart_swww() {
 }
 
 # Function to restart background-watcher
-start_background_watcher() {
+restart_background_watcher() {
     echo "🚀 Starting background-watcher..."
     sleep 5
-    systemctl --user enable --now background-watcher.service &>/dev/null
+    systemctl --user restart background-watcher.service &>/dev/null
     echo "✅ background-watcher started"
 }
 
