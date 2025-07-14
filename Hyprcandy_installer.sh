@@ -231,6 +231,7 @@ build_package_list() {
         
         # System utilities
         "network-manager-applet"
+        "bluetui"
         "blueman"
         "nwg-displays"
         "nwg-dock-hyprland"
@@ -238,7 +239,7 @@ build_package_list() {
         "uwsm"
         
         # Application launchers and menus
-        "rofi-wayland"
+        "rofi-lbonn-wayland-git"
         "rofi-emoji"
         "rofi-nerdy"
         
