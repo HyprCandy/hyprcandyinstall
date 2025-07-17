@@ -4675,9 +4675,7 @@ else
     systemctl --user enable --now rofi-font-watcher.service &>/dev/null
 fi
 
-systemctl enable --now swww-daemon
-systemctl start swww-daemon
-sleep 1
+swww init
 swww img "$HOME/.config/background.png"
 
     # 🔄 Reload Hyprland
