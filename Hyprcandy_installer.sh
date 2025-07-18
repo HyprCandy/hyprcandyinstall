@@ -875,7 +875,8 @@ setup_hyprcandy() {
     cd "$HOME"
 
     # Remove present .zshrc file
-    rm -rf .face.icon .hyprcandy-zsh.zsh .icons HyprCandy GJS
+    rm -rf .face.icon .hyprcandy-zsh.zsh .icons Candy GJS
+    rm -rf "$HOME/Pictures/HyprCandy"
 
     # Ensure ~/.config exists, then remove specified subdirectories
     [ -d "$HOME/.config" ] || mkdir -p "$HOME/.config"
@@ -890,7 +891,7 @@ setup_hyprcandy() {
     [ -f "$HOME/.face.icon" ] && rm -f "$HOME/.face.icon"
     [ -f "$HOME/.hyprcandy-zsh.zsh" ] && rm -f "$HOME/.hyprcandy-zsh.zsh"
     [ -f "$HOME/.icons" ] && rm -f "$HOME/.icons"
-    [ -f "$HOME/HyprCandy" ] && rm -f "$HOME/HyprCandy"
+    [ -f "$HOME/Candy" ] && rm -f "$HOME/Candy"
     [ -f "$HOME/GJS" ] && rm -f "$HOME/GJS"
 
     # 📁 Create Screenshots and Recordings directories if they don't exist
@@ -908,7 +909,7 @@ setup_hyprcandy() {
     config_dirs=(".face.icon" ".config" ".icons" ".hyprcandy-zsh.zsh")
 
     # Add files/folders to exclude from deletion
-    preserve_items=("HyprCandy" ".git")
+    preserve_items=("Candy" ".git")
 
     if [ ${#config_dirs[@]} -eq 0 ]; then
         echo "❌ No configuration directories specified."
@@ -938,12 +939,12 @@ setup_hyprcandy() {
         rm -rf "$item"
     done
 
-# Stow all configurations at once, ignoring HyprCandy folder
-if stow -v -t "$HOME" --ignore='HyprCandy' --ignore='GJS' . 2>/dev/null; then
+# Stow all configurations at once, ignoring Candy folder
+if stow -v -t "$HOME" --ignore='Candy' --ignore='GJS' . 2>/dev/null; then
     echo "✅ Successfully stowed all configurations"
 else
     echo "⚠️  Stow operation failed — attempting restow..."
-    if stow -R -v -t "$HOME" --ignore='HyprCandy' --ignore='GJS' . 2>/dev/null; then
+    if stow -R -v -t "$HOME" --ignore='Candy' --ignore='GJS' . 2>/dev/null; then
         echo "✅ Successfully restowed all configurations"
     else
         echo "❌ Failed to stow configurations"
@@ -1768,51 +1769,28 @@ if [ "$PANEL_CHOICE" = "waybar" ]; then
 
 cat > "$HOME/.config/hyprcandy/hooks/startup_services.sh" << 'EOF'
 #!/bin/bash
-# Enhanced startup script for Hyprland services
 
-# Function to start Quickshell and its systemd-inhibit monitoring service
-start_waybar_monitor() {
-    echo "🚀 Starting Quickshell systemd-inhibit monitoring service based on Quickshell activity ..."
-    systemctl --user enable --now waybar-idle-monitor.service &>/dev/null
-    echo "✅ Both started successfully"
+# Define colors file path
+COLORS_FILE="$HOME/.config/hyprcandy/nwg_dock_colors.conf"
+
+# Function to initialize colors file
+initialize_colors_file() {
+    echo "🎨 Initializing colors file..."
+    
+    mkdir -p "$(dirname "$COLORS_FILE")"
+    local css_file="$HOME/.config/nwg-dock-hyprland/colors.css"
+    
+    if [ -f "$css_file" ]; then
+        grep -E "@define-color (blur_background8|primary)" "$css_file" > "$COLORS_FILE"
+        echo "✅ Colors file initialized with current values"
+    else
+        touch "$COLORS_FILE"
+        echo "⚠️ CSS file not found, created empty colors file"
+    fi
 }
 
-start_background_watcher() {
-    echo "🚀 Starting background-watcher..."
-    systemctl --user enable --now background-watcher
-    echo "✅ background-watcher started"
-}
-
-start_font_watcher() {
-    # Start Rofi font sync watcher
-systemctl --user enable --now rofi-font-watcher.service &>/dev/null
-echo "✅ Rofi font sync service started"
-}
-
-start_cursor_watcher() {
-    # Start cursor settings watcher
-systemctl --user enable --now cursor-theme-watcher.service &>/dev/null
-echo "✅ Cursor settings sync service started"
-}
-
-start_waypaper_watcher() {
-    # Start waypaper watcher
-    systemctl --user enable --now waypaper-watcher.service &>/dev/null
-    echo "✅ Waypaper watcher service started"
-}
-
-# Main execution
-
-start_waybar_monitor
-
-start_background_watcher
-
-start_font_watcher
-
-start_cursor_watcher
-
-start_waypaper_watcher
-
+# MAIN EXECUTION
+initialize_colors_file
 echo "🎯 All services started successfully"
 EOF
 
@@ -1844,12 +1822,6 @@ initialize_colors_file() {
     fi
 }
 
-start_hyprpanel() {
-    echo "🚀 Starting hyprpanel..."
-    systemctl --user start hyprpanel
-    echo "✅ hyprpanel started"
-}
-
 wait_for_hyprpanel() {
     echo "⏳ Waiting for hyprpanel to initialize..."
     local max_wait=30
@@ -1878,29 +1850,8 @@ restart_swww() {
     echo "✅ swww-daemon restarted"
 }
 
-restart_background_watcher() {
-    echo "🚀 Starting background-watcher..."
-    sleep 5
-    systemctl --user restart background-watcher
-    echo "✅ background-watcher started"
-}
-
-start_font_watcher() {
-    # Start Rofi font sync watcher
-    systemctl --user enable --now rofi-font-watcher.service &>/dev/null
-    echo "✅ Rofi font sync service started"
-}
-
-start_cursor_watcher() {
-    # Start cursor theme and size sync service 
-    systemctl --user enable --now cursor-theme-watcher.service &>/dev/null
-    echo "✅ Cursor size and theme sync service started"
-}
-
 # MAIN EXECUTION
 initialize_colors_file
-
-start_hyprpanel
     
 if wait_for_hyprpanel; then
     sleep 0.5
@@ -1910,11 +1861,6 @@ else
     restart_swww
 fi
 
-restart_background_watcher
-
-start_font_watcher
-
-start_cursor_watcher
 echo "🎯 All services started successfully"
 EOF
 
@@ -2012,41 +1958,60 @@ EOF
 cat > "$HOME/.config/hyprcandy/hooks/update_background.sh" << 'EOF'
 #!/bin/bash
 
+# Define colors file path
+COLORS_FILE="$HOME/.config/hyprcandy/nwg_dock_colors.conf"
+
+# Update local background.png
+if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
+    magick "$HOME/.config/background[0]" "$HOME/.config/background.png"
+    
+    # Check if colors have changed and launch dock if different
+    colors_file="$HOME/.config/nwg-dock-hyprland/colors.css"
+    
+    # Get current colors from CSS file
+    get_current_colors() {
+        if [ -f "$colors_file" ]; then
+            grep -E "@define-color (blur_background8|primary)" "$colors_file"
+        fi
+    }
+    
+    # Get stored colors from our tracking file
+    get_stored_colors() {
+        if [ -f "$COLORS_FILE" ]; then
+            cat "$COLORS_FILE"
+        fi
+    }
+    
+    # Compare colors and launch dock if different
+    if [ -f "$colors_file" ]; then
+        current_colors=$(get_current_colors)
+        stored_colors=$(get_stored_colors)
+        
+        if [ "$current_colors" != "$stored_colors" ]; then
+            # Colors have changed, launch dock
+            "$HOME/.config/nwg-dock-hyprland/launch.sh" > /dev/null 2>&1 &
+            
+            # Update stored colors file with new colors
+            mkdir -p "$(dirname "$COLORS_FILE")"
+            echo "$current_colors" > "$COLORS_FILE"
+            echo "🎨 Updated dock colors and launched dock"
+        else
+            echo "🎨 Colors unchanged, skipping dock launch"
+        fi
+    else
+        # Fallback if colors.css doesn't exist
+        "$HOME/.config/nwg-dock-hyprland/launch.sh" > /dev/null 2>&1 &
+        echo "🎨 Colors file not found, launched dock anyway"
+    fi
+fi
+
+sleep 1
+
 # Update SDDM background with sudo and reload the dock
 if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
     sudo magick "$HOME/.config/background[0]" "/usr/share/sddm/themes/sugar-candy/Backgrounds/Mountain.jpg"
     sleep 1
 fi
-
-# Restart portals
-_sleep1="1"
-_sleep2="2"
-_sleep3="3"
-
-killall -e xdg-desktop-portal-hyprland
-killall -e xdg-desktop-portal-gtk
-killall -e xdg-desktop-portal
-
-# Set required environment variables
-dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=hyprland
-sleep $_sleep1
-
-# Stop all services
-systemctl --user stop xdg-desktop-portal
-systemctl --user stop xdg-desktop-portal-gtk
-systemctl --user stop xdg-desktop-portal-hyprland
-sleep $_sleep2
-
-# Start portals
-/usr/lib/xdg-desktop-portal &
-/usr/lib/xdg-desktop-portal-gtk &
-/usr/lib/xdg-desktop-portal-hyprland &
-sleep $_sleep3
-
-# Start required services
-systemctl --user start xdg-desktop-portal
-systemctl --user start xdg-desktop-portal-gtk
-systemctl --user start xdg-desktop-portal-hyprland
 EOF
 
 chmod +x "$HOME/.config/hyprcandy/hooks/update_background.sh"
@@ -2060,6 +2025,12 @@ cat > "$HOME/.config/hyprcandy/hooks/watch_background.sh" << 'EOF'
 CONFIG_BG="$HOME/.config/background"
 HOOKS_DIR="$HOME/.config/hyprcandy/hooks"
 COLORS_CSS="$HOME/.config/nwg-dock-hyprland/colors.css"
+
+while [ -z "$HYPRLAND_INSTANCE_SIGNATURE" ]; do
+    echo "Waiting for Hyprland to start..."
+    sleep 1
+done
+echo "Hyprland started"
 
 # Function to execute hooks
 execute_hooks() {
@@ -2165,6 +2136,14 @@ CHECK_INTERVAL=5      # seconds between polls
 
 # holds the PID of our systemd-inhibit process
 IDLE_INHIBITOR_PID=""
+
+# Wait for Hyprland to start
+while [ -z "$HYPRLAND_INSTANCE_SIGNATURE" ]; do
+  echo "Waiting for Hyprland to start..."
+  sleep 1
+done
+echo "Hyprland started"
+echo "🔍 Waiting for Waybar to start..."
 
 # ----------------------------------------------------------------------
 # Helpers
@@ -2369,6 +2348,12 @@ EOF
 WAYPAPER_CONFIG="$HOME/.config/waypaper/config.ini"
 INTEGRATION_SCRIPT="$HOME/.config/hyprcandy/hooks/waypaper_integration.sh"
 wait_for_config() {
+    while [ -z "$HYPRLAND_INSTANCE_SIGNATURE" ]; do
+        echo "Waiting for Hyprland to start..."
+        sleep 1
+    done
+    echo "Hyprland started"
+    echo "🔍 Waiting for Waypaper config to appear..."
     while [ ! -f "$WAYPAPER_CONFIG" ]; do
         echo "⏳ Waiting for Waypaper config to appear..."
         sleep 1
@@ -2429,6 +2414,14 @@ IDLE_INHIBITOR_PID=""
 MAKO_PID=""
 CHECK_INTERVAL=5
 INHIBITOR_WHO="HyprCandy-Monitor"
+
+# Wait for Hyprland to start
+while [ -z "$HYPRLAND_INSTANCE_SIGNATURE" ]; do
+  echo "Waiting for Hyprland to start..."
+  sleep 1
+done
+echo "Hyprland started"
+echo "🔍 Waiting for hyprpanel to start..."
 
 has_hyprpanel_inhibitor() {
     systemd-inhibit --list 2>/dev/null | grep -i "hyprpanel\|panel" >/dev/null 2>&1
@@ -2738,18 +2731,18 @@ EOF
         echo "⚠️  'gsettings' not found. Skipping GNOME button layout configuration."
     fi
     
-    # 📁 Copy HyprCandy folder to ~/Pictures
+    # 📁 Copy Candy folder to ~/Pictures
     echo
-    echo "📁 Attempting to copy 'HyprCandy' images folder to ~/Pictures..."
-    if [ -d "$hyprcandy_dir/HyprCandy" ]; then
+    echo "📁 Attempting to copy 'Candy' images folder to ~/Pictures..."
+    if [ -d "$hyprcandy_dir/Candy" ]; then
         if [ -d "$HOME/Pictures" ]; then
-            cp -r "$hyprcandy_dir/HyprCandy" "$HOME/Pictures/"
-            echo "✅ 'HyprCandy' copied successfully to ~/Pictures"
+            cp -r "$hyprcandy_dir/Candy" "$HOME/Pictures/"
+            echo "✅ 'Candy' copied successfully to ~/Pictures"
         else
             echo "⚠️  Skipped copy: '$HOME/Pictures' directory does not exist."
         fi
     else
-        echo "⚠️  'HyprCandy' folder not found in $hyprcandy_dir"
+        echo "⚠️  'Candy' folder not found in $hyprcandy_dir"
     fi
 
     # Change Start Button Icon
@@ -2767,7 +2760,7 @@ EOF
     cd "$HOME" || exit 1
 
     # 📂 Step 3: Copy new grid.svg from custom SVG folder
-    SVG_SOURCE="$HOME/Pictures/HyprCandy/Dock-SVGs/grid.svg"
+    SVG_SOURCE="$HOME/Pictures/Candy/Dock-SVGs/grid.svg"
     SVG_DEST="/usr/share/nwg-dock-hyprland/images"
 
     if [ -f "$SVG_SOURCE" ]; then
@@ -2886,6 +2879,12 @@ setup_custom_config() {
 # ┃                           Autostart                         ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
+exec-once = systemctl --user import-environment HYPRLAND_INSTANCE_SIGNATURE
+exec-once = systemctl --user start background-watcher #Watches for system background changes to update background.png
+exec-once = systemctl --user start waypaper-watcher #Watches for system waypaper changes to trigger color generation
+exec-once = systemctl --user start waybar-idle-monitor #Watches waybar running status to enable/disable idle-inhibitor
+exec-once = systemctl --user start rofi-font-watcher #Watches for system font changes to update rofi-font.rasi
+exec-once = systemctl --user start cursor-theme-watcher #Watches for system cursor theme & size changes to update cursor theme & size on re-login
 exec-once = bash -c "mkfifo /tmp/$HYPRLAND_INSTANCE_SIGNATURE.wob && tail -f /tmp/$HYPRLAND_INSTANCE_SIGNATURE.wob | wob & disown" &
 exec-once = dbus-update-activation-environment --systemd DBUS_SESSION_BUS_ADDRESS DISPLAY XAUTHORITY &
 exec-once = hash dbus-update-activation-environment 2>/dev/null &
@@ -2896,7 +2895,7 @@ exec-once = swww-daemon &
 exec-once = waybar &
 #Launch Notification daemon
 exec-once = mako &
-# Launch serices and reload swww
+# Startup
 exec-once = ~/.config/hyprcandy/hooks/startup_services.sh &
 # Start Polkit
 exec-once = systemctl --user start hyprpolkitagent &
@@ -2932,7 +2931,7 @@ source = ~/.config/hypr/colors.conf
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 # Packages to have full env path access
-env = PATH,$PATH:/usr/local/bin:/usr/bin:/bin:/home/$USERNAME/.cargo/bin
+env = PATH,$PATH:/usr/local/bin:/usr/bin:/bin:/home/king/.cargo/bin
 
 # After using nwg-look, also change the cursor settings here to maintain changes after every reboot
 env = XCURSOR_THEME,Bibata-Modern-Classic
@@ -3377,11 +3376,17 @@ else
 # ┃                           Autostart                         ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
+exec-once = systemctl --user import-environment HYPRLAND_INSTANCE_SIGNATURE
+exec-once = systemctl --user start background-watcher #Watches for system background changes to update background.png
+exec-once = systemctl --user start hyprpanel #Starts hyprpanel and also kills it while mainitaining swww-daemon running
+exec-once = systemctl --user start hyprpanel-idle-monitor #Starts hyprpanel-idle-monitor which is used to enable/disable idle-inhibitor based on hyprpanel running status
+exec-once = systemctl --user start rofi-font-watcher #Watches for system font changes to update rofi-font.rasi
+exec-once = systemctl --user start cursor-theme-watcher #Watches for system cursor theme & size changes to update cursor theme & size on re-login
 exec-once = bash -c "mkfifo /tmp/$HYPRLAND_INSTANCE_SIGNATURE.wob && tail -f /tmp/$HYPRLAND_INSTANCE_SIGNATURE.wob | wob & disown" &
 exec-once = dbus-update-activation-environment --systemd DBUS_SESSION_BUS_ADDRESS DISPLAY XAUTHORITY &
 exec-once = hash dbus-update-activation-environment 2>/dev/null &
 exec-once = systemctl --user import-environment &
-# Launch panel and reload swww
+# Startup
 exec-once = ~/.config/hyprcandy/hooks/startup_services.sh &
 # Start Polkit
 exec-once = systemctl --user start hyprpolkitagent &
@@ -4675,30 +4680,15 @@ setup_keyboard_layout() {
         print_error "Please run setup_custom_config() first"
     fi
 
-    # ═══════════════════════════════════════════════════════════════
-#         Conditional Service Enablement Based on Panel
-# ═══════════════════════════════════════════════════════════════
-
-if [ "$PANEL_CHOICE" = "waybar" ]; then
-    systemctl --user daemon-reexec
-    systemctl --user daemon-reload
-    systemctl --user enable --now background-watcher.service &>/dev/null
-    systemctl --user enable --now waypaper.service &>/dev/null
-    systemctl --user enable --now waybar-idle-monitor.service &>/dev/null
-    systemctl --user enable --now cursor-theme-watcher.service &>/dev/null
-    systemctl --user enable --now rofi-font-watcher.service &>/dev/null
-else
-    systemctl --user daemon-reexec
-    systemctl --user daemon-reload
-    systemctl --user enable --now background-watcher.service &>/dev/null
-    systemctl --user enable --now hyprpanel.service &>/dev/null
-    systemctl --user enable --now hyprpanel-idle-monitor.service &>/dev/null
-    systemctl --user enable --now cursor-theme-watcher.service &>/dev/null
-    systemctl --user enable --now rofi-font-watcher.service &>/dev/null
-fi
-
-swww init
+pgrep -x swww-daemon > /dev/null 2>&1 || swww-daemon &>/dev/null
+sleep 1
 swww img "$HOME/.config/background.png"
+
+# Update SDDM background with sudo
+if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
+    sudo magick "$HOME/.config/background[0]" "/usr/share/sddm/themes/sugar-candy/Backgrounds/Mountain.jpg"
+    sleep 1
+fi
 
     # 🔄 Reload Hyprland
     echo
