@@ -1777,10 +1777,9 @@ start_waybar_monitor() {
     echo "✅ Both started successfully"
 }
 
-# Function to restart background-watcher
-restart_background_watcher() {
+start_background_watcher() {
     echo "🚀 Starting background-watcher..."
-    systemctl --user restart background-watcher
+    systemctl --user enable --now background-watcher
     echo "✅ background-watcher started"
 }
 
@@ -1806,7 +1805,7 @@ start_waypaper_watcher() {
 
 start_waybar_monitor
 
-restart_background_watcher
+start_background_watcher
 
 start_font_watcher
 
@@ -2089,18 +2088,16 @@ done
 
 echo "🚀 Starting background and matugen monitoring..."
 
-# Start background monitoring
-{
-    inotifywait -m -e close_write "$CONFIG_BG" | while read -r file; do
-        echo "🎯 Detected background update: $file"
-        if pgrep -x "matugen" > /dev/null 2>&1; then
-            echo "🎨 Matugen is running, will wait for completion..."
-            monitor_matugen
-        else
-            execute_hooks
-        fi
-    done
-} &
+# Start background monitoring in foreground (removed & to keep service alive)
+inotifywait -m -e close_write "$CONFIG_BG" | while read -r file; do
+    echo "🎯 Detected background update: $file"
+    if pgrep -x "matugen" > /dev/null 2>&1; then
+        echo "🎨 Matugen is running, will wait for completion..."
+        monitor_matugen
+    else
+        execute_hooks
+    fi
+done
 EOF
 
 chmod +x "$HOME/.config/hyprcandy/hooks/watch_background.sh"
@@ -4853,3 +4850,4 @@ main() {
 
 # Run main function
 main "$@"
+
