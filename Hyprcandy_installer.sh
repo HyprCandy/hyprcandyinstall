@@ -1762,59 +1762,7 @@ echo "✅ Hyprland adjustment scripts created and made executable!"
 # ═══════════════════════════════════════════════════════════════
 if [ "$PANEL_CHOICE" = "waybar" ]; then
 
-# ═══════════════════════════════════════════════════════════════
-#                      Startup with Waybar
-# ═══════════════════════════════════════════════════════════════
-
-cat > "$HOME/.config/hyprcandy/hooks/startup_services.sh" << 'EOF'
-#!/bin/bash
-# Enhanced startup script for Hyprland services
-
-# Function to start Quickshell and its systemd-inhibit monitoring service
-start_waybar_monitor() {
-    echo "🚀 Starting Quickshell systemd-inhibit monitoring service based on Quickshell activity ..."
-    systemctl --user enable --now waybar-idle-monitor.service &>/dev/null
-    echo "✅ Both started successfully"
-}
-
-start_background_watcher() {
-    echo "🚀 Starting background-watcher..."
-    systemctl --user enable --now background-watcher
-    echo "✅ background-watcher started"
-}
-
-start_font_watcher() {
-    # Start Rofi font sync watcher
-systemctl --user enable --now rofi-font-watcher.service &>/dev/null
-echo "✅ Rofi font sync service started"
-}
-
-start_cursor_watcher() {
-    # Start cursor settings watcher
-systemctl --user enable --now cursor-theme-watcher.service &>/dev/null
-echo "✅ Cursor settings sync service started"
-}
-
-start_waypaper_watcher() {
-    # Start waypaper watcher
-    systemctl --user enable --now waypaper-watcher.service &>/dev/null
-    echo "✅ Waypaper watcher service started"
-}
-
-# Main execution
-
-start_waybar_monitor
-
-start_background_watcher
-
-start_font_watcher
-
-start_cursor_watcher
-
-start_waypaper_watcher
-
-echo "🎯 All services started successfully"
-EOF
+echo "🎯 All services will be started later in the installation process"
 
 else
 
@@ -2012,41 +1960,60 @@ EOF
 cat > "$HOME/.config/hyprcandy/hooks/update_background.sh" << 'EOF'
 #!/bin/bash
 
+# Define colors file path
+COLORS_FILE="$HOME/.config/hyprcandy/nwg_dock_colors.conf"
+
+# Update local background.png
+if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
+    magick "$HOME/.config/background[0]" "$HOME/.config/background.png"
+    
+    # Check if colors have changed and launch dock if different
+    colors_file="$HOME/.config/nwg-dock-hyprland/colors.css"
+    
+    # Get current colors from CSS file
+    get_current_colors() {
+        if [ -f "$colors_file" ]; then
+            grep -E "@define-color (blur_background8|primary)" "$colors_file"
+        fi
+    }
+    
+    # Get stored colors from our tracking file
+    get_stored_colors() {
+        if [ -f "$COLORS_FILE" ]; then
+            cat "$COLORS_FILE"
+        fi
+    }
+    
+    # Compare colors and launch dock if different
+    if [ -f "$colors_file" ]; then
+        current_colors=$(get_current_colors)
+        stored_colors=$(get_stored_colors)
+        
+        if [ "$current_colors" != "$stored_colors" ]; then
+            # Colors have changed, launch dock
+            "$HOME/.config/nwg-dock-hyprland/launch.sh" > /dev/null 2>&1 &
+            
+            # Update stored colors file with new colors
+            mkdir -p "$(dirname "$COLORS_FILE")"
+            echo "$current_colors" > "$COLORS_FILE"
+            echo "🎨 Updated dock colors and launched dock"
+        else
+            echo "🎨 Colors unchanged, skipping dock launch"
+        fi
+    else
+        # Fallback if colors.css doesn't exist
+        "$HOME/.config/nwg-dock-hyprland/launch.sh" > /dev/null 2>&1 &
+        echo "🎨 Colors file not found, launched dock anyway"
+    fi
+fi
+
+sleep 1
+
 # Update SDDM background with sudo and reload the dock
 if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
     sudo magick "$HOME/.config/background[0]" "/usr/share/sddm/themes/sugar-candy/Backgrounds/Mountain.jpg"
     sleep 1
 fi
-
-# Restart portals
-_sleep1="1"
-_sleep2="2"
-_sleep3="3"
-
-killall -e xdg-desktop-portal-hyprland
-killall -e xdg-desktop-portal-gtk
-killall -e xdg-desktop-portal
-
-# Set required environment variables
-dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=hyprland
-sleep $_sleep1
-
-# Stop all services
-systemctl --user stop xdg-desktop-portal
-systemctl --user stop xdg-desktop-portal-gtk
-systemctl --user stop xdg-desktop-portal-hyprland
-sleep $_sleep2
-
-# Start portals
-/usr/lib/xdg-desktop-portal &
-/usr/lib/xdg-desktop-portal-gtk &
-/usr/lib/xdg-desktop-portal-hyprland &
-sleep $_sleep3
-
-# Start required services
-systemctl --user start xdg-desktop-portal
-systemctl --user start xdg-desktop-portal-gtk
-systemctl --user start xdg-desktop-portal-hyprland
 EOF
 
 chmod +x "$HOME/.config/hyprcandy/hooks/update_background.sh"
@@ -2872,8 +2839,6 @@ exec-once = swww-daemon &
 exec-once = waybar &
 #Launch Notification daemon
 exec-once = mako &
-# Launch serices and reload swww
-exec-once = ~/.config/hyprcandy/hooks/startup_services.sh &
 # Start Polkit
 exec-once = systemctl --user start hyprpolkitagent &
 # Dock
