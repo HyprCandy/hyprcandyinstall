@@ -1780,7 +1780,7 @@ start_waybar_monitor() {
 # Function to restart background-watcher
 restart_background_watcher() {
     echo "🚀 Starting background-watcher..."
-    systemctl --user enable --now background-watcher.service &>/dev/null
+    systemctl --user restart background-watcher.service &>/dev/null
     echo "✅ background-watcher started"
 }
 
@@ -4856,3 +4856,4 @@ main() {
 
 # Run main function
 main "$@"
+
