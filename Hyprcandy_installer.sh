@@ -880,7 +880,7 @@ setup_hyprcandy() {
     # Ensure ~/.config exists, then remove specified subdirectories
     [ -d "$HOME/.config" ] || mkdir -p "$HOME/.config"
     cd "$HOME/.config" || exit 1
-    rm -rf btop cava fastfetch gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct rofi uwsm waybar waypaper wlogout xsettingsd
+    rm -rf background background.png btop cava fastfetch gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct rofi uwsm waybar waypaper wlogout xsettingsd
 
     # Go to the home directory
     cd "$HOME"
@@ -4673,6 +4673,9 @@ else
     systemctl --user enable --now rofi-font-watcher.service &>/dev/null
 fi
 
+swww init
+swww img "$HOME/.config/background.png"
+
     # 🔄 Reload Hyprland
     echo
     echo "🔄 Reloading Hyprland with 'hyprctl reload'..."
@@ -4850,4 +4853,3 @@ main() {
 
 # Run main function
 main "$@"
-
