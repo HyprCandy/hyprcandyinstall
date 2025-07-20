@@ -118,12 +118,16 @@ choose_browser() {
     echo "1) Brave (Seemless integration with Ultracandy GTK and Qt theme through its Appearance settings, fast, secure and privacy-focused browser)"
     echo "2) Firefox (Themed through python-pywalfox by running pywalfox update in the terminal, open-source browser with a focus on privacy)"
     echo "3) Zen Browser (Themed through zen mods and slightly through python-pywalfox by running pywalfox update in the terminal, open-source browser with a focus on privacy)"
-    read -rp "Enter 1, 2 or 3: " browser_choice
+    echo "4) Librewolf (Open-source browser with a focus on privacy, highly customizable manually)"
+    echo "5) Other (Please install your own browser post-installation)"
+    read -rp "Enter 1, 2, 3, 4 or 5: " browser_choice
     case $browser_choice in
         1) BROWSER_CHOICE="brave" ;;
         2) BROWSER_CHOICE="firefox" ;;
         3) BROWSER_CHOICE="zen-browser-bin" ;;
-        *) print_error "Invalid choice. Please enter 1, 2 or 3." ;;
+        4) BROWSER_CHOICE="librewolf" ;;
+        5) BROWSER_CHOICE="Other" ;;
+        *) print_error "Invalid choice. Please enter 1, 2, 3, 4 or 5." ;;
     esac
     echo -e "${GREEN}Browser selected: $BROWSER_CHOICE${NC}"
 }
@@ -430,6 +434,14 @@ build_package_list() {
             "python-pywalfox"
         )
         print_status "Added Zen Browser to package list"
+    elif [ "$BROWSER_CHOICE" = "librewolf" ]; then
+        packages+=(
+            "librewolf"
+            "python-pywalfox"
+        )
+        print_status "Added Librewolf to package list"
+    elif [ "$BROWSER_CHOICE" = "Other" ]; then
+        print_status "Please install your own browser post-installation"
     fi
 }
 
@@ -4892,6 +4904,7 @@ main() {
     print_status "• If you chose Brave, go to ${YELLOW}Appearance${NC} in Settings and set the 'Theme' to ${CYAN}GTK${NC} and Brave colors to Same as Linux"
     print_status "• If you chose Firefox, install the ${YELLOW}pywalfox${NC} extension and run ${YELLOW}pywalfox update${NC} in kitty"
     print_status "• If you chose Zen Browser, for slight additional theming install the ${YELLOW}pywalfox${NC} extension and run ${YELLOW}pywalfox update${NC}"
+    print_status "• If you chose Librewolf, you know what you're doing"
     echo
     echo -e "${PURPLE}🏠 Clean Home Directory:${NC}"
     print_status "• You can delete any stowed symlinks made in the 'Home' directory"
@@ -4904,3 +4917,4 @@ main() {
 
 # Run main function
 main "$@"
+
