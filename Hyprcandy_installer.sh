@@ -24,6 +24,7 @@ DISPLAY_MANAGER=""
 DISPLAY_MANAGER_SERVICE=""
 SHELL_CHOICE=""
 PANEL_CHOICE=""
+BROWSER_CHOICE=""
 
 # Function to display multicolored ASCII art
 show_ascii_art() {
@@ -110,6 +111,21 @@ choose_panel() {
         *) print_error "Invalid choice. Please enter 1 or 2." ;;
     esac
     echo -e "${GREEN}Panel selected: $PANEL_CHOICE${NC}"
+}
+
+choose_browser() {
+    echo -e "${CYAN}Choose your browser:${NC}"
+    echo "1) Brave (Seemless integration with Ultracandy GTK and Qt theme through its Appearance settings, fast, secure and privacy-focused browser)"
+    echo "2) Firefox (Themed through python-pywalfox by running pywalfox update in the terminal, open-source browser with a focus on privacy)"
+    echo "3) Zen Browser (Themed through zen mods and slightly through python-pywalfox by running pywalfox update in the terminal, open-source browser with a focus on privacy)"
+    read -rp "Enter 1, 2 or 3: " browser_choice
+    case $browser_choice in
+        1) BROWSER_CHOICE="brave" ;;
+        2) BROWSER_CHOICE="firefox" ;;
+        3) BROWSER_CHOICE="zen-browser-bin" ;;
+        *) print_error "Invalid choice. Please enter 1, 2 or 3." ;;
+    esac
+    echo -e "${GREEN}Browser selected: $BROWSER_CHOICE${NC}"
 }
 
 # Function to choose shell
@@ -319,10 +335,8 @@ build_package_list() {
         
         # Clipboard
         "cliphist"
-        "python-pywalfox"
         
         # Browser and theming
-        "firefox"
         "adw-gtk-theme"
         "adwaita-qt6"
         "adwaita-qt-git"
@@ -392,8 +406,30 @@ build_package_list() {
         )
         print_status "Added Waybar to package list"
     else
-        packages+=("ags-hyprpanel-git")
+        packages+=(
+        "ags-hyprpanel-git"
+        )
         print_status "Added Hyprpanel to package list"
+    fi
+
+    # Add browser based on user choice
+    if [ "$BROWSER_CHOICE" = "brave" ]; then
+        packages+=(
+            "brave-bin"
+        )
+        print_status "Added Brave to package list"
+    elif [ "$BROWSER_CHOICE" = "firefox" ]; then
+        packages+=(
+            "firefox"
+            "python-pywalfox"
+        )
+        print_status "Added Firefox to package list"
+    elif [ "$BROWSER_CHOICE" = "zen-browser-bin" ]; then
+        packages+=(
+            "zen-browser-bin"
+            "python-pywalfox"
+        )
+        print_status "Added Zen Browser to package list"
     fi
 }
 
@@ -2772,7 +2808,7 @@ EOF
 
     # 🔐 Add sudoers entry for background script
     echo
-    echo "🔐 Adding sudoers entry for background script..."
+    echo "🔄 Adding sddm background auto-update settings..."
     
     # Get the current username
     USERNAME=$(whoami)
@@ -2781,7 +2817,6 @@ EOF
     SUDOERS_ENTRIES=(
         "$USERNAME ALL=(ALL) NOPASSWD: $HOME/.config/hyprcandy/hooks/update_background.sh"
         "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/magick * /usr/share/sddm/themes/sugar-candy/Backgrounds/Mountain.jpg"
-        "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/cp * /usr/share/sddm/themes/sugar-candy/Backgrounds/Mountain.jpg"
     )
     
     # Add all entries to sudoers safely using visudo
@@ -2790,7 +2825,7 @@ EOF
     # Set proper permissions on the sudoers file
     sudo chmod 440 /etc/sudoers.d/hyprcandy-background
     
-    echo "✅ Sudoers entry added: $SUDOERS_ENTRY"
+    echo "✅ Added sddm background auto-update settings successfully"
     
     # 🎨 Update wlogout style.css with correct username
     echo
@@ -3290,7 +3325,7 @@ workspace = f[1], gapsout:0, gapsin:0
 #windowrulev2 = rounding 10, floating:0, onworkspace:w[tg1]
 #windowrulev2 = bordersize 2, floating:0, onworkspace:f[1]
 #windowrulev2 = rounding 10, floating:0, onworkspace:f[1]
-#windowrulev2 = rounding 0, fullscreen:1
+windowrulev2 = rounding 0, fullscreen:1
 windowrulev2 = noborder, fullscreen:1
 #workspace = w[tv1-10], gapsout:6, gapsin:2
 #workspace = f[1], gapsout:6, gapsin:2
@@ -3781,7 +3816,7 @@ workspace = f[1], gapsout:0, gapsin:0
 #windowrulev2 = rounding 10, floating:0, onworkspace:w[tg1]
 #windowrulev2 = bordersize 2, floating:0, onworkspace:f[1]
 #windowrulev2 = rounding 10, floating:0, onworkspace:f[1]
-#windowrulev2 = rounding 0, fullscreen:1
+windowrulev2 = rounding 0, fullscreen:1
 windowrulev2 = noborder, fullscreen:1
 #workspace = w[tv1-10], gapsout:6, gapsin:2
 #workspace = f[1], gapsout:6, gapsin:2
@@ -4853,8 +4888,10 @@ main() {
     print_status "• You can also rerun the script to install Zsh shell"
     print_status "• When both are installed switch by running ${CYAN}chsh -s /usr/bin/<name of shell>${NC} then reboot"
     echo
-    echo -e "${PURPLE}🔎 Firefox:${NC}"
-    print_status "• Required packages are already installed. Just open firefox, install the ${YELLOW}pywalfox${NC} extension and run ${YELLOW}pywalfox update${NC} in kitty"
+    echo -e "${PURPLE}🔎 Browser Color Theming:${NC}"
+    print_status "• If you chose Brave, go to ${YELLOW}Appearance${NC} in Settings and set the 'Theme' to ${CYAN}GTK${NC} and Brave colors to Same as Linux"
+    print_status "• If you chose Firefox, install the ${YELLOW}pywalfox${NC} extension and run ${YELLOW}pywalfox update${NC} in kitty"
+    print_status "• If you chose Zen Browser, for slight additional theming install the ${YELLOW}pywalfox${NC} extension and run ${YELLOW}pywalfox update${NC}"
     echo
     echo -e "${PURPLE}🏠 Clean Home Directory:${NC}"
     print_status "• You can delete any stowed symlinks made in the 'Home' directory"
