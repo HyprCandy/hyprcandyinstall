@@ -1373,6 +1373,8 @@ sed -i "s/BORDER_WIDTH=.*/BORDER_WIDTH=$NEW_WIDTH/" "$SETTINGS_FILE"
 sed -i "s/border-width: [0-9]\+px/border-width: ${NEW_WIDTH}px/" "$STYLE_FILE"
 
 # Reload dock to apply CSS changes
+"$HOME/.config/nwg-dock-hyprland/launch.sh"
+
 # ... (same dock reload logic as before, for brevity)
 notify-send "Dock Border Width Increased" "Width: ${NEW_WIDTH}px" -t 2000
 EOF
@@ -1407,6 +1409,8 @@ sed -i "s/BORDER_WIDTH=.*/BORDER_WIDTH=$NEW_WIDTH/" "$SETTINGS_FILE"
 sed -i "s/border-width: [0-9]\+px/border-width: ${NEW_WIDTH}px/" "$STYLE_FILE"
 
 # Reload dock to apply CSS changes
+"$HOME/.config/nwg-dock-hyprland/launch.sh"
+
 # ... (same dock reload logic as before, for brevity)
 notify-send "Dock Border Width Decreased" "Width: ${NEW_WIDTH}px" -t 2000
 EOF
