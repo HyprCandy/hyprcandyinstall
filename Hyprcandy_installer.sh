@@ -253,6 +253,9 @@ build_package_list() {
         "gnome-tweaks"
         "gnome-software"
         "mutter"
+
+        # Flatpak base repo for Gnome Software app
+        "flatpak"
         
         # Terminals and file manager
         "kitty"
