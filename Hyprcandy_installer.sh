@@ -1373,7 +1373,25 @@ sed -i "s/BORDER_WIDTH=.*/BORDER_WIDTH=$NEW_WIDTH/" "$SETTINGS_FILE"
 sed -i "s/border-width: [0-9]\+px/border-width: ${NEW_WIDTH}px/" "$STYLE_FILE"
 
 # Reload dock to apply CSS changes
-"$HOME/.config/nwg-dock-hyprland/launch.sh"
+if pgrep -f "nwg-dock-hyprland.*-p left" > /dev/null; then
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    nwg-dock-hyprland -p left -lp start -i $ICON_SIZE -w 10 -ml 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" > /dev/null 2>&1 &
+elif pgrep -f "nwg-dock-hyprland.*-p top" > /dev/null; then
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    nwg-dock-hyprland -p top -lp start -i $ICON_SIZE -w 10 -mt 6 -ml 10 -mr 10 -x -r -s "style.css" -c "rofi -show drun" > /dev/null 2>&1 &
+elif pgrep -f "nwg-dock-hyprland.*-p right" > /dev/null; then
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    nwg-dock-hyprland -p right -lp start -i $ICON_SIZE -w 10 -mr 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" > /dev/null 2>&1 &
+elif pgrep -f "nwg-dock-hyprland" > /dev/null; then
+    # Default to bottom
+    LAUNCH_SCRIPT="$HOME/.config/nwg-dock-hyprland/launch.sh"
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    "$LAUNCH_SCRIPT" > /dev/null 2>&1 &
+fi
 
 # ... (same dock reload logic as before, for brevity)
 notify-send "Dock Border Width Increased" "Width: ${NEW_WIDTH}px" -t 2000
@@ -1409,7 +1427,25 @@ sed -i "s/BORDER_WIDTH=.*/BORDER_WIDTH=$NEW_WIDTH/" "$SETTINGS_FILE"
 sed -i "s/border-width: [0-9]\+px/border-width: ${NEW_WIDTH}px/" "$STYLE_FILE"
 
 # Reload dock to apply CSS changes
-"$HOME/.config/nwg-dock-hyprland/launch.sh"
+if pgrep -f "nwg-dock-hyprland.*-p left" > /dev/null; then
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    nwg-dock-hyprland -p left -lp start -i $ICON_SIZE -w 10 -ml 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" > /dev/null 2>&1 &
+elif pgrep -f "nwg-dock-hyprland.*-p top" > /dev/null; then
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    nwg-dock-hyprland -p top -lp start -i $ICON_SIZE -w 10 -mt 6 -ml 10 -mr 10 -x -r -s "style.css" -c "rofi -show drun" > /dev/null 2>&1 &
+elif pgrep -f "nwg-dock-hyprland.*-p right" > /dev/null; then
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    nwg-dock-hyprland -p right -lp start -i $ICON_SIZE -w 10 -mr 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" > /dev/null 2>&1 &
+elif pgrep -f "nwg-dock-hyprland" > /dev/null; then
+    # Default to bottom
+    LAUNCH_SCRIPT="$HOME/.config/nwg-dock-hyprland/launch.sh"
+    pkill -f nwg-dock-hyprland
+    sleep 0.3
+    "$LAUNCH_SCRIPT" > /dev/null 2>&1 &
+fi
 
 # ... (same dock reload logic as before, for brevity)
 notify-send "Dock Border Width Decreased" "Width: ${NEW_WIDTH}px" -t 2000
@@ -4923,4 +4959,3 @@ main() {
 
 # Run main function
 main "$@"
-
