@@ -72,6 +72,15 @@ print_error() {
 
 # Function to choose display manager
 choose_display_manager() {
+    print_status "First removing conflicting rofi package"
+    sudo pacman -Rnsd rofi-wayland --noconfirm &>/dev/null
+    print_success "Done"
+    print_status "Checking for updates. Incase of a core-package update please stop the install, restart, then rerun the script"
+    sudo pacman -Syu --noconfirm
+    print_success "Done"
+    print_status "Clearing cache"
+    sudo pacman -Scc --noconfirm &>/dev/null
+    print_success "Done"
     print_status "Choose your display manager:"
     echo "1) SDDM with Sugar Candy theme (HyprCandy automatic background set according to applied wallpaper)"
     echo "2) GDM with GDM settings app (GNOME Display Manager and customization app)"
@@ -3409,8 +3418,8 @@ layerrule = ignorezero,notifications
 #layerrule = ignorezero,swaync-control-center
 layerrule = blur,logout_dialog
 layerrule = ignorezero,logout_dialog
-#layerrule = blur,nwg-dock
-#layerrule = ignorezero,nwg-dock
+layerrule = blur,nwg-dock
+layerrule = ignorezero,nwg-dock
 layerrule = blur,gtk-layer-shell
 layerrule = ignorezero,gtk-layer-shell
 layerrule = blur,waybar
@@ -3899,8 +3908,8 @@ layerrule = ignorezero,notifications
 #layerrule = ignorezero,swaync-notification-window
 #layerrule = blur,swaync-control-center
 #layerrule = ignorezero,swaync-control-center
-#layerrule = blur,nwg-dock
-#layerrule = ignorezero,nwg-dock
+layerrule = blur,nwg-dock
+layerrule = ignorezero,nwg-dock
 layerrule = blur,logout_dialog
 layerrule = ignorezero,logout_dialog
 layerrule = blur,gtk-layer-shell
@@ -4782,6 +4791,11 @@ if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
     sleep 1
 fi
 
+systemctl --user daemon-reload
+systemctl --user disable --now hyprpanel.service hyprpanel-idle-monitor.service waybar.service waybar-idle-monitor.service waypaper-watcher.service background-watcher.service swww.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
+sleep 1
+systemctl --user stop hyprpanel.service hyprpanel-idle-monitor.service waybar-idle-monitor.service waypaper-watcher.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
+
     # 🔄 Reload Hyprland
     echo
     echo "🔄 Reloading Hyprland with 'hyprctl reload'..."
@@ -4843,6 +4857,10 @@ main() {
     choose_panel
     echo
     
+    # Choose a browser
+    choose_browser
+    echo
+
     # Choose shell
     choose_shell
     echo
@@ -4962,3 +4980,4 @@ main() {
 
 # Run main function
 main "$@"
+
