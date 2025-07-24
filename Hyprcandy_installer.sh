@@ -2051,6 +2051,24 @@ Restart=on-failure
 WantedBy=default.target
 EOF
 
+if [ "$PANEL_CHOICE" = "waybar" ]; then
+
+echo
+
+else
+
+# ═══════════════════════════════════════════════════════════════
+#                  Clear Swww Cache Script
+# ═══════════════════════════════════════════════════════════════
+
+cat > "$HOME/.config/hyprcandy/hooks/clear_swww.sh" << 'EOF'
+#!/bin/bash
+CACHE_DIR="$HOME/.cache/swww"
+[ -d "$CACHE_DIR" ] && rm -rf "$CACHE_DIR"
+EOF
+chmod +x "$HOME/.config/hyprcandy/hooks/clear_swww.sh"
+fi
+
 # ═══════════════════════════════════════════════════════════════
 #                  Background Update Script
 # ═══════════════════════════════════════════════════════════════
@@ -4980,3 +4998,4 @@ main() {
 
 # Run main function
 main "$@"
+
