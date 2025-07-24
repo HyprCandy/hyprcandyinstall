@@ -2708,7 +2708,7 @@ cat > "$HOME/.config/hyprcandy/hooks/restart_hyprpanel.sh" << 'EOF'
 echo "🔄 Restarting hyprpanel via systemd..."
 
 systemctl --user stop hyprpanel.service
-sleep 1
+sleep 0.5
 systemctl --user start hyprpanel.service
 
 echo "✅ Hyprpanel restarted"
@@ -3100,14 +3100,14 @@ general {
     gaps_out = 6	
     gaps_workspaces = 50    # Gaps between workspaces
     border_size = 2
-    col.active_border =  $source_color $primary $primary $source_color 90deg
+    col.active_border =  $primary_fixed_dim $source_color $source_color $primary_fixed_dim 90deg
     col.inactive_border = $background
     layout = dwindle
     resize_on_border = true
     allow_tearing = true
 }
 
-group:groupbar:col.active =  $source_color $primary $primary $source_color 90deg
+group:groupbar:col.active =  $source_color $primary_fixed_dim $primary_fixed_dim $source_color 90deg
 group:groupbar:col.inactive = $background
 
 dwindle {
@@ -3594,14 +3594,14 @@ general {
     gaps_out = 6	
     gaps_workspaces = 50    # Gaps between workspaces
     border_size = 3
-    col.active_border =  $source_color $primary $primary $source_color 90deg
+    col.active_border =  $primary_fixed_dim $source_color $source_color $primary_fixed_dim 90deg
     col.inactive_border = $background
     layout = dwindle
     resize_on_border = true
     allow_tearing = true
 }
 
-group:groupbar:col.active =  $source_color $primary $primary $source_color 90deg
+group:groupbar:col.active =  $source_color $primary_fixed_dim $primary_fixed_dim $source_color 90deg
 group:groupbar:col.inactive = $background
 
 dwindle {
@@ -4821,16 +4821,16 @@ prompt_reboot() {
     echo
     print_warning "A reboot is recommended to ensure all changes take effect properly."
     echo
-    echo -e "${YELLOW}Would you like to reboot now? (y/N)${NC}"
+    echo -e "${YELLOW}Would you like to reboot now? (n/Y)${NC}"
     read -r reboot_choice
     case "$reboot_choice" in
-        [yY][eE][sS]|[yY])
-            print_status "Rebooting system..."
-            sudo reboot
-            ;;
-        *)
+        [nN][oO]|[nN])
             print_status "Reboot skipped. Please reboot manually when convenient."
             print_status "Run: sudo reboot"
+            ;;
+        *)
+            print_status "Rebooting system..."
+            sudo reboot
             ;;
     esac
 }
@@ -4875,15 +4875,15 @@ main() {
     build_package_list
     
     # Ask for confirmation
-    echo -e "${YELLOW}This will install ${#packages[@]} packages and setup Hyprcandy configuration. Continue? (y/N)${NC}"
+    echo -e "${YELLOW}This will install ${#packages[@]} packages and setup UltraCandy configuration. Continue? (n/Y)${NC}"
     read -r response
     case "$response" in
-        [yY][eE][sS]|[yY])
-            install_packages
-            ;;
-        *)
+        [nN][oO]|[nN])
             print_status "Installation cancelled."
             exit 0
+            ;;
+        *)
+            install_packages
             ;;
     esac
     
@@ -4980,4 +4980,3 @@ main() {
 
 # Run main function
 main "$@"
-
