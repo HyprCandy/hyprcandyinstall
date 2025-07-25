@@ -2130,6 +2130,33 @@ if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
     sudo magick "$HOME/.config/background[0]" "/usr/share/sddm/themes/sugar-candy/Backgrounds/Mountain.jpg"
     sleep 1
 fi
+
+# Update mako config colors from nwg-dock-hyprland/colors.css
+MAKO_CONFIG="$HOME/.config/mako/config"
+COLORS_CSS="$HOME/.config/nwg-dock-hyprland/colors.css"
+
+if [ -f "$COLORS_CSS" ] && [ -f "$MAKO_CONFIG" ]; then
+    # Extract hex values from colors.css, removing trailing semicolons and newlines
+    ON_PRIMARY_FIXED_VARIANT=$(grep -E "@define-color[[:space:]]+on_primary_fixed_variant" "$COLORS_CSS" | awk '{print $3}' | tr -d ';' | tr -d '\n')
+    PRIMARY_FIXED_DIM=$(grep -E "@define-color[[:space:]]+primary_fixed_dim" "$COLORS_CSS" | awk '{print $3}' | tr -d ';' | tr -d '\n')
+    SCIM=$(grep -E "@define-color[[:space:]]+scrim" "$COLORS_CSS" | awk '{print $3}' | tr -d ';' | tr -d '\n')
+
+    # Only proceed if both colors are found
+    if [[ $ON_PRIMARY_FIXED_VARIANT =~ ^#([A-Fa-f0-9]{6})$ ]] && [[ $PRIMARY_FIXED_DIM =~ ^#([A-Fa-f0-9]{6})$ ]]; then
+        # Update all background-color, progress-color, and border-color lines in mako config
+        sed -i "s|^background-color=#.*|background-color=$ON_PRIMARY_FIXED_VARIANT|g" "$MAKO_CONFIG"
+        sed -i "s|^progress-color=#.*|progress-color=$SCIM|g" "$MAKO_CONFIG"
+        sed -i "s|^border-color=#.*|border-color=$PRIMARY_FIXED_DIM|g" "$MAKO_CONFIG"
+        pkill -f mako
+        sleep 1
+        mako &
+        echo "🎨 Updated ALL mako config colors: background-color=$ON_PRIMARY_FIXED_VARIANT, progress-color=$SCIM, border-color=$PRIMARY_FIXED_DIM"
+    else
+        echo "⚠️  Could not extract required color values from $COLORS_CSS"
+    fi
+else
+    echo "⚠️  $COLORS_CSS or $MAKO_CONFIG not found, skipping mako color update"
+fi
 EOF
 
 chmod +x "$HOME/.config/hyprcandy/hooks/update_background.sh"
