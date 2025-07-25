@@ -2075,7 +2075,7 @@ fi
 
 cat > "$HOME/.config/hyprcandy/hooks/update_background.sh" << 'EOF'
 #!/bin/bash
-
+set +e
 # Define colors file path
 COLORS_FILE="$HOME/.config/hyprcandy/nwg_dock_colors.conf"
 
@@ -2106,9 +2106,10 @@ if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
         stored_colors=$(get_stored_colors)
         
         if [ "$current_colors" != "$stored_colors" ]; then
-            # Colors have changed, launch dock
-            "$HOME/.config/nwg-dock-hyprland/launch.sh" > /dev/null 2>&1 &
-            
+            # Colors have changed, reload dock
+            pkill -f mwg-dock-hyprland
+            sleep 0.3
+            "$HOME/.config/nwg-dock-hyprland/launch.sh" >/dev/null 2>&1 &
             # Update stored colors file with new colors
             mkdir -p "$(dirname "$COLORS_FILE")"
             echo "$current_colors" > "$COLORS_FILE"
@@ -2118,7 +2119,7 @@ if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
         fi
     else
         # Fallback if colors.css doesn't exist
-        "$HOME/.config/nwg-dock-hyprland/launch.sh" > /dev/null 2>&1 &
+        "$HOME/.config/nwg-dock-hyprland/launch.sh" >/dev/null 2>&1 &
         echo "🎨 Colors file not found, launched dock anyway"
     fi
 fi
@@ -5025,4 +5026,3 @@ main() {
 
 # Run main function
 main "$@"
-
