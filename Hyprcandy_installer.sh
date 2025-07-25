@@ -4128,7 +4128,7 @@ bind = $mainMod SHIFT, Escape, exec, hyprctl activewindow | grep pid | tr -d 'pi
 #### Rofi Menus ####
 
 bind = $mainMod, A, exec, rofi -show drun || pkill rofi      #Launch or kill rofi application finder
-bind = $mainMod CTRL, K, exec, $HYPRSCRIPTS/keybindings.sh     #Show keybindings
+bind = $mainMod, K, exec, $HYPRSCRIPTS/keybindings.sh     #Show keybindings
 bind = $mainMod CTRL, V, exec, $SCRIPTS/cliphist.sh     #Open clipboard manager
 bind = $mainMod CTRL, E, exec, ~/.config/hyprcandy/settings/emojipicker.sh 		  #Open rofi emoji-picker
 bind = $mainMod CTRL, G, exec, ~/.config/hyprcandy/settings/glyphpicker.sh 		  #Open rofi glyph-picker
@@ -4321,7 +4321,7 @@ bind = $mainMod SHIFT, up, resizeactive, 0 -100                                 
 bind = $mainMod, G, togglegroup                                                             #Toggle window group
 bind = $mainMod CTRL, left, changegroupactive, prev				  	    #Switch to the previous window in the group
 bind = $mainMod CTRL, right, changegroupactive, next					    #Switch to the next window in the group
-bind = $mainMod, K, swapsplit                                                               #Swapsplit
+bind = $mainMod CTRL, K, swapsplit                                                               #Swapsplit
 bind = $mainMod ALT, left, swapwindow, l                                                    #Swap tiled window left
 bind = $mainMod ALT, right, swapwindow, r                                                   #Swap tiled window right
 bind = $mainMod ALT, up, swapwindow, u                                                      #Swap tiled window up
@@ -4394,7 +4394,7 @@ bind = $mainMod SHIFT, Escape, exec, hyprctl activewindow | grep pid | tr -d 'pi
 #### Rofi Menus ####
 
 bind = $mainMod, A, exec, rofi -show drun || pkill rofi      #Launch or kill rofi application finder
-bind = $mainMod CTRL, K, exec, $HYPRSCRIPTS/keybindings.sh     #Show keybindings
+bind = $mainMod, K, exec, $HYPRSCRIPTS/keybindings.sh     #Show keybindings
 bind = $mainMod CTRL, V, exec, $SCRIPTS/cliphist.sh     #Open clipboard manager
 bind = $mainMod CTRL, E, exec, ~/.config/hyprcandy/settings/emojipicker.sh 		  #Open rofi emoji-picker
 bind = $mainMod CTRL, G, exec, ~/.config/hyprcandy/settings/glyphpicker.sh 		  #Open rofi glyph-picker
@@ -4587,7 +4587,7 @@ bind = $mainMod SHIFT, up, resizeactive, 0 -100                                 
 bind = $mainMod, G, togglegroup                                                             #Toggle window group
 bind = $mainMod CTRL, left, changegroupactive, prev				  	    #Switch to the previous window in the group
 bind = $mainMod CTRL, right, changegroupactive, next					    #Switch to the next window in the group
-bind = $mainMod, K, swapsplit                                                               #Swapsplit
+bind = $mainMod CTRL, K, swapsplit                                                               #Swapsplit
 bind = $mainMod ALT, left, swapwindow, l                                                    #Swap tiled window left
 bind = $mainMod ALT, right, swapwindow, r                                                   #Swap tiled window right
 bind = $mainMod ALT, up, swapwindow, u                                                      #Swap tiled window up
