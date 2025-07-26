@@ -1027,10 +1027,10 @@ cat > "$HOME/.config/mako/config" << 'EOF'
 # Colors directly embedded (since include might not work)
 
 # Default notification appearance
-background-color=#353434
+background-color=#432a00
 text-color=#ffffff
-border-color=#c0bec3
-progress-color=#e2dfe7
+border-color=#edbf80
+progress-color=#000000
 
 # Notification positioning and layout
 anchor=top-right
@@ -1061,80 +1061,80 @@ max-icon-size=20
 
 # Urgency levels with Material You colors
 [urgency=low]
-background-color=#2a292a
+background-color=#432a00
 text-color=#ffffff
-border-color=#9c9a9f
+border-color=#edbf80
 default-timeout=3000
 
 [urgency=normal]
-background-color=#353434
+background-color=#432a00
 text-color=#ffffff
-border-color=#c0bec3
+border-color=#edbf80
 default-timeout=5000
 
 [urgency=critical]
-background-color=#ff6b5e
-text-color=#000000
-border-color=#ffd7d2
+background-color=#432a00
+text-color=#ffffff
+border-color=#edbf80
 default-timeout=0
 
 # App-specific styling
 [app-name=Spotify]
-background-color=#9b9aa1
-text-color=#000000
-border-color=#e2dfe7
+background-color=#432a00
+text-color=#ffffff
+border-color=#edbf80
 
 [app-name=Discord]
-background-color=#9c9a9d
-text-color=#000000
-border-color=#e2dfe3
+background-color=#432a00
+text-color=#ffffff
+border-color=#edbf80
 
 [app-name="Volume Control"]
-background-color=#9b9b9b
-text-color=#000000
-border-color=#e0e0e0
-progress-color=#e2dfe7
+background-color=#432a00
+text-color=#ffffff
+border-color=#edbf80
+progress-color=#000000
 
 [app-name="Brightness Control"]
-background-color=#484647
+background-color=#432a00
 text-color=#ffffff
-border-color=#c8c5ce
-progress-color=#e0e0e0
+border-color=#edbf80
+progress-color=#000000
 
 # Network notifications
 [app-name="NetworkManager"]
-background-color=#2a292a
+background-color=#432a00
 text-color=#ffffff
-border-color=#e2dfe7
+border-color=#edbf80
 
 # Battery notifications
 [app-name="Power Management"]
-background-color=#2a292a
+background-color=#432a00
 text-color=#ffffff
-border-color=#e2dfe7
+border-color=#edbf80
 
 [app-name="Power Management" urgency=critical]
-background-color=#ff6b5e
-text-color=#000000
-border-color=#ffd7d2
+background-color=#432a00
+text-color=#ffffff
+border-color=#edbf80
 
 # System notifications
 [app-name="System"]
-background-color=#353434
+background-color=#432a00
 text-color=#ffffff
-border-color=#c0bec3
+border-color=#edbf80
 
 # Screenshot notifications
 [app-name="Screenshot"]
-background-color=#9b9aa1
-text-color=#000000
-border-color=#e2dfe7
+background-color=#432a00
+text-color=#ffffff
+border-color=#edbf80
 
 # Media player notifications
 [category=media]
-background-color=#403f3f
+background-color=#432a00
 text-color=#ffffff
-border-color=#e2dfe7
+border-color=#edbf80
 default-timeout=3000
 
 # Animation and effects
