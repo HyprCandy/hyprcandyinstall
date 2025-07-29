@@ -72,15 +72,7 @@ print_error() {
 
 # Function to choose display manager
 choose_display_manager() {
-    print_status "First removing conflicting rofi package"
-    sudo pacman -Rnsd rofi-wayland --noconfirm &>/dev/null
-    print_success "Done"
-    print_status "Checking for updates. Incase of a core-package update please stop the install, restart, then rerun the script"
-    sudo pacman -Syu --noconfirm
-    print_success "Done"
-    print_status "Clearing cache"
-    sudo pacman -Scc --noconfirm &>/dev/null
-    print_success "Done"
+    print_status "For old users remove rofi-wayland through 'sudo pacman -Rnsd rofi-wayland' then clear cache through 'sudo pacman -Scc'"
     print_status "Choose your display manager:"
     echo "1) SDDM with Sugar Candy theme (HyprCandy automatic background set according to applied wallpaper)"
     echo "2) GDM with GDM settings app (GNOME Display Manager and customization app)"
@@ -309,7 +301,7 @@ build_package_list() {
         
         # Customization and theming
         "matugen-bin"
-        "python-pywal16"
+        "wallust"
         
         # Editors
         "gedit"
@@ -357,8 +349,6 @@ build_package_list() {
         "adwaita-qt6"
         "adwaita-qt-git"
         "tela-circle-icon-theme-all"
-        "matugen-bin"
-        "python-pywal16"
         
         # Cursor themes
         "bibata-cursor-theme"
@@ -570,6 +560,9 @@ $cmd_duration $jobs $time\
 $line_break\
 $character"""
 
+[fill]
+symbol = " "
+
 [directory]
 style = "blue"
 read_only = " 🔒"
@@ -643,7 +636,7 @@ if test -d ~/.local/bin
 end
 
 # Aliases
-alias hyprcandy="cd .hyprcandy && git pull && stow --ignore='HyprCandy' --ignore='Candy-Images' --ignore='Dock-SVGs' --ignore='Gifs' --ignore='Logo' --ignore='GJS' --ignore='resources' --ignore='src' --ignore='meson.build' --ignore='README.md' --ignore='run.log' --ignore='test_layout.js' --ignore='test_media_menu.js' --ignore='toggle.js' --ignore='toggle-main.js' */"
+alias hyprcandy="cd .hyprcandy && git pull && stow --ignore='HyprCandy' --ignore='Candy-Images' --ignore='Dock-SVGs' --ignore='Gifs' --ignore='Logo' --ignore='GJS' --ignore='resources' --ignore='src' --ignore='meson.build' --ignore='README.md' --ignore='run.log' --ignore='test_layout.js' --ignore='test_media_menu.js' --ignore='toggle.js' --ignore='toggle-main.js' --ignore='~' --ignore='candy-main.js' --ignore='gjs-media-player.desktop' --ignore='gjs-toggle-controls.desktop' --ignore='main.js' --ignore='media-main.js' --ignore='SEEK_FEATURE.md' --ignore='setup-custom-icon.sh' --ignore='weather-main.js' */"
 alias ll="ls -alF"
 alias la="ls -A"
 alias l="ls -CF"
@@ -682,7 +675,7 @@ alias sysinfo="fastfetch"
 alias weather="curl wttr.in"
 
 # Fun stuff
-alias matrix="cmatrix"
+alias matrix="cmatrix -a -b -r"
 alias pipes="pipes.sh"
 
 # Start HyprCandy fastfetch
@@ -747,6 +740,9 @@ $swift\
 $cmd_duration $jobs $time\
 $line_break\
 $character"""
+
+[fill]
+symbol = " "
 
 [directory]
 style = "blue"
@@ -824,7 +820,7 @@ fi
 source $ZSH/oh-my-zsh.sh
 
 # Aliases
-alias hyprcandy="cd .hyprcandy && git pull && stow --ignore='HyprCandy' --ignore='Candy-Images' --ignore='Dock-SVGs' --ignore='Gifs' --ignore='Logo' --ignore='GJS' --ignore='resources' --ignore='src' --ignore='meson.build' --ignore='README.md' --ignore='run.log' --ignore='test_layout.js' --ignore='test_media_menu.js' --ignore='toggle.js' --ignore='toggle-main.js' */"
+alias hyprcandy="cd .hyprcandy && git pull && stow --ignore='HyprCandy' --ignore='Candy-Images' --ignore='Dock-SVGs' --ignore='Gifs' --ignore='Logo' --ignore='GJS' --ignore='resources' --ignore='src' --ignore='meson.build' --ignore='README.md' --ignore='run.log' --ignore='test_layout.js' --ignore='test_media_menu.js' --ignore='toggle.js' --ignore='toggle-main.js' --ignore='~' --ignore='candy-main.js' --ignore='gjs-media-player.desktop' --ignore='gjs-toggle-controls.desktop' --ignore='main.js' --ignore='media-main.js' --ignore='SEEK_FEATURE.md' --ignore='setup-custom-icon.sh' --ignore='weather-main.js' */"
 alias ll="ls -alF"
 alias la="ls -A"
 alias l="ls -CF"
@@ -863,7 +859,7 @@ alias sysinfo="fastfetch"
 alias weather="curl wttr.in"
 
 # Fun stuff
-alias matrix="cmatrix"
+alias matrix="cmatrix -a -b -r"
 alias pipes="pipes.sh"
 
 # Start HyprCandy fastfetch
@@ -941,7 +937,7 @@ setup_hyprcandy() {
     # Ensure ~/.config exists, then remove specified subdirectories
     [ -d "$HOME/.config" ] || mkdir -p "$HOME/.config"
     cd "$HOME/.config" || exit 1
-    rm -rf background background.png btop cava fastfetch gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct rofi uwsm waybar waypaper wlogout xsettingsd
+    rm -rf background background.png btop cava fastfetch gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct rofi uwsm wallust waybar waypaper wlogout xsettingsd
 
     # Go to the home directory
     cd "$HOME"
@@ -2457,19 +2453,19 @@ trigger_matugen() {
         echo "⚠️  Matugen config not found at: $MATUGEN_CONFIG"
     fi
 }
-trigger_pywal16() {
-    if command -v wal >/dev/null 2>&1; then
-        echo "🎨 Triggering pywal16 color generation..."
-        wal --cols16 -i "$CONFIG_BG" -n &
-        echo "✅ Pywal16 color generation started"
+trigger_wallust() {
+    if command -v wallust >/dev/null 2>&1; then
+        echo "🎨 Triggering wallust color generation..."
+        wallust run ~/.config/background &
+        echo "✅ Wallust color generation started"
     else
-        echo "⚠️  Pywal16 not found"
+        echo "⚠️  Wallust not found"
     fi
 }
 execute_color_generation() {
     echo "🚀 Starting color generation for new background..."
     trigger_matugen
-    trigger_pywal16
+    trigger_wallust
     sleep 1
     echo "✅ Color generation processes initiated"
 }
@@ -2863,6 +2859,47 @@ Restart=on-failure
 WantedBy=default.target
 EOF
 
+# ═══════════════════════════════════════════════════════════════
+#               Change Nwg-Dock Start Button Icon
+# ═══════════════════════════════════════════════════════════════
+
+cat > "$HOME/.config/hyprcandy/hooks/change_start_button_icon.sh" << 'EOF'
+#!/bin/bash
+
+# Change Start Button Icon
+ # ⚙️ Step 1: Remove old grid.svg from nwg-dock-hyprland
+ echo "🔄 Replacing 'grid.svg' in /usr/share/nwg-dock-hyprland/images..."
+
+print_status "Removing old start button icon"
+
+if cd /usr/share/nwg-dock-hyprland/images 2>/dev/null; then
+    pkexec rm -f grid.svg && echo "🗑️  Removed old grid.svg"
+else
+    echo "❌ Failed to access /usr/share/nwg-dock-hyprland/images"
+    exit 1
+fi
+
+# 🏠 Step 2: Return to home
+cd "$HOME" || exit 1
+
+# 📂 Step 3: Copy new grid.svg from custom SVG folder
+SVG_SOURCE="$HOME/Pictures/Candy/Dock-SVGs/grid.svg"
+SVG_DEST="/usr/share/nwg-dock-hyprland/images"
+
+print_status "Changing start button icon"
+
+if [ -f "$SVG_SOURCE" ]; then
+    pkexec cp "$SVG_SOURCE" "$SVG_DEST" && echo "✅ grid.svg copied successfully."
+    sleep 1
+    #"$HOME/.config/nwg-dock-hyprland/launch.sh" >/dev/null 2>&1 &
+    notify-send "Start Icon Changed" -t 2000
+else
+    echo "❌ grid.svg not found at $SVG_SOURCE"
+    exit 1
+fi
+EOF
+chmod +x "$HOME/.config/hyprcandy/hooks/change_start_button_icon.sh"
+
     # 🛠️ GNOME Window Button Layout Adjustment
     echo
     echo "🛠️ Disabling GNOME titlebar buttons..."
@@ -2895,6 +2932,8 @@ EOF
     # ⚙️ Step 1: Remove old grid.svg from nwg-dock-hyprland
     echo "🔄 Replacing 'grid.svg' in /usr/share/nwg-dock-hyprland/images..."
 
+    print_status "Removing old start button icon"
+
     if cd /usr/share/nwg-dock-hyprland/images 2>/dev/null; then
         sudo rm -f grid.svg && echo "🗑️  Removed old grid.svg"
     else
@@ -2908,6 +2947,8 @@ EOF
     # 📂 Step 3: Copy new grid.svg from custom SVG folder
     SVG_SOURCE="$HOME/Pictures/Candy/Dock-SVGs/grid.svg"
     SVG_DEST="/usr/share/nwg-dock-hyprland/images"
+
+    print_status "Changing start button icon"
 
     if [ -f "$SVG_SOURCE" ]; then
         sudo cp "$SVG_SOURCE" "$SVG_DEST" && echo "✅ grid.svg copied successfully."
@@ -3076,9 +3117,9 @@ source = ~/.config/hypr/colors.conf
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 # Packages to have full env path access
-env = PATH,$PATH:/usr/local/bin:/usr/bin:/bin:/home/king/.cargo/bin
+env = PATH,$PATH:/usr/local/bin:/usr/bin:/bin:/home/$USERNAME/.cargo/bin
 
-# After using nwg-look, also change the cursor settings here to maintain changes after every reboot
+# Cursor settings
 env = XCURSOR_THEME,Bibata-Modern-Classic
 env = XCURSOR_SIZE,18
 env = HYPRCURSOR_THEME,Bibata-Modern-Classic
@@ -3110,13 +3151,17 @@ env = ELECTRON_OZONE_PLATFORM_HINT,wayland
 env = WINIT_UNIX_BACKEND,wayland
 env = GTK_THEME,adw-gtk3-dark
 env = WLR_DRM_NO_ATOMIC,1
+# Virtual machine display scaling
+env = QT_SCALE_FACTOR_ROUNDING_POLICY=PassThrough
+# For better VM performance
+env = QEMU_AUDIO_DRV=pa
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 # ┃                           Keyboard                          ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 input {
-    kb_layout = us
+    kb_layout = $LAYOUT
     kb_variant = 
     kb_model =
     kb_options =
@@ -3142,19 +3187,19 @@ input {
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 general {
-    gaps_in = 3
+    gaps_in = 4
     gaps_out = 6	
     gaps_workspaces = 50    # Gaps between workspaces
-    border_size = 2
-    col.active_border =  $primary_fixed_dim $source_color $source_color $primary_fixed_dim 90deg
-    col.inactive_border = $background
+    border_size = 3
+    col.active_border = $primary_fixed_dim $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $primary_fixed_dim 90deg
+    col.inactive_border = $on_primary_fixed_variant
     layout = dwindle
     resize_on_border = true
     allow_tearing = true
 }
 
-group:groupbar:col.active =  $source_color $primary_fixed_dim $primary_fixed_dim $source_color 90deg
-group:groupbar:col.inactive = $background
+group:groupbar:col.active =  $on_primary_fixed_variant $primary_fixed_dim $primary_fixed_dim $on_primary_fixed_variant 90deg
+group:groupbar:col.inactive = $on_primary_fixed_variant
 
 dwindle {
     pseudotile = true
@@ -3190,7 +3235,7 @@ binds {
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 decoration {
-    rounding = 8
+    rounding = 10
     rounding_power = 2
     active_opacity = 0.85
     inactive_opacity = 0.85
@@ -3198,11 +3243,11 @@ decoration {
 
     blur {
     enabled = true
-    size = 2
-    passes = 4
+    size = 6
+    passes = 2
     new_optimizations = on
     ignore_opacity = true
-    xray = false
+    xray = true
     vibrancy = 0.1696
     noise = 0.01
     popups = true
@@ -3213,7 +3258,7 @@ decoration {
         enabled = true
         range = 6
         render_power = 4
-        color = $source_color
+        color = $scrim
     }
 }
 
@@ -3306,7 +3351,7 @@ windowrule = animation slide right, class:^(kitty|Alacritty)$
 windowrule = noblur, class:^(org.mozilla.firefox)$
 # Decorations related to floating windows on workspaces 1 to 10
 ##windowrule = bordersize 2, floating:1, onworkspace:w[fv1-10]
-windowrule = bordercolor $primary, floating:1, onworkspace:w[fv1-10]
+windowrule = bordercolor $primary_fixed_dim $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $primary_fixed_dim 90deg, floating:1, onworkspace:w[fv1-10]
 ##windowrule = rounding 8, floating:1, onworkspace:w[fv1-10]
 # Decorations related to tiling windows on workspaces 1 to 10
 ##windowrule = bordersize 3, floating:0, onworkspace:f[1-10]
@@ -3462,10 +3507,10 @@ layerrule = ignorezero,notifications
 #layerrule = ignorezero,swaync-notification-window
 #layerrule = blur,swaync-control-center
 #layerrule = ignorezero,swaync-control-center
-layerrule = blur,logout_dialog
-layerrule = ignorezero,logout_dialog
 layerrule = blur,nwg-dock
 layerrule = ignorezero,nwg-dock
+layerrule = blur,logout_dialog
+layerrule = ignorezero,logout_dialog
 layerrule = blur,gtk-layer-shell
 layerrule = ignorezero,gtk-layer-shell
 layerrule = blur,waybar
@@ -3572,7 +3617,7 @@ source = ~/.config/hypr/colors.conf
 # Packages to have full env path access
 env = PATH,$PATH:/usr/local/bin:/usr/bin:/bin:/home/$USERNAME/.cargo/bin
 
-# After using nwg-look, also change the cursor settings here to maintain changes after every reboot
+# Cursor settings
 env = XCURSOR_THEME,Bibata-Modern-Classic
 env = XCURSOR_SIZE,18
 env = HYPRCURSOR_THEME,Bibata-Modern-Classic
@@ -3604,13 +3649,17 @@ env = ELECTRON_OZONE_PLATFORM_HINT,wayland
 env = WINIT_UNIX_BACKEND,wayland
 env = GTK_THEME,adw-gtk3-dark
 env = WLR_DRM_NO_ATOMIC,1
+# Virtual machine display scaling
+env = QT_SCALE_FACTOR_ROUNDING_POLICY=PassThrough
+# For better VM performance
+env = QEMU_AUDIO_DRV=pa
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 # ┃                           Keyboard                          ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 input {
-    kb_layout = us
+    kb_layout = $LAYOUT
     kb_variant = 
     kb_model =
     kb_options =
@@ -3640,15 +3689,15 @@ general {
     gaps_out = 6	
     gaps_workspaces = 50    # Gaps between workspaces
     border_size = 3
-    col.active_border =  $primary_fixed_dim $source_color $source_color $primary_fixed_dim 90deg
-    col.inactive_border = $background
+    col.active_border = $primary_fixed_dim $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $primary_fixed_dim 90deg
+    col.inactive_border = $on_primary_fixed_variant
     layout = dwindle
     resize_on_border = true
     allow_tearing = true
 }
 
-group:groupbar:col.active =  $source_color $primary_fixed_dim $primary_fixed_dim $source_color 90deg
-group:groupbar:col.inactive = $background
+group:groupbar:col.active =  $on_primary_fixed_variant $primary_fixed_dim $primary_fixed_dim $on_primary_fixed_variant 90deg
+group:groupbar:col.inactive = $on_primary_fixed_variant
 
 dwindle {
     pseudotile = true
@@ -3684,7 +3733,7 @@ binds {
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 decoration {
-    rounding = 16
+    rounding = 10
     rounding_power = 2
     active_opacity = 0.85
     inactive_opacity = 0.85
@@ -3692,11 +3741,11 @@ decoration {
 
     blur {
     enabled = true
-    size = 2
-    passes = 4
+    size = 6
+    passes = 2
     new_optimizations = on
     ignore_opacity = true
-    xray = false
+    xray = true
     vibrancy = 0.1696
     noise = 0.01
     popups = true
@@ -3707,7 +3756,7 @@ decoration {
         enabled = true
         range = 6
         render_power = 4
-        color = $source_color
+        color = $scrim
     }
 }
 
@@ -3800,7 +3849,7 @@ windowrule = animation slide right, class:^(kitty|Alacritty)$
 windowrule = noblur, class:^(org.mozilla.firefox)$
 # Decorations related to floating windows on workspaces 1 to 10
 ##windowrule = bordersize 2, floating:1, onworkspace:w[fv1-10]
-windowrule = bordercolor $primary, floating:1, onworkspace:w[fv1-10]
+windowrule = bordercolor $primary_fixed_dim $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $primary_fixed_dim 90deg, floating:1, onworkspace:w[fv1-10]
 ##windowrule = rounding 8, floating:1, onworkspace:w[fv1-10]
 # Decorations related to tiling windows on workspaces 1 to 10
 ##windowrule = bordersize 3, floating:0, onworkspace:f[1-10]
@@ -4128,7 +4177,7 @@ bind = $mainMod SHIFT, Escape, exec, hyprctl activewindow | grep pid | tr -d 'pi
 
 #### Rofi Menus ####
 
-bind = $mainMod, A, exec, rofi -show drun || pkill rofi      #Launch or kill rofi application finder
+bind = $mainMod, A, exec, rofi -show drun || pkill rofi      #Launch or kill/hide rofi application finder
 bind = $mainMod, K, exec, $HYPRSCRIPTS/keybindings.sh     #Show keybindings
 bind = $mainMod CTRL, V, exec, $SCRIPTS/cliphist.sh     #Open clipboard manager
 bind = $mainMod CTRL, E, exec, ~/.config/hyprcandy/settings/emojipicker.sh 		  #Open rofi emoji-picker
@@ -4136,79 +4185,34 @@ bind = $mainMod CTRL, G, exec, ~/.config/hyprcandy/settings/glyphpicker.sh 		  #
 
 #### Applications ####
 
-#bind = $mainMod, S, exec, spotify
-#bind = $mainMod, D, exec, $DISCORD
-#bind = $mainMod, W, exec, warp-terminal
+bind = $mainMod, S, exec, spotify
+bind = $mainMod, D, exec, $DISCORD
+bind = $mainMod, W, exec, warp-terminal
 bind = $mainMod, C, exec, DRI_PRIME=1 $EDITOR #Editor
 bind = $mainMod, B, exec, DRI_PRIME=1 xdg-open "http:// &" #Launch your default browser
-bind = $mainMod, Q, exec, DRI_PRIME=1 pypr toggle term #Launch a kitty scratchpad through pyprland
-bind = $mainMod, Return, exec, kitty --class=kitty-normal #Launch normal kitty instances
+bind = $mainMod, Q, exec, kitty #Launch normal kitty instances
+#bind = $mainMod, Return, exec, DRI_PRIME=1 pypr toggle term #Launch a kitty scratchpad through pyprland
 bind = $mainMod, O, exec, DRI_PRIME=1 /usr/bin/octopi #Launch octopi application finder
 bind = $mainMod, E, exec, DRI_PRIME=1 nautilus #pypr toggle filemanager #Launch the filemanager 
 bind = $mainMod CTRL, C, exec, DRI_PRIME=1 gnome-calculator #Launch the calculator
 
-#### Gaps OUT controls (outer gaps - screen edges) ####
-bind = $mainMod ALT, equal, exec, ~/.config/hyprcandy/hooks/hyprland_gaps_out_increase.sh  # $mainMod+Alt+= (Gap increase)
-bind = $mainMod ALT, minus, exec, ~/.config/hyprcandy/hooks/hyprland_gaps_out_decrease.sh  # $mainMod+Alt+- (Gap decrease)
+#### Waybar ####
 
-#### Gaps IN controls (inner gaps - between windows) ####
-bind = ALT, equal, exec, ~/.config/hyprcandy/hooks/hyprland_gaps_in_increase.sh            # Alt+= (Gap increase)
-bind = ALT, minus, exec, ~/.config/hyprcandy/hooks/hyprland_gaps_in_decrease.sh            # Alt+- (Gap decrease)
-
-#### Border controls #### 
-
-bind = $mainMod SHIFT, equal, exec, ~/.config/hyprcandy/hooks/hyprland_border_increase.sh  # $mainMod+Shift+= (Border increase)
-bind = $mainMod SHIFT, minus, exec, ~/.config/hyprcandy/hooks/hyprland_border_decrease.sh  # $mainMod+Shift+- (Border decrease)
-
-#### Rounding controls ####
-
-bind = $mainMod CTRL, equal, exec, ~/.config/hyprcandy/hooks/hyprland_rounding_increase.sh # $mainMod+Ctrl+= (Rounding increase)
-bind = $mainMod CTRL, minus, exec, ~/.config/hyprcandy/hooks/hyprland_rounding_decrease.sh # $mainMod+Ctrl+- (Rounding decrease)
-
-#### Visual presets ####
-
-bind = ALT, 1, exec, ~/.config/hyprcandy/hooks/hyprland_gap_presets.sh minimal
-bind = ALT, 2, exec, ~/.config/hyprcandy/hooks/hyprland_gap_presets.sh balanced
-bind = ALT, 3, exec, ~/.config/hyprcandy/hooks/hyprland_gap_presets.sh spacious
-bind = ALT, 4, exec, ~/.config/hyprcandy/hooks/hyprland_gap_presets.sh zero
-
-#### Status display ####
-
-bind = $mainMod, I, exec, ~/.config/hyprcandy/hooks/hyprland_status_display.sh
+bind = ALT, 1, exec, ~/.config/hyprcandy/hooks/kill_waybar_safe.sh #Hide/kill waybar and start automatic idle-inhibitor
+bind = ALT, 2, exec, ~/.config/hyprcandy/hooks/restart_waybar.sh #Restart or reload waybar and stop automatic idle-inhibitor
 
 #### Dock keybinds ####
 
-bind = CTRL SHIFT, Z, exec, pkill -f nwg-dock-hyprland #kill dock
-bind = CTRL SHIFT, J, exec, nwg-dock-hyprland -p left -lp start -i 28 -w 10 -ml 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" #Left dock
-bind = CTRL SHIFT, I, exec, nwg-dock-hyprland -p top -lp start -i 28 -w 10 -mt 6 -ml 10 -mr 10 -x -r -s "style.css" -c "rofi -show drun" #Top dock
-bind = CTRL SHIFT, K, exec, ~/.config/nwg-dock-hyprland/launch.sh #Bottom dock and quick-reload dock
-bind = CTRL SHIFT, L, exec, nwg-dock-hyprland -p right -lp start -i 28 -w 10 -mr 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" #Right dock
+bind = ALT , 3, exec, ~/.config/hyprcandy/hooks/nwg_dock_presets.sh hidden #Hide/kill dock
+bind = ALT , 4, exec, ~/.config/nwg-dock-hyprland/launch.sh #Bottom dock and quick-reload dock
+bind = ALT , 5, exec, nwg-dock-hyprland -p top -lp start -i 22 -w 10 -mt 6 -ml 10 -mr 10 -x -r -s "style.css" -c "rofi -show drun" #Top dock
+bind = ALT , 6, exec, nwg-dock-hyprland -p left -lp start -i 22 -w 10 -ml 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" #Left dock
+bind = ALT , 7, exec, nwg-dock-hyprland -p right -lp start -i 22 -w 10 -mr 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" #Right dock
+bind = ALT, 8, exec, ~/.config/hyprcandy/hooks/nwg_dock_status_display.sh #Dock status display
 
-#### NWG-Dock Icon Size controls ####
-bind = CTRL SHIFT ALT, equal, exec, ~/.config/hyprcandy/hooks/nwg_dock_icon_size_increase.sh
-bind = CTRL SHIFT ALT, minus, exec, ~/.config/hyprcandy/hooks/nwg_dock_icon_size_decrease.sh
+#### Status display ####
 
-#### NWG-Dock Border Radius controls ####
-bind = CTRL ALT, equal, exec, ~/.config/hyprcandy/hooks/nwg_dock_border_radius_increase.sh
-bind = CTRL ALT, minus, exec, ~/.config/hyprcandy/hooks/nwg_dock_border_radius_decrease.sh
-
-#### NWG-Dock Border Width controls ####
-bind = SHIFT ALT, equal, exec, ~/.config/hyprcandy/hooks/nwg_dock_border_width_increase.sh
-bind = SHIFT ALT, minus, exec, ~/.config/hyprcandy/hooks/nwg_dock_border_width_decrease.sh
-
-#### NWG-Dock Presets ####
-bind = ALT, 5, exec, ~/.config/hyprcandy/hooks/nwg_dock_presets.sh minimal
-bind = ALT, 6, exec, ~/.config/hyprcandy/hooks/nwg_dock_presets.sh balanced
-bind = ALT, 7, exec, ~/.config/hyprcandy/hooks/nwg_dock_presets.sh prominent
-bind = ALT, 8, exec, ~/.config/hyprcandy/hooks/nwg_dock_presets.sh hidden
-
-#### NWG-Dock Status display ####
-bind = CTRL SHIFT, S, exec, ~/.config/hyprcandy/hooks/nwg_dock_status_display.sh
-
-#### Waybar ####
-
-bind = $mainMod, H, exec, ~/.config/hyprcandy/hooks/restart_waybar.sh #Restart or reload waybar and stop automatic idle-inhibitor
-bind = $mainMod Alt, H, exec, ~/.config/hyprcandy/hooks/kill_waybar_safe.sh #Close/kill waybar and start automatic idle-inhibitor
+bind = ALT, 9, exec, ~/.config/hyprcandy/hooks/hyprland_status_display.sh #Hyprland status display
 
 #### Recorder ####
 
@@ -4394,7 +4398,7 @@ bind = $mainMod SHIFT, Escape, exec, hyprctl activewindow | grep pid | tr -d 'pi
 
 #### Rofi Menus ####
 
-bind = $mainMod, A, exec, rofi -show drun || pkill rofi      #Launch or kill rofi application finder
+bind = $mainMod, A, exec, rofi -show drun || pkill rofi      #Launch or kill/hide rofi application finder
 bind = $mainMod, K, exec, $HYPRSCRIPTS/keybindings.sh     #Show keybindings
 bind = $mainMod CTRL, V, exec, $SCRIPTS/cliphist.sh     #Open clipboard manager
 bind = $mainMod CTRL, E, exec, ~/.config/hyprcandy/settings/emojipicker.sh 		  #Open rofi emoji-picker
@@ -4402,79 +4406,34 @@ bind = $mainMod CTRL, G, exec, ~/.config/hyprcandy/settings/glyphpicker.sh 		  #
 
 #### Applications ####
 
-#bind = $mainMod, S, exec, spotify
-#bind = $mainMod, D, exec, $DISCORD
-#bind = $mainMod, W, exec, warp-terminal
+bind = $mainMod, S, exec, spotify
+bind = $mainMod, D, exec, $DISCORD
+bind = $mainMod, W, exec, warp-terminal
 bind = $mainMod, C, exec, DRI_PRIME=1 $EDITOR #Editor
 bind = $mainMod, B, exec, DRI_PRIME=1 xdg-open "http:// &" #Launch your default browser
-bind = $mainMod, Q, exec, DRI_PRIME=1 pypr toggle term #Launch a kitty scratchpad through pyprland
-bind = $mainMod, Return, exec, kitty --class=kitty-normal #Launch normal kitty instances
+bind = $mainMod, Q, exec, kitty #Launch normal kitty instances
+#bind = $mainMod, Return, exec, DRI_PRIME=1 pypr toggle term #Launch a kitty scratchpad through pyprland
 bind = $mainMod, O, exec, DRI_PRIME=1 /usr/bin/octopi #Launch octopi application finder
 bind = $mainMod, E, exec, DRI_PRIME=1 nautilus #pypr toggle filemanager #Launch the filemanager 
 bind = $mainMod CTRL, C, exec, DRI_PRIME=1 gnome-calculator #Launch the calculator
 
-#### Gaps OUT controls (outer gaps - screen edges) ####
-bind = $mainMod ALT, equal, exec, ~/.config/hyprcandy/hooks/hyprland_gaps_out_increase.sh  # $mainMod+Alt+= (Gap increase)
-bind = $mainMod ALT, minus, exec, ~/.config/hyprcandy/hooks/hyprland_gaps_out_decrease.sh  # $mainMod+Alt+- (Gap decrease)
+#### Hyprpanel ####
 
-#### Gaps IN controls (inner gaps - between windows) ####
-bind = ALT, equal, exec, ~/.config/hyprcandy/hooks/hyprland_gaps_in_increase.sh            # Alt+= (Gap increase)
-bind = ALT, minus, exec, ~/.config/hyprcandy/hooks/hyprland_gaps_in_decrease.sh            # Alt+- (Gap decrease)
-
-#### Border controls #### 
-
-bind = $mainMod SHIFT, equal, exec, ~/.config/hyprcandy/hooks/hyprland_border_increase.sh  # $mainMod+Shift+= (Border increase)
-bind = $mainMod SHIFT, minus, exec, ~/.config/hyprcandy/hooks/hyprland_border_decrease.sh  # $mainMod+Shift+- (Border decrease)
-
-#### Rounding controls ####
-
-bind = $mainMod CTRL, equal, exec, ~/.config/hyprcandy/hooks/hyprland_rounding_increase.sh # $mainMod+Ctrl+= (Rounding increase)
-bind = $mainMod CTRL, minus, exec, ~/.config/hyprcandy/hooks/hyprland_rounding_decrease.sh # $mainMod+Ctrl+- (Rounding decrease)
-
-#### Visual presets ####
-
-bind = ALT, 1, exec, ~/.config/hyprcandy/hooks/hyprland_gap_presets.sh minimal
-bind = ALT, 2, exec, ~/.config/hyprcandy/hooks/hyprland_gap_presets.sh balanced
-bind = ALT, 3, exec, ~/.config/hyprcandy/hooks/hyprland_gap_presets.sh spacious
-bind = ALT, 4, exec, ~/.config/hyprcandy/hooks/hyprland_gap_presets.sh zero
-
-#### Status display ####
-
-bind = $mainMod, I, exec, ~/.config/hyprcandy/hooks/hyprland_status_display.sh
+bind = ALT, 1, exec, ~/.config/hyprcandy/hooks/kill_hyprpanel_safe.sh #Hide/kill hyprpanel and start automatic idle-inhibitor
+bind = ALT, 2, exec, ~/.config/hyprcandy/hooks/restart_hyprpanel.sh #Restart or reload hyprpanel and stop automatic idle-inhibitor
 
 #### Dock keybinds ####
 
-bind = CTRL SHIFT, Z, exec, pkill -f nwg-dock-hyprland #kill dock
-bind = CTRL SHIFT, J, exec, nwg-dock-hyprland -p left -lp start -i 28 -w 10 -ml 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" #Left dock
-bind = CTRL SHIFT, I, exec, nwg-dock-hyprland -p top -lp start -i 28 -w 10 -mt 6 -ml 10 -mr 10 -x -r -s "style.css" -c "rofi -show drun" #Top dock
-bind = CTRL SHIFT, K, exec, ~/.config/nwg-dock-hyprland/launch.sh #Bottom dock and quick-reload dock
-bind = CTRL SHIFT, L, exec, nwg-dock-hyprland -p right -lp start -i 28 -w 10 -mr 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" #Right dock
+bind = ALT , 3, exec, ~/.config/hyprcandy/hooks/nwg_dock_presets.sh hidden #Hide/kill dock
+bind = ALT , 4, exec, ~/.config/nwg-dock-hyprland/launch.sh #Bottom dock and quick-reload dock
+bind = ALT , 5, exec, nwg-dock-hyprland -p top -lp start -i 22 -w 10 -mt 6 -ml 10 -mr 10 -x -r -s "style.css" -c "rofi -show drun" #Top dock
+bind = ALT , 6, exec, nwg-dock-hyprland -p left -lp start -i 22 -w 10 -ml 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" #Left dock
+bind = ALT , 7, exec, nwg-dock-hyprland -p right -lp start -i 22 -w 10 -mr 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" #Right dock
+bind = ALT, 8, exec, ~/.config/hyprcandy/hooks/nwg_dock_status_display.sh #Dock status display
 
-#### NWG-Dock Icon Size controls ####
-bind = CTRL SHIFT ALT, equal, exec, ~/.config/hyprcandy/hooks/nwg_dock_icon_size_increase.sh
-bind = CTRL SHIFT ALT, minus, exec, ~/.config/hyprcandy/hooks/nwg_dock_icon_size_decrease.sh
+#### Status display ####
 
-#### NWG-Dock Border Radius controls ####
-bind = CTRL ALT, equal, exec, ~/.config/hyprcandy/hooks/nwg_dock_border_radius_increase.sh
-bind = CTRL ALT, minus, exec, ~/.config/hyprcandy/hooks/nwg_dock_border_radius_decrease.sh
-
-#### NWG-Dock Border Width controls ####
-bind = SHIFT ALT, equal, exec, ~/.config/hyprcandy/hooks/nwg_dock_border_width_increase.sh
-bind = SHIFT ALT, minus, exec, ~/.config/hyprcandy/hooks/nwg_dock_border_width_decrease.sh
-
-#### NWG-Dock Presets ####
-bind = ALT, 5, exec, ~/.config/hyprcandy/hooks/nwg_dock_presets.sh minimal
-bind = ALT, 6, exec, ~/.config/hyprcandy/hooks/nwg_dock_presets.sh balanced
-bind = ALT, 7, exec, ~/.config/hyprcandy/hooks/nwg_dock_presets.sh prominent
-bind = ALT, 8, exec, ~/.config/hyprcandy/hooks/nwg_dock_presets.sh hidden
-
-#### NWG-Dock Status display ####
-bind = CTRL SHIFT, S, exec, ~/.config/hyprcandy/hooks/nwg_dock_status_display.sh
-
-#### Hyprpanel ####
-
-bind = $mainMod, H, exec, DRI_PRIME=1 ~/.config/hyprcandy/hooks/restart_hyprpanel.sh #Restart or reload hyprpanel and stop automatic idle-inhibitor
-bind = $mainMod Alt, H, exec, ~/.config/hyprcandy/hooks/kill_hyprpanel_safe.sh #Close/kill hyprpanel and start automatic idle-inhibitor
+bind = ALT, 9, exec, ~/.config/hyprcandy/hooks/hyprland_status_display.sh #Hyprland status display
 
 #### Recorder ####
 
@@ -4647,6 +4606,1257 @@ fi
         echo "⚠️  File not found: $HYPRLAND_CUSTOM"
     fi
         fi
+}
+
+setup_gjs() {
+# Create the GJS directory and files if they don't already exist
+if [ ! -d "$HOME/.ultracandy/GJS/src" ]; then
+    mkdir -p "$HOME/.ultracandy/GJS/src"
+    echo "📁 Created the GJS directory"
+fi
+
+# Add GJS files
+cat > "$HOME/.ultracandy/GJS/toggle-main.js" << 'EOF'
+#!/usr/bin/env gjs
+
+imports.gi.versions.Gtk = '4.0';
+imports.gi.versions.Gdk = '4.0';
+imports.gi.versions.GLib = '2.0';
+const { Gtk, Gdk, GLib } = imports.gi;
+
+const scriptDir = GLib.path_get_dirname(imports.system.programInvocationName);
+imports.searchPath.unshift(scriptDir);
+imports.searchPath.unshift(GLib.build_filenamev([scriptDir, 'src']));
+
+let Adw;
+try {
+    imports.gi.versions.Adw = '1';
+    Adw = imports.gi.Adw;
+} catch (e) {
+    Adw = null;
+}
+
+const Toggle = imports['toggle'];
+
+const APP_ID = 'org.gnome.gjstoggles';
+
+function onActivate(app) {
+    const winToggles = new (Adw ? Adw.ApplicationWindow : Gtk.ApplicationWindow)({
+        application: app,
+        title: 'Toggles',
+        default_width: 400,
+        default_height: 220,
+        resizable: false,
+        decorated: false,
+    });
+    if (winToggles.set_icon_from_file) {
+        try { winToggles.set_icon_from_file(GLib.build_filenamev([GLib.get_home_dir(), '.local/share/icons/HyprCandy.png'])); } catch (e) {}
+    }
+    const togglesBox = Toggle.createTogglesBox();
+    if (Adw && winToggles.set_content) {
+        winToggles.set_content(togglesBox);
+    } else {
+        winToggles.set_child(togglesBox);
+    }
+    // Add Escape key handling
+    const keyController = new Gtk.EventControllerKey();
+    keyController.connect('key-pressed', (controller, keyval, keycode, state) => {
+        if (keyval === Gdk.KEY_Escape) {
+            winToggles.close();
+        }
+        return false;
+    });
+    winToggles.add_controller(keyController);
+    winToggles.set_visible(true);
+    if (winToggles.set_keep_above) winToggles.set_keep_above(true);
+    winToggles.present();
+}
+
+function main() {
+    const ApplicationType = Adw ? Adw.Application : Gtk.Application;
+    const app = new ApplicationType({ application_id: APP_ID });
+    app.connect('activate', onActivate);
+    app.run([]);
+}
+
+main();  
+EOF
+
+cat > "$HOME/.ultracandy/GJS/weather-main.js" << 'EOF'
+#!/usr/bin/env gjs
+
+imports.gi.versions.Gtk = '4.0';
+imports.gi.versions.Gdk = '4.0';
+imports.gi.versions.GLib = '2.0';
+const { Gtk, Gdk, GLib } = imports.gi;
+
+const scriptDir = GLib.path_get_dirname(imports.system.programInvocationName);
+imports.searchPath.unshift(scriptDir);
+imports.searchPath.unshift(GLib.build_filenamev([scriptDir, 'src']));
+
+let Adw;
+try {
+    imports.gi.versions.Adw = '1';
+    Adw = imports.gi.Adw;
+} catch (e) {
+    Adw = null;
+}
+
+const Weather = imports['weather'];
+
+const APP_ID = 'Candy.Weather';
+
+function onActivate(app) {
+    const winWeather = new (Adw ? Adw.ApplicationWindow : Gtk.ApplicationWindow)({
+        application: app,
+        title: 'Weather',
+        // default_width: 300,
+        // default_height: 160,
+        resizable: false,
+        decorated: false,
+    });
+    if (winWeather.set_icon_from_file) {
+        try { winWeather.set_icon_from_file(GLib.build_filenamev([GLib.get_home_dir(), '.local/share/icons/HyprCandy.png'])); } catch (e) {}
+    }
+    const weatherBox = Weather.createWeatherBox();
+    if (Adw && winWeather.set_content) {
+        winWeather.set_content(weatherBox);
+    } else {
+        winWeather.set_child(weatherBox);
+    }
+    // Add Escape key handling
+    const keyController = new Gtk.EventControllerKey();
+    keyController.connect('key-pressed', (controller, keyval, keycode, state) => {
+        if (keyval === Gdk.KEY_Escape) {
+            winWeather.close();
+        }
+        return false;
+    });
+    winWeather.add_controller(keyController);
+    winWeather.set_visible(true);
+    if (winWeather.set_keep_above) winWeather.set_keep_above(true);
+    winWeather.present();
+}
+
+function main() {
+    const ApplicationType = Adw ? Adw.Application : Gtk.Application;
+    const app = new ApplicationType({ application_id: APP_ID });
+    app.connect('activate', onActivate);
+    app.run([]);
+}
+
+main(); 
+EOF
+
+cat > "$HOME/.ultracandy/GJS/src/mediaMenu.js" << 'EOF'
+imports.gi.versions.Gtk = '4.0';
+imports.gi.versions.Gio = '2.0';
+imports.gi.versions.GLib = '2.0';
+imports.gi.versions.Gdk = '4.0';
+imports.gi.versions.Soup = '3.0';
+imports.gi.versions.GdkPixbuf = '2.0';
+const { Gtk, Gio, GLib, Gdk, Soup, GdkPixbuf } = imports.gi;
+
+function createTogglesBox() {
+// --- Hyprsunset state persistence setup ---
+const hyprsunsetStateDir = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcandy']);
+const hyprsunsetStateFile = GLib.build_filenamev([hyprsunsetStateDir, 'hyprsunset.state']);
+// Ensure directory exists
+try { GLib.mkdir_with_parents(hyprsunsetStateDir, 0o755); } catch (e) {}
+function loadHyprsunsetState() {
+    try {
+        let [ok, contents] = GLib.file_get_contents(hyprsunsetStateFile);
+        if (ok && contents) {
+            let state = imports.byteArray.toString(contents).trim();
+            return state === 'enabled';
+        }
+    } catch (e) {}
+    return false;
+}
+function saveHyprsunsetState(enabled) {
+    try {
+        GLib.file_set_contents(hyprsunsetStateFile, enabled ? 'enabled' : 'disabled');
+    } catch (e) {}
+}
+
+// Main horizontal layout: left (hyprsunset, hyprpicker, toggles), right (presets, weather)
+const mainRow = new Gtk.Box({
+    orientation: Gtk.Orientation.HORIZONTAL,
+    spacing: 32,
+    halign: Gtk.Align.CENTER,
+    valign: Gtk.Align.CENTER,
+    margin_top: 16,
+    margin_bottom: 16,
+    margin_start: 16,
+    margin_end: 16
+});
+mainRow.add_css_class('candy-utils-frame');
+
+// Left: Hyprsunset, Hyprpicker, Toggles
+const leftBox = new Gtk.Box({
+    orientation: Gtk.Orientation.VERTICAL,
+    spacing: 16,
+    halign: Gtk.Align.CENTER,
+    valign: Gtk.Align.CENTER
+});
+// Hyprsunset controls
+const hyprsunsetBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER });
+let hyprsunsetEnabled = loadHyprsunsetState();
+const hyprsunsetBtn = new Gtk.Button({ label: hyprsunsetEnabled ? 'Hyprsunset 󰌵' : 'Hyprsunset 󰹏' });
+if (hyprsunsetEnabled) hyprsunsetBtn.add_css_class('neon-highlight');
+hyprsunsetBtn.connect('clicked', () => {
+    if (!hyprsunsetEnabled) {
+        GLib.spawn_command_line_async("bash -c 'hyprsunset &'");
+        hyprsunsetBtn.set_label('Hyprsunset 󰌵');
+        hyprsunsetBtn.add_css_class('neon-highlight');
+        hyprsunsetEnabled = true;
+    } else {
+        GLib.spawn_command_line_async('pkill hyprsunset');
+        hyprsunsetBtn.set_label('Hyprsunset 󰹏');
+        hyprsunsetBtn.remove_css_class('neon-highlight');
+        hyprsunsetEnabled = false;
+    }
+    saveHyprsunsetState(hyprsunsetEnabled);
+});
+const gammaDecBtn = new Gtk.Button({ label: 'Gamma -10%' });
+gammaDecBtn.connect('clicked', () => {
+    GLib.spawn_command_line_async('hyprctl hyprsunset gamma -10');
+});
+const gammaIncBtn = new Gtk.Button({ label: 'Gamma +10%' });
+gammaIncBtn.connect('clicked', () => {
+    GLib.spawn_command_line_async('hyprctl hyprsunset gamma +10');
+});
+hyprsunsetBox.append(hyprsunsetBtn);
+hyprsunsetBox.append(gammaDecBtn);
+hyprsunsetBox.append(gammaIncBtn);
+//leftBox.append(hyprsunsetBox);
+
+// Hyprpicker button
+const hyprpickerBtn = new Gtk.Button({ label: 'Launch Hyprpicker' });
+hyprpickerBtn.connect('clicked', () => {
+    GLib.spawn_command_line_async('hyprpicker');
+});
+//leftBox.append(hyprpickerBtn);
+
+// --- Xray Toggle Button ---
+const xrayStateFile = GLib.build_filenamev([hyprsunsetStateDir, 'xray.state']);
+function loadXrayState() {
+    try {
+        let [ok, contents] = GLib.file_get_contents(xrayStateFile);
+        if (ok && contents) {
+            let state = imports.byteArray.toString(contents).trim();
+            return state === 'enabled';
+        }
+    } catch (e) {}
+    return false;
+}
+function saveXrayState(enabled) {
+    try {
+        GLib.file_set_contents(xrayStateFile, enabled ? 'enabled' : 'disabled');
+    } catch (e) {}
+}
+function toggleXray(enabled) {
+    const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
+    const newValue = enabled ? 'true' : 'false';
+    GLib.spawn_command_line_async(`sed -i 's/xray = .*/xray = ${newValue}/' "${configFile}"`);
+    GLib.spawn_command_line_async('hyprctl reload');
+}
+
+let xrayEnabled = loadXrayState();
+const xrayBtn = new Gtk.Button({ label: xrayEnabled ? 'Xray Enabled ' : 'Xray Disabled ' });
+if (xrayEnabled) xrayBtn.add_css_class('neon-highlight');
+xrayBtn.connect('clicked', () => {
+    xrayEnabled = !xrayEnabled;
+    toggleXray(xrayEnabled);
+    if (xrayEnabled) {
+        xrayBtn.set_label('Xray Enabled ');
+        xrayBtn.add_css_class('neon-highlight');
+    } else {
+        xrayBtn.set_label('Xray Disabled ');
+        xrayBtn.remove_css_class('neon-highlight');
+    }
+    saveXrayState(xrayEnabled);
+});
+//leftBox.append(xrayBtn);
+
+// --- Opacity Toggle Button ---
+const opacityStateFile = GLib.build_filenamev([hyprsunsetStateDir, 'opacity.state']);
+function loadOpacityState() {
+    try {
+        let [ok, contents] = GLib.file_get_contents(opacityStateFile);
+        if (ok && contents) {
+            let state = imports.byteArray.toString(contents).trim();
+            return state === 'enabled';
+        }
+    } catch (e) {}
+    return false;
+}
+function saveOpacityState(enabled) {
+    try {
+        GLib.file_set_contents(opacityStateFile, enabled ? 'enabled' : 'disabled');
+    } catch (e) {}
+}
+
+let opacityEnabled = loadOpacityState();
+const opacityBtn = new Gtk.Button({ label: opacityEnabled ? 'Opacity ' : 'Opacity ' });
+if (opacityEnabled) opacityBtn.add_css_class('neon-highlight');
+opacityBtn.connect('clicked', () => {
+    opacityEnabled = !opacityEnabled;
+    if (opacityEnabled) {
+        opacityBtn.set_label('Opacity ');
+        opacityBtn.add_css_class('neon-highlight');
+        GLib.spawn_command_line_async('bash -c "$HOME/.config/hypr/scripts/window-opacity.sh"');
+    } else {
+        opacityBtn.set_label('Opacity ');
+        opacityBtn.remove_css_class('neon-highlight');
+        GLib.spawn_command_line_async('bash -c "$HOME/.config/hypr/scripts/window-opacity.sh"');
+    }
+    saveOpacityState(opacityEnabled);
+});
+
+// --- Active Opacity Controls ---
+function activeOpacityRow(label, configKey) {
+    const row = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER, valign: Gtk.Align.CENTER });
+    const lbl = new Gtk.Label({ label, halign: Gtk.Align.END, xalign: 1 });
+    lbl.set_size_request(110, -1);
+    const decBtn = new Gtk.Button({ label: '-' });
+    decBtn.set_size_request(32, 32);
+    const incBtn = new Gtk.Button({ label: '+' });
+    incBtn.set_size_request(32, 32);
+    
+    function updateActiveOpacity(increment) {
+        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
+        // Read current value
+        try {
+            let [ok, contents] = GLib.file_get_contents(configFile);
+            if (ok && contents) {
+                let content = imports.byteArray.toString(contents);
+                let regex = new RegExp(`active_opacity = ([0-9.]+)`);
+                let match = content.match(regex);
+                if (match) {
+                    let currentValue = parseFloat(match[1]);
+                    let newValue = Math.max(0.0, Math.min(1.0, currentValue + increment));
+                    let newValueStr = newValue.toFixed(2);
+                    GLib.spawn_command_line_async(`sed -i 's/active_opacity = .*/active_opacity = ${newValueStr}/' "${configFile}"`);
+                    GLib.spawn_command_line_async('hyprctl reload');
+                    GLib.spawn_command_line_async(`notify-send "Opacity" "Scale: ${newValueStr}" -t 2000`);
+                }
+            }
+        } catch (e) {}
+    }
+    
+    decBtn.connect('clicked', () => {
+        updateActiveOpacity(-0.05);
+    });
+    incBtn.connect('clicked', () => {
+        updateActiveOpacity(0.05);
+    });
+    
+    row.append(lbl);
+    row.append(decBtn);
+    row.append(incBtn);
+    leftBox.append(row);
+}
+
+// --- Blur Controls ---
+function addBlurSizeRow(label, configKey, increment = 1) {
+    const row = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER, valign: Gtk.Align.CENTER });
+    const lbl = new Gtk.Label({ label, halign: Gtk.Align.END, xalign: 1 });
+    lbl.set_size_request(110, -1);
+    const decBtn = new Gtk.Button({ label: '-' });
+    decBtn.set_size_request(32, 32);
+    const incBtn = new Gtk.Button({ label: '+' });
+    incBtn.set_size_request(32, 32);
+    
+    function updateBlurSize(increment) {
+        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
+        // Read current value
+        try {
+            let [ok, contents] = GLib.file_get_contents(configFile);
+            if (ok && contents) {
+                let content = imports.byteArray.toString(contents);
+                // Look for size = X inside the blur block
+                let blurSection = content.match(/blur \{[\s\S]*?\}/);
+                if (blurSection) {
+                    let sizeMatch = blurSection[0].match(/size = ([0-9]+)/);
+                    if (sizeMatch) {
+                        let currentValue = parseInt(sizeMatch[1]);
+                        let newValue = Math.max(0, currentValue + increment);
+                        // Use a simpler sed command that targets the specific line
+                        GLib.spawn_command_line_async(`sed -i '/blur {/,/}/{s/size = ${currentValue}/size = ${newValue}/}' '${configFile}'`);
+                        GLib.spawn_command_line_async('hyprctl reload');
+                        GLib.spawn_command_line_async(`notify-send "Blur Size" "Size: ${newValue}" -t 2000`);
+                    }
+                }
+            }
+        } catch (e) {
+            print('Error updating blur size: ' + e.message);
+        }
+    }
+    
+    decBtn.connect('clicked', () => {
+        updateBlurSize(-increment);
+    });
+    incBtn.connect('clicked', () => {
+        updateBlurSize(increment);
+    });
+    
+    row.append(lbl);
+    row.append(decBtn);
+    row.append(incBtn);
+    leftBox.append(row);
+}
+
+function addBlurPassRow(label, configKey, increment = 1) {
+    const row = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER, valign: Gtk.Align.CENTER });
+    const lbl = new Gtk.Label({ label, halign: Gtk.Align.END, xalign: 1 });
+    lbl.set_size_request(110, -1);
+    const decBtn = new Gtk.Button({ label: '-' });
+    decBtn.set_size_request(32, 32);
+    const incBtn = new Gtk.Button({ label: '+' });
+    incBtn.set_size_request(32, 32);
+    
+    function updateBlurPass(increment) {
+        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
+        // Read current value
+        try {
+            let [ok, contents] = GLib.file_get_contents(configFile);
+            if (ok && contents) {
+                let content = imports.byteArray.toString(contents);
+                // Look for passes = X inside the blur block
+                let blurSection = content.match(/blur \{[\s\S]*?\}/);
+                if (blurSection) {
+                    let passesMatch = blurSection[0].match(/passes = ([0-9]+)/);
+                    if (passesMatch) {
+                        let currentValue = parseInt(passesMatch[1]);
+                        let newValue = Math.max(0, currentValue + increment);
+                        // Use a simpler sed command that targets the specific line
+                        GLib.spawn_command_line_async(`sed -i 's/passes = ${currentValue}/passes = ${newValue}/' '${configFile}'`);
+                        GLib.spawn_command_line_async('hyprctl reload');
+                        GLib.spawn_command_line_async(`notify-send "Blur Pass" "Passes: ${newValue}" -t 2000`);
+                    }
+                }
+            }
+        } catch (e) {
+            print('Error updating blur passes: ' + e.message);
+        }
+    }
+    
+    decBtn.connect('clicked', () => {
+        updateBlurPass(-increment);
+    });
+    incBtn.connect('clicked', () => {
+        updateBlurPass(increment);
+    });
+    
+    row.append(lbl);
+    row.append(decBtn);
+    row.append(incBtn);
+    leftBox.append(row);
+}
+
+// --- Rofi Controls ---
+function addRofiBorderRow(label, increment = 1) {
+    const row = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER, valign: Gtk.Align.CENTER });
+    const lbl = new Gtk.Label({ label, halign: Gtk.Align.END, xalign: 1 });
+    lbl.set_size_request(110, -1);
+    const decBtn = new Gtk.Button({ label: '-' });
+    decBtn.set_size_request(32, 32);
+    const incBtn = new Gtk.Button({ label: '+' });
+    incBtn.set_size_request(32, 32);
+    
+    function updateRofiBorder(increment) {
+        const rofiBorderFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcandy', 'settings', 'rofi-border.rasi']);
+        try {
+            let [ok, contents] = GLib.file_get_contents(rofiBorderFile);
+            if (ok && contents) {
+                let content = imports.byteArray.toString(contents);
+                let borderMatch = content.match(/border-width: ([0-9]+)px/);
+                if (borderMatch) {
+                    let currentValue = parseInt(borderMatch[1]);
+                    let newValue = Math.max(0, currentValue + increment);
+                    GLib.spawn_command_line_async(`sed -i 's/border-width: ${currentValue}px/border-width: ${newValue}px/' '${rofiBorderFile}'`);
+                    GLib.spawn_command_line_async(`notify-send "Rofi Border" "Border: ${newValue}px" -t 2000`);
+                }
+            }
+        } catch (e) {
+            print('Error updating rofi border: ' + e.message);
+        }
+    }
+    
+    decBtn.connect('clicked', () => {
+        updateRofiBorder(-increment);
+    });
+    incBtn.connect('clicked', () => {
+        updateRofiBorder(increment);
+    });
+    
+    row.append(lbl);
+    row.append(decBtn);
+    row.append(incBtn);
+    leftBox.append(row);
+}
+
+function addRofiRadiusRow(label, increment = 0.1) {
+    const row = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER, valign: Gtk.Align.CENTER });
+    const lbl = new Gtk.Label({ label, halign: Gtk.Align.END, xalign: 1 });
+    lbl.set_size_request(110, -1);
+    const decBtn = new Gtk.Button({ label: '-' });
+    decBtn.set_size_request(32, 32);
+    const incBtn = new Gtk.Button({ label: '+' });
+    incBtn.set_size_request(32, 32);
+    
+    function updateRofiRadius(increment) {
+        const rofiRadiusFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcandy', 'settings', 'rofi-border-radius.rasi']);
+        try {
+            let [ok, contents] = GLib.file_get_contents(rofiRadiusFile);
+            if (ok && contents) {
+                let content = imports.byteArray.toString(contents);
+                let radiusMatch = content.match(/border-radius: ([0-9.]+)em/);
+                if (radiusMatch) {
+                    let currentValue = parseFloat(radiusMatch[1]);
+                    let newValue = Math.max(0, Math.min(5, currentValue + increment));
+                    let newValueStr = newValue.toFixed(1);
+                    GLib.spawn_command_line_async(`sed -i 's/border-radius: ${radiusMatch[1]}em/border-radius: ${newValueStr}em/' '${rofiRadiusFile}'`);
+                    GLib.spawn_command_line_async(`notify-send "Rofi Radius" "Radius: ${newValueStr}em" -t 2000`);
+                }
+            }
+        } catch (e) {
+            print('Error updating rofi radius: ' + e.message);
+        }
+    }
+    
+    decBtn.connect('clicked', () => {
+        updateRofiRadius(-increment);
+    });
+    incBtn.connect('clicked', () => {
+        updateRofiRadius(increment);
+    });
+    
+    row.append(lbl);
+    row.append(decBtn);
+    row.append(incBtn);
+    leftBox.append(row);
+}
+
+// Move presets and weather to left box after opacity button
+//leftBox.append(opacityBtn);
+
+// Preset buttons
+const presetBox = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL, spacing: 4, halign: Gtk.Align.CENTER });
+// Add 'New Start Icon' button before Dock presets
+const newStartIconBtn = new Gtk.Button({ label: 'New Start Icon' });
+newStartIconBtn.connect('clicked', () => {
+    GLib.spawn_command_line_async(`${GLib.get_home_dir()}/.config/hyprcandy/hooks/change_start_button_icon.sh`);
+});
+presetBox.append(newStartIconBtn);
+const dockPresets = ['minimal', 'balanced', 'prominent', 'hidden'];
+dockPresets.forEach(preset => {
+    let btn = new Gtk.Button({ label: `Dock: ${preset.charAt(0).toUpperCase() + preset.slice(1)}` });
+    btn.connect('clicked', () => {
+        GLib.spawn_command_line_async(`bash -c '$HOME/.config/hyprcandy/hooks/nwg_dock_presets.sh ${preset}'`);
+    });
+    presetBox.append(btn);
+});
+const hyprPresets = ['minimal', 'balanced', 'spacious', 'zero'];
+hyprPresets.forEach(preset => {
+    let btn = new Gtk.Button({ label: `Hypr: ${preset.charAt(0).toUpperCase() + preset.slice(1)}` });
+    btn.connect('clicked', () => {
+        GLib.spawn_command_line_async(`bash -c '$HOME/.config/hyprcandy/hooks/hyprland_gap_presets.sh ${preset}'`);
+    });
+    presetBox.append(btn);
+});
+leftBox.append(presetBox);
+
+mainRow.append(leftBox);
+
+// --- Theme Box (Matugen Schemes) ---
+const themeBox = new Gtk.Box({
+    orientation: Gtk.Orientation.VERTICAL,
+    spacing: 4,
+    halign: Gtk.Align.CENTER,
+    valign: Gtk.Align.CENTER
+});
+
+// Matugen state persistence setup
+const matugenStateFile = GLib.build_filenamev([hyprsunsetStateDir, 'matugen-state']);
+function loadMatugenState() {
+    try {
+        let [ok, contents] = GLib.file_get_contents(matugenStateFile);
+        if (ok && contents) {
+            let state = imports.byteArray.toString(contents).trim();
+            return state || 'scheme-content'; // Default to content if empty
+        }
+    } catch (e) {}
+    return 'scheme-content'; // Default fallback
+}
+function saveMatugenState(scheme) {
+    try {
+        GLib.file_set_contents(matugenStateFile, scheme);
+    } catch (e) {}
+}
+
+let currentMatugenScheme = loadMatugenState();
+
+// Matugen scheme buttons
+const matugenSchemes = [
+    'Content',
+    'Expressive', 
+    'Fidelity',
+    'Fruit-salad',
+    'Monochrome',
+    'Neutral',
+    'Rainbow',
+    'Tonal-spot'
+];
+
+function updateMatugenScheme(schemeName) {
+    const waypaperIntegrationFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcandy', 'hooks', 'waypaper_integration.sh']);
+    const gtk3File = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'gtk-3.0', 'gtk.css']);
+    const gtk4File = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'gtk-4.0', 'gtk.css']);
+    
+    // Convert scheme name to matugen format
+    const schemeMap = {
+        'Content': 'scheme-content',
+        'Expressive': 'scheme-expressive',
+        'Fidelity': 'scheme-fidelity',
+        'Fruit-salad': 'scheme-fruit-salad',
+        'Monochrome': 'scheme-monochrome',
+        'Neutral': 'scheme-neutral',
+        'Rainbow': 'scheme-rainbow',
+        'Tonal-spot': 'scheme-tonal-spot'
+    };
+    
+    const matugenScheme = schemeMap[schemeName];
+    if (!matugenScheme) return;
+    
+    // Update the waypaper_integration.sh file
+    GLib.spawn_command_line_async(`sed -i 's/--type scheme-[^ ]*/--type ${matugenScheme}/' '${waypaperIntegrationFile}'`);
+    
+    // Handle monochrome vs other schemes for GTK CSS
+    if (schemeName === 'Monochrome') {
+        // Replace @on_secondary with @on_primary_fixed_variant for monochrome
+        GLib.spawn_command_line_async(`sed -i 's/@on_secondary/@on_primary_fixed_variant/g' '${gtk3File}'`);
+        GLib.spawn_command_line_async(`sed -i 's/@on_secondary/@on_primary_fixed_variant/g' '${gtk4File}'`);
+    } else {
+        // Replace @on_primary_fixed_variant with @on_secondary for other schemes
+        GLib.spawn_command_line_async(`sed -i 's/@on_primary_fixed_variant/@on_secondary/g' '${gtk3File}'`);
+        GLib.spawn_command_line_async(`sed -i 's/@on_primary_fixed_variant/@on_secondary/g' '${gtk4File}'`);
+    }
+    
+    // Save the new state
+    saveMatugenState(matugenScheme);
+    currentMatugenScheme = matugenScheme;
+    
+    // Update button states
+    updateMatugenButtonStates();
+}
+
+function updateMatugenButtonStates() {
+    // Update all button states based on current scheme
+    for (let i = 0; i < matugenButtons.length; i++) {
+        const btn = matugenButtons[i];
+        const schemeName = matugenSchemes[i];
+        const schemeMap = {
+            'Content': 'scheme-content',
+            'Expressive': 'scheme-expressive',
+            'Fidelity': 'scheme-fidelity',
+            'Fruit-salad': 'scheme-fruit-salad',
+            'Monochrome': 'scheme-monochrome',
+            'Neutral': 'scheme-neutral',
+            'Rainbow': 'scheme-rainbow',
+            'Tonal-spot': 'scheme-tonal-spot'
+        };
+        
+        if (currentMatugenScheme === schemeMap[schemeName]) {
+            btn.add_css_class('neon-highlight');
+        } else {
+            btn.remove_css_class('neon-highlight');
+        }
+    }
+}
+
+const matugenButtons = [];
+matugenSchemes.forEach(schemeName => {
+    const btn = new Gtk.Button({ label: schemeName });
+    btn.connect('clicked', () => {
+        updateMatugenScheme(schemeName);
+    });
+    matugenButtons.push(btn);
+    themeBox.append(btn);
+});
+
+// Set initial button states
+updateMatugenButtonStates();
+
+//mainRow.append(themeBox);
+
+// Right: All toggles
+const rightBox = new Gtk.Box({
+    orientation: Gtk.Orientation.VERTICAL,
+    spacing: 16,
+    halign: Gtk.Align.CENTER,
+    valign: Gtk.Align.CENTER
+});
+
+// Create new toggles box for right side
+const rightTogglesBox = new Gtk.Box({
+    orientation: Gtk.Orientation.VERTICAL,
+    spacing: 10,
+    halign: Gtk.Align.CENTER,
+    valign: Gtk.Align.CENTER
+});
+
+// Move all toggle functions to append to rightTogglesBox instead of togglesBox
+function addToggleRowRight(label, incScript, decScript) {
+    const row = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER, valign: Gtk.Align.CENTER });
+    const lbl = new Gtk.Label({ label, halign: Gtk.Align.END, xalign: 1 });
+    lbl.set_size_request(110, -1);
+    const decBtn = new Gtk.Button({ label: '-' });
+    decBtn.set_size_request(32, 32);
+    const incBtn = new Gtk.Button({ label: '+' });
+    incBtn.set_size_request(32, 32);
+    decBtn.connect('clicked', () => {
+        GLib.spawn_command_line_async(`bash -c '$HOME/.config/hyprcandy/hooks/${decScript}'`);
+    });
+    incBtn.connect('clicked', () => {
+        GLib.spawn_command_line_async(`bash -c '$HOME/.config/hyprcandy/hooks/${incScript}'`);
+    });
+    row.append(lbl);
+    row.append(decBtn);
+    row.append(incBtn);
+    rightTogglesBox.append(row);
+}
+
+function activeOpacityRowRight(label, configKey) {
+    const row = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER, valign: Gtk.Align.CENTER });
+    const lbl = new Gtk.Label({ label, halign: Gtk.Align.END, xalign: 1 });
+    lbl.set_size_request(110, -1);
+    const decBtn = new Gtk.Button({ label: '-' });
+    decBtn.set_size_request(32, 32);
+    const incBtn = new Gtk.Button({ label: '+' });
+    incBtn.set_size_request(32, 32);
+    
+    function updateActiveOpacity(increment) {
+        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
+        // Read current value
+        try {
+            let [ok, contents] = GLib.file_get_contents(configFile);
+            if (ok && contents) {
+                let content = imports.byteArray.toString(contents);
+                let regex = new RegExp(`active_opacity = ([0-9.]+)`);
+                let match = content.match(regex);
+                if (match) {
+                    let currentValue = parseFloat(match[1]);
+                    let newValue = Math.max(0.0, Math.min(1.0, currentValue + increment));
+                    let newValueStr = newValue.toFixed(2);
+                    GLib.spawn_command_line_async(`sed -i 's/active_opacity = .*/active_opacity = ${newValueStr}/' "${configFile}"`);
+                    GLib.spawn_command_line_async('hyprctl reload');
+                    GLib.spawn_command_line_async(`notify-send "Opacity" "Scale: ${newValueStr}" -t 2000`);
+                }
+            }
+        } catch (e) {}
+    }
+    
+    decBtn.connect('clicked', () => {
+        updateActiveOpacity(-0.05);
+    });
+    incBtn.connect('clicked', () => {
+        updateActiveOpacity(0.05);
+    });
+    
+    row.append(lbl);
+    row.append(decBtn);
+    row.append(incBtn);
+    rightTogglesBox.append(row);
+}
+
+function addBlurSizeRowRight(label, configKey, increment = 1) {
+    const row = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER, valign: Gtk.Align.CENTER });
+    const lbl = new Gtk.Label({ label, halign: Gtk.Align.END, xalign: 1 });
+    lbl.set_size_request(110, -1);
+    const decBtn = new Gtk.Button({ label: '-' });
+    decBtn.set_size_request(32, 32);
+    const incBtn = new Gtk.Button({ label: '+' });
+    incBtn.set_size_request(32, 32);
+    
+    function updateBlurSize(increment) {
+        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
+        // Read current value
+        try {
+            let [ok, contents] = GLib.file_get_contents(configFile);
+            if (ok && contents) {
+                let content = imports.byteArray.toString(contents);
+                // Look for size = X inside the blur block
+                let blurSection = content.match(/blur \{[\s\S]*?\}/);
+                if (blurSection) {
+                    let sizeMatch = blurSection[0].match(/size = ([0-9]+)/);
+                    if (sizeMatch) {
+                        let currentValue = parseInt(sizeMatch[1]);
+                        let newValue = Math.max(0, currentValue + increment);
+                        // Use a simpler sed command that targets the specific line
+                        GLib.spawn_command_line_async(`sed -i '/blur {/,/}/{s/size = ${currentValue}/size = ${newValue}/}' '${configFile}'`);
+                        GLib.spawn_command_line_async('hyprctl reload');
+                        GLib.spawn_command_line_async(`notify-send "Blur Size" "Size: ${newValue}" -t 2000`);
+                    }
+                }
+            }
+        } catch (e) {
+            print('Error updating blur size: ' + e.message);
+        }
+    }
+    
+    decBtn.connect('clicked', () => {
+        updateBlurSize(-increment);
+    });
+    incBtn.connect('clicked', () => {
+        updateBlurSize(increment);
+    });
+    
+    row.append(lbl);
+    row.append(decBtn);
+    row.append(incBtn);
+    rightTogglesBox.append(row);
+}
+
+function addBlurPassRowRight(label, configKey, increment = 1) {
+    const row = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER, valign: Gtk.Align.CENTER });
+    const lbl = new Gtk.Label({ label, halign: Gtk.Align.END, xalign: 1 });
+    lbl.set_size_request(110, -1);
+    const decBtn = new Gtk.Button({ label: '-' });
+    decBtn.set_size_request(32, 32);
+    const incBtn = new Gtk.Button({ label: '+' });
+    incBtn.set_size_request(32, 32);
+    
+    function updateBlurPass(increment) {
+        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
+        // Read current value
+        try {
+            let [ok, contents] = GLib.file_get_contents(configFile);
+            if (ok && contents) {
+                let content = imports.byteArray.toString(contents);
+                // Look for passes = X inside the blur block
+                let blurSection = content.match(/blur \{[\s\S]*?\}/);
+                if (blurSection) {
+                    let passesMatch = blurSection[0].match(/passes = ([0-9]+)/);
+                    if (passesMatch) {
+                        let currentValue = parseInt(passesMatch[1]);
+                        let newValue = Math.max(0, currentValue + increment);
+                        // Use a simpler sed command that targets the specific line
+                        GLib.spawn_command_line_async(`sed -i 's/passes = ${currentValue}/passes = ${newValue}/' '${configFile}'`);
+                        GLib.spawn_command_line_async('hyprctl reload');
+                        GLib.spawn_command_line_async(`notify-send "Blur Pass" "Passes: ${newValue}" -t 2000`);
+                    }
+                }
+            }
+        } catch (e) {
+            print('Error updating blur passes: ' + e.message);
+        }
+    }
+    
+    decBtn.connect('clicked', () => {
+        updateBlurPass(-increment);
+    });
+    incBtn.connect('clicked', () => {
+        updateBlurPass(increment);
+    });
+    
+    row.append(lbl);
+    row.append(decBtn);
+    row.append(incBtn);
+    rightTogglesBox.append(row);
+}
+
+function addRofiBorderRowRight(label, increment = 1) {
+    const row = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER, valign: Gtk.Align.CENTER });
+    const lbl = new Gtk.Label({ label, halign: Gtk.Align.END, xalign: 1 });
+    lbl.set_size_request(110, -1);
+    const decBtn = new Gtk.Button({ label: '-' });
+    decBtn.set_size_request(32, 32);
+    const incBtn = new Gtk.Button({ label: '+' });
+    incBtn.set_size_request(32, 32);
+    
+    function updateRofiBorder(increment) {
+        const rofiBorderFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcandy', 'settings', 'rofi-border.rasi']);
+        try {
+            let [ok, contents] = GLib.file_get_contents(rofiBorderFile);
+            if (ok && contents) {
+                let content = imports.byteArray.toString(contents);
+                let borderMatch = content.match(/border-width: ([0-9]+)px/);
+                if (borderMatch) {
+                    let currentValue = parseInt(borderMatch[1]);
+                    let newValue = Math.max(0, currentValue + increment);
+                    GLib.spawn_command_line_async(`sed -i 's/border-width: ${currentValue}px/border-width: ${newValue}px/' '${rofiBorderFile}'`);
+                    GLib.spawn_command_line_async(`notify-send "Rofi Border" "Border: ${newValue}px" -t 2000`);
+                }
+            }
+        } catch (e) {
+            print('Error updating rofi border: ' + e.message);
+        }
+    }
+    
+    decBtn.connect('clicked', () => {
+        updateRofiBorder(-increment);
+    });
+    incBtn.connect('clicked', () => {
+        updateRofiBorder(increment);
+    });
+    
+    row.append(lbl);
+    row.append(decBtn);
+    row.append(incBtn);
+    rightTogglesBox.append(row);
+}
+
+function addRofiRadiusRowRight(label, increment = 0.1) {
+    const row = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER, valign: Gtk.Align.CENTER });
+    const lbl = new Gtk.Label({ label, halign: Gtk.Align.END, xalign: 1 });
+    lbl.set_size_request(110, -1);
+    const decBtn = new Gtk.Button({ label: '-' });
+    decBtn.set_size_request(32, 32);
+    const incBtn = new Gtk.Button({ label: '+' });
+    incBtn.set_size_request(32, 32);
+    
+    function updateRofiRadius(increment) {
+        const rofiRadiusFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcandy', 'settings', 'rofi-border-radius.rasi']);
+        try {
+            let [ok, contents] = GLib.file_get_contents(rofiRadiusFile);
+            if (ok && contents) {
+                let content = imports.byteArray.toString(contents);
+                let radiusMatch = content.match(/border-radius: ([0-9.]+)em/);
+                if (radiusMatch) {
+                    let currentValue = parseFloat(radiusMatch[1]);
+                    let newValue = Math.max(0, Math.min(5, currentValue + increment));
+                    let newValueStr = newValue.toFixed(1);
+                    GLib.spawn_command_line_async(`sed -i 's/border-radius: ${radiusMatch[1]}em/border-radius: ${newValueStr}em/' '${rofiRadiusFile}'`);
+                    GLib.spawn_command_line_async(`notify-send "Rofi Radius" "Radius: ${newValueStr}em" -t 2000`);
+                }
+            }
+        } catch (e) {
+            print('Error updating rofi radius: ' + e.message);
+        }
+    }
+    
+    decBtn.connect('clicked', () => {
+        updateRofiRadius(-increment);
+    });
+    incBtn.connect('clicked', () => {
+        updateRofiRadius(increment);
+    });
+    
+    row.append(lbl);
+    row.append(decBtn);
+    row.append(incBtn);
+    rightTogglesBox.append(row);
+}
+
+// Add all toggles to the right box
+addToggleRowRight('Dock Icon Size', 'nwg_dock_icon_size_increase.sh', 'nwg_dock_icon_size_decrease.sh');
+addToggleRowRight('Dock Radius', 'nwg_dock_border_radius_increase.sh', 'nwg_dock_border_radius_decrease.sh');
+addToggleRowRight('Dock Width', 'nwg_dock_border_width_increase.sh', 'nwg_dock_border_width_decrease.sh');
+addToggleRowRight('Rounding', 'hyprland_rounding_increase.sh', 'hyprland_rounding_decrease.sh');
+addToggleRowRight('Gaps OUT', 'hyprland_gaps_out_increase.sh', 'hyprland_gaps_out_decrease.sh');
+addToggleRowRight('Gaps IN', 'hyprland_gaps_in_increase.sh', 'hyprland_gaps_in_decrease.sh');
+addToggleRowRight('Border', 'hyprland_border_increase.sh', 'hyprland_border_decrease.sh');
+addBlurSizeRowRight('Blur Size', 'size', 1);
+addBlurPassRowRight('Blur Pass', 'passes', 1);
+addRofiBorderRowRight('Rofi Border', 1);
+addRofiRadiusRowRight('Rofi Radius', 0.1);
+activeOpacityRowRight('Opacity Scale', 'active_opacity');
+
+rightBox.append(rightTogglesBox);
+mainRow.append(rightBox);
+return mainRow;
+}
+
+// Export both functions
+var exports = {
+    createTogglesBox
+}; 
+EOF
+
+cat > "$HOME/.ultracandy/GJS/src/weather.js" << 'EOF'
+imports.gi.versions.Gtk = '4.0';
+imports.gi.versions.Gio = '2.0';
+imports.gi.versions.GLib = '2.0';
+imports.gi.versions.Gdk = '4.0';
+imports.gi.versions.Soup = '3.0';
+const { Gtk, Gio, GLib, Gdk, Soup } = imports.gi;
+
+const scriptDir = GLib.path_get_dirname(imports.system.programInvocationName);
+imports.searchPath.unshift(scriptDir);
+
+function createWeatherBox() {
+    // Load user's GTK color theme
+    const userColorsProvider = new Gtk.CssProvider();
+    userColorsProvider.load_from_path(GLib.build_filenamev([GLib.get_home_dir(), '.config', 'gtk-3.0', 'colors.css']));
+    Gtk.StyleContext.add_provider_for_display(
+        Gdk.Display.get_default(),
+        userColorsProvider,
+        Gtk.STYLE_PROVIDER_PRIORITY_USER
+    );
+
+    // Load our custom gradient CSS after user theme
+    const cssProvider = new Gtk.CssProvider();
+    let css = `
+        .media-player-frame, .weather-frame, .tray-frame {
+            border-radius: 22px;
+            min-width: 244px;
+            min-height: 118px;
+            padding: 0px 0px;
+            box-shadow: 0 4px 32px 0 rgba(0,0,0,0.22);
+            background: linear-gradient(45deg, @source_color 0%, @background 100%, #9558e1 0%, #16121a 100%);
+            background-size: cover;
+        }
+        .weather-bg-overlay {
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: rgba(0, 0, 0, 0.12);
+            opacity: 0.95;
+            border-radius: 22px;
+        }
+        .weather-blurred-bg {
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: rgba(0,0,0,0.4);
+            opacity: 0.8;
+            border-radius: 22px;
+        }
+        .weather-content {
+            margin: 0px;
+            padding: 0px;
+        }
+        .weather-temp {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: @primary_fixed_dim;
+            text-shadow: 0 0 12px @background;
+            opacity: 1;
+        }
+        .weather-desc {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #f0f0f0;
+            text-shadow: 0 0 8px rgba(224, 224, 224, 0.6);
+            opacity: 1;
+        }
+        .weather-location {
+            font-size: 0.8em;
+            font-weight: 500;
+            color: #ffffff;
+            text-shadow: 0 0 6px rgba(255, 255, 255, 0.7);
+            opacity: 1;
+        }
+    `;
+    cssProvider.load_from_data(css, css.length);
+    Gtk.StyleContext.add_provider_for_display(
+        Gdk.Display.get_default(),
+        cssProvider,
+        Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+    );
+
+    // --- Weather Frame and Box ---
+    const weatherFrame = new Gtk.Overlay({
+        halign: Gtk.Align.CENTER,
+        valign: Gtk.Align.CENTER,
+        hexpand: true,
+        vexpand: true,
+        margin_top: 2,
+        margin_bottom: 2,
+        margin_start: 2,
+        margin_end: 2
+    });
+    weatherFrame.add_css_class('weather-frame');
+
+    // Weather content
+    const weatherBox = new Gtk.Box({
+        orientation: Gtk.Orientation.VERTICAL,
+        spacing: 4,
+        hexpand: true,
+        vexpand: true,
+        halign: Gtk.Align.CENTER,
+        valign: Gtk.Align.CENTER,
+        margin_top: 0, // Reduced from 8
+        margin_bottom: 0 // Reduced from 8
+    });
+    weatherBox.add_css_class('weather-content');
+
+    // Weather labels
+    const weatherTemp = new Gtk.Label({
+        label: '--°C',
+        halign: Gtk.Align.CENTER,
+        valign: Gtk.Align.CENTER,
+    });
+    weatherTemp.add_css_class('weather-temp');
+    
+    const weatherDesc = new Gtk.Label({
+        label: 'Weather',
+        halign: Gtk.Align.CENTER,
+        valign: Gtk.Align.CENTER,
+        ellipsize: 3,
+        max_width_chars: 15,
+    });
+    weatherDesc.add_css_class('weather-desc');
+    
+    const weatherLocation = new Gtk.Label({
+        label: 'Location',
+        halign: Gtk.Align.CENTER,
+        valign: Gtk.Align.CENTER,
+        ellipsize: 3,
+        max_width_chars: 15,
+    });
+    weatherLocation.add_css_class('weather-location');
+
+    weatherBox.append(weatherTemp);
+    weatherBox.append(weatherDesc);
+    weatherBox.append(weatherLocation);
+    weatherFrame.set_child(weatherBox);
+
+    // --- Weather async/cached update function using wttr.in ---
+    let weatherCache = null;
+    let weatherCacheTime = 0;
+    const WEATHER_CACHE_DURATION = 10 * 60 * 1000; // 10 minutes in ms
+    const WEATHER_URL = 'https://wttr.in/?format=j1';
+    const session = new Soup.Session();
+
+    function setWeatherLabels(weatherData) {
+        weatherTemp.set_label(`${weatherData.temp}°C`);
+        weatherDesc.set_label(weatherData.desc);
+        weatherLocation.set_label(weatherData.loc);
+    }
+
+    function updateWeather() {
+        const now = Date.now();
+        if (weatherCache && (now - weatherCacheTime < WEATHER_CACHE_DURATION)) {
+            setWeatherLabels(weatherCache);
+            return;
+        }
+        let message = Soup.Message.new('GET', WEATHER_URL);
+        session.send_and_read_async(message, GLib.PRIORITY_DEFAULT, null, (session, res) => {
+            try {
+                let bytes = session.send_and_read_finish(res);
+                let text = imports.byteArray.toString(bytes.get_data());
+                let data = JSON.parse(text);
+                let current = data.current_condition && data.current_condition[0];
+                let temp = current ? current.temp_C : '--';
+                let desc = current && current.weatherDesc && current.weatherDesc[0] ? current.weatherDesc[0].value : 'Weather';
+                let loc = data.nearest_area && data.nearest_area[0] && data.nearest_area[0].areaName && data.nearest_area[0].areaName[0] ? data.nearest_area[0].areaName[0].value : 'Location';
+                let weatherData = { temp, desc, loc };
+                weatherCache = weatherData;
+                weatherCacheTime = Date.now();
+                setWeatherLabels(weatherData);
+            } catch (e) {
+                setWeatherLabels({ temp: '--', desc: 'Weather', loc: 'Location' });
+            }
+        });
+    }
+
+    updateWeather();
+    const weatherInterval = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 30000, () => {
+        updateWeather();
+        return true;
+    });
+
+    return weatherFrame;
+}
+
+function createWeatherBoxForEmbed() {
+    // Only the weather content box, no overlay or extra margins
+    const weatherBox = new Gtk.Box({
+        orientation: Gtk.Orientation.VERTICAL,
+        spacing: 4,
+        hexpand: true,
+        vexpand: true,
+        halign: Gtk.Align.CENTER,
+        valign: Gtk.Align.CENTER,
+        margin_top: 0,
+        margin_bottom: 0
+    });
+    weatherBox.add_css_class('weather-content');
+
+    const weatherTemp = new Gtk.Label({
+        label: '--°C',
+        halign: Gtk.Align.CENTER,
+        valign: Gtk.Align.CENTER,
+    });
+    weatherTemp.add_css_class('weather-temp');
+    const weatherDesc = new Gtk.Label({
+        label: 'Weather',
+        halign: Gtk.Align.CENTER,
+        valign: Gtk.Align.CENTER,
+        ellipsize: 3,
+        max_width_chars: 15,
+    });
+    weatherDesc.add_css_class('weather-desc');
+    const weatherLocation = new Gtk.Label({
+        label: 'Location',
+        halign: Gtk.Align.CENTER,
+        valign: Gtk.Align.CENTER,
+        ellipsize: 3,
+        max_width_chars: 15,
+    });
+    weatherLocation.add_css_class('weather-location');
+    weatherBox.append(weatherTemp);
+    weatherBox.append(weatherDesc);
+    weatherBox.append(weatherLocation);
+
+    // --- Weather async/cached update function using wttr.in ---
+    let weatherCache = null;
+    let weatherCacheTime = 0;
+    const WEATHER_CACHE_DURATION = 10 * 60 * 1000;
+    const WEATHER_URL = 'https://wttr.in/?format=j1';
+    const session = new Soup.Session();
+
+    function setWeatherLabels(weatherData) {
+        weatherTemp.set_label(`${weatherData.temp}°C`);
+        weatherDesc.set_label(weatherData.desc);
+        weatherLocation.set_label(weatherData.loc);
+    }
+
+    function updateWeather() {
+        const now = Date.now();
+        if (weatherCache && (now - weatherCacheTime < WEATHER_CACHE_DURATION)) {
+            setWeatherLabels(weatherCache);
+            return;
+        }
+        let message = Soup.Message.new('GET', WEATHER_URL);
+        session.send_and_read_async(message, GLib.PRIORITY_DEFAULT, null, (session, res) => {
+            try {
+                let bytes = session.send_and_read_finish(res);
+                let text = imports.byteArray.toString(bytes.get_data());
+                let data = JSON.parse(text);
+                let current = data.current_condition && data.current_condition[0];
+                let temp = current ? current.temp_C : '--';
+                let desc = current && current.weatherDesc && current.weatherDesc[0] ? current.weatherDesc[0].value : 'Weather';
+                let loc = data.nearest_area && data.nearest_area[0] && data.nearest_area[0].areaName && data.nearest_area[0].areaName[0] ? data.nearest_area[0].areaName[0].value : 'Location';
+                let weatherData = { temp, desc, loc };
+                weatherCache = weatherData;
+                weatherCacheTime = Date.now();
+                setWeatherLabels(weatherData);
+            } catch (e) {
+                setWeatherLabels({ temp: '--', desc: 'Weather', loc: 'Location' });
+            }
+        });
+    }
+
+    updateWeather();
+    const weatherInterval = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 30000, () => {
+        updateWeather();
+        return true;
+    });
+
+    return weatherBox;
+}
+
+var exports = {
+    createWeatherBox,
+    createWeatherBoxForEmbed
+}; 
+EOF
+
+echo "✅ Files and Apps setup complete"
 }
 
 # Function to setup keyboard layout
@@ -4954,6 +6164,9 @@ main() {
 
     # Setup default "custom.conf" file
     setup_custom_config
+
+    # Setup GJS
+    setup_gjs
 
     # Setup keyboard layout
     setup_keyboard_layout
