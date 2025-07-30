@@ -103,13 +103,29 @@ choose_display_manager() {
 
 choose_panel() {
     echo -e "${CYAN}Choose your panel:${NC}"
-    echo "1) Waybar (light with fast startup/reload and highly customizable, manually)"
-    echo "2) Hyprpanel (easy to theme through its interface but slower to launch or restart)"
+    echo -e "${GREEN}1) Waybar${NC}"
+    echo "   • Light with fast startup/reload for a 'taskbar' like experience"
+    echo "   • Highly customizable manually"
+    echo "   • Waypaper integration: loads colors through waypaper backgrounds"
+    echo "   • Fast live wallpaper application through caching and easier background setup"
+    echo ""
+    echo -e "${GREEN}2) Hyprpanel${NC}"
+    echo "   • Easy to theme through its interface"
+    echo "   • Has an autohide feature when only one window is open"
+    echo "   • Much slower to relaunch after manually killing (when multiple windows are open)"
+    echo "   • Recommended for users who don't mind an always-on panel"
+    echo "   • Longer process to set backgrounds and slower for live backgrounds"
+    echo ""
+    
     read -rp "Enter 1 or 2: " panel_choice
     case $panel_choice in
         1) PANEL_CHOICE="waybar" ;;
         2) PANEL_CHOICE="hyprpanel" ;;
-        *) print_error "Invalid choice. Please enter 1 or 2." ;;
+        *) 
+            print_error "Invalid choice. Please enter 1 or 2."
+            echo ""
+            choose_panel  # Recursively ask again
+            ;;
     esac
     echo -e "${GREEN}Panel selected: $PANEL_CHOICE${NC}"
 }
@@ -3065,21 +3081,22 @@ setup_custom_config() {
 # ┃                           Autostart                         ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
+#Launch bar/panel
+exec-once = waybar &
+
 exec-once = systemctl --user import-environment HYPRLAND_INSTANCE_SIGNATURE
 exec-once = systemctl --user start background-watcher #Watches for system background changes to update background.png
+exec-once = systemctl --user start waybar-idle-monitor #Watches bar/panel running status to enable/disable idle-inhibitor
 exec-once = systemctl --user start waypaper-watcher #Watches for system waypaper changes to trigger color generation
-exec-once = systemctl --user start waybar-idle-monitor #Watches waybar running status to enable/disable idle-inhibitor
 exec-once = systemctl --user start rofi-font-watcher #Watches for system font changes to update rofi-font.rasi
 exec-once = systemctl --user start cursor-theme-watcher #Watches for system cursor theme & size changes to update cursor theme & size on re-login
 exec-once = bash -c "mkfifo /tmp/$HYPRLAND_INSTANCE_SIGNATURE.wob && tail -f /tmp/$HYPRLAND_INSTANCE_SIGNATURE.wob | wob & disown" &
 exec-once = dbus-update-activation-environment --systemd DBUS_SESSION_BUS_ADDRESS DISPLAY XAUTHORITY &
 exec-once = hash dbus-update-activation-environment 2>/dev/null &
 exec-once = systemctl --user import-environment &
-#Launch SWWW
+# Start swww
 exec-once = swww-daemon &
-#Launch bar
-exec-once = waybar &
-#Launch Notification daemon
+# Start mako
 exec-once = mako &
 # Startup
 exec-once = ~/.config/hyprcandy/hooks/startup_services.sh &
@@ -3119,7 +3136,7 @@ source = ~/.config/hypr/colors.conf
 # Packages to have full env path access
 env = PATH,$PATH:/usr/local/bin:/usr/bin:/bin:/home/$USERNAME/.cargo/bin
 
-# Cursor settings
+# After using nwg-look, also change the cursor settings here to maintain changes after every reboot
 env = XCURSOR_THEME,Bibata-Modern-Classic
 env = XCURSOR_SIZE,18
 env = HYPRCURSOR_THEME,Bibata-Modern-Classic
@@ -3243,11 +3260,11 @@ decoration {
 
     blur {
     enabled = true
-    size = 6
+    size = 4
     passes = 2
     new_optimizations = on
     ignore_opacity = true
-    xray = true
+    xray = false
     vibrancy = 0.1696
     noise = 0.01
     popups = true
@@ -3567,36 +3584,41 @@ else
 # ┃                           Autostart                         ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
+#Launch bar/panel
+exec-once = systemctl --user start hyprpanel
+
 exec-once = systemctl --user import-environment HYPRLAND_INSTANCE_SIGNATURE
 exec-once = systemctl --user start background-watcher #Watches for system background changes to update background.png
-exec-once = systemctl --user start hyprpanel #Starts hyprpanel and also kills it while mainitaining swww-daemon running
-exec-once = systemctl --user start hyprpanel-idle-monitor #Starts hyprpanel-idle-monitor which is used to enable/disable idle-inhibitor based on hyprpanel running status
+exec-once = systemctl --user start hyprpanel-idle-monitor #Watches bar/panel running status to enable/disable idle-inhibitor
+#exec-once = systemctl --user start waypaper-watcher #Watches for system waypaper changes to trigger color generation
 exec-once = systemctl --user start rofi-font-watcher #Watches for system font changes to update rofi-font.rasi
 exec-once = systemctl --user start cursor-theme-watcher #Watches for system cursor theme & size changes to update cursor theme & size on re-login
 exec-once = bash -c "mkfifo /tmp/$HYPRLAND_INSTANCE_SIGNATURE.wob && tail -f /tmp/$HYPRLAND_INSTANCE_SIGNATURE.wob | wob & disown" &
 exec-once = dbus-update-activation-environment --systemd DBUS_SESSION_BUS_ADDRESS DISPLAY XAUTHORITY &
 exec-once = hash dbus-update-activation-environment 2>/dev/null &
 exec-once = systemctl --user import-environment &
+# Start swww
+#exec-once = swww-daemon &
+# Start mako
+#exec-once = mako &
 # Startup
 exec-once = ~/.config/hyprcandy/hooks/startup_services.sh &
-# Start Polkit
+# Start polkit agent
 exec-once = systemctl --user start hyprpolkitagent &
-# Using hypridle to start hyprlock
-exec-once = hypridle &
 # Dock
 exec-once = ~/.config/nwg-dock-hyprland/launch.sh &
-# Pyprland
-exec-once = /usr/bin/pypr &
-# Launch updater
-exec-once = /usr/bin/octopi-notifier &
-# Start networkmanager
-exec-once = nm-applet &
+# Using hypridle to start hyprlock
+exec-once = hypridle &
 # Load cliphist history
 exec-once = wl-paste --watch cliphist store
 # Restart xdg
 exec-once = ~/.config/hpr/scripts/xdg.sh
+# Start networkmanager
+exec-once = nm-applet &
 # Restore wallaper
-#exec-once = ~/.config/hpr/scripts/wallpaper-restore.sh
+exec-once = bash ~/.config/hypr/scripts/wallpaper-restore.sh
+# Pyprland
+#exec-once = /usr/bin/pypr &
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 # ┃                           Animations                        ┃
@@ -3617,7 +3639,7 @@ source = ~/.config/hypr/colors.conf
 # Packages to have full env path access
 env = PATH,$PATH:/usr/local/bin:/usr/bin:/bin:/home/$USERNAME/.cargo/bin
 
-# Cursor settings
+# After using nwg-look, also change the cursor settings here to maintain changes after every reboot
 env = XCURSOR_THEME,Bibata-Modern-Classic
 env = XCURSOR_SIZE,18
 env = HYPRCURSOR_THEME,Bibata-Modern-Classic
@@ -3741,11 +3763,11 @@ decoration {
 
     blur {
     enabled = true
-    size = 6
+    size = 4
     passes = 2
     new_optimizations = on
     ignore_opacity = true
-    xray = true
+    xray = false
     vibrancy = 0.1696
     noise = 0.01
     popups = true
@@ -3923,6 +3945,8 @@ windowrulev2 = float,class:^(kitty)$,title:^(top)$
 windowrulev2 = float,class:^(kitty)$,title:^(btop)$
 windowrulev2 = float,class:^(kitty)$,title:^(htop)$
 windowrulev2 = float,class:^(vlc)$
+windowrulev2 = float,class:^(eww-main-window)$
+windowrulev2 = float,class:^(eww-notifications)$
 windowrulev2 = float,class:^(kvantummanager)$
 windowrulev2 = float,class:^(qt5ct)$
 windowrulev2 = float,class:^(qt6ct)$
@@ -4189,7 +4213,7 @@ bind = $mainMod, S, exec, spotify
 bind = $mainMod, D, exec, $DISCORD
 bind = $mainMod, W, exec, warp-terminal
 bind = $mainMod, C, exec, DRI_PRIME=1 $EDITOR #Editor
-bind = $mainMod, B, exec, DRI_PRIME=1 xdg-open "http:// &" #Launch your default browser
+bind = $mainMod, B, exec, DRI_PRIME=1 xdg-open "http://" #Launch your default browser
 bind = $mainMod, Q, exec, kitty #Launch normal kitty instances
 #bind = $mainMod, Return, exec, DRI_PRIME=1 pypr toggle term #Launch a kitty scratchpad through pyprland
 bind = $mainMod, O, exec, DRI_PRIME=1 /usr/bin/octopi #Launch octopi application finder
@@ -4410,7 +4434,7 @@ bind = $mainMod, S, exec, spotify
 bind = $mainMod, D, exec, $DISCORD
 bind = $mainMod, W, exec, warp-terminal
 bind = $mainMod, C, exec, DRI_PRIME=1 $EDITOR #Editor
-bind = $mainMod, B, exec, DRI_PRIME=1 xdg-open "http:// &" #Launch your default browser
+bind = $mainMod, B, exec, DRI_PRIME=1 xdg-open "http://" #Launch your default browser
 bind = $mainMod, Q, exec, kitty #Launch normal kitty instances
 #bind = $mainMod, Return, exec, DRI_PRIME=1 pypr toggle term #Launch a kitty scratchpad through pyprland
 bind = $mainMod, O, exec, DRI_PRIME=1 /usr/bin/octopi #Launch octopi application finder
@@ -4606,6 +4630,81 @@ fi
         echo "⚠️  File not found: $HYPRLAND_CUSTOM"
     fi
         fi
+}
+
+update_keybinds() {
+    local CONFIG_FILE="$HOME/.config/hyprcustom/custom_keybinds.conf"
+    
+    # Check if config file exists
+    if [ ! -f "$CONFIG_FILE" ]; then
+        print_error "Config file not found: $CONFIG_FILE"
+        return 1
+    fi
+    
+    # Optional: Create backup (uncomment if needed)
+    # cp "$CONFIG_FILE" "${CONFIG_FILE}.backup.$(date +%Y%m%d_%H%M%S)"
+    # echo -e "${GREEN}Backup created${NC}"
+    
+    # Check current panel configuration to avoid unnecessary changes
+    if grep -q "waybar" "$CONFIG_FILE" && [ "$PANEL_CHOICE" = "waybar" ]; then
+        print_warning "Keybinds already set for waybar"
+        return 0
+    elif grep -q "hyprpanel" "$CONFIG_FILE" && [ "$PANEL_CHOICE" = "hyprpanel" ]; then
+        print_warning "Keybinds already set for hyprpanel"
+        return 0
+    fi
+    
+    if [ "$PANEL_CHOICE" = "waybar" ]; then
+        # Replace hyprpanel with waybar
+        sed -i 's/hyprpanel/waybar/g' "$CONFIG_FILE"
+        # Also update specific script paths that might reference hyprpanel
+        sed -i 's/kill_hyprpanel_safe\.sh/kill_waybar_safe.sh/g' "$CONFIG_FILE"
+        sed -i 's/restart_hyprpanel\.sh/restart_waybar.sh/g' "$CONFIG_FILE"
+        echo -e "${GREEN}Updated keybinds for waybar${NC}"
+    else
+        # Replace waybar with hyprpanel
+        sed -i 's/waybar/hyprpanel/g' "$CONFIG_FILE"
+        # Also update specific script paths that might reference waybar
+        sed -i 's/kill_waybar_safe\.sh/kill_hyprpanel_safe.sh/g' "$CONFIG_FILE"
+        sed -i 's/restart_waybar\.sh/restart_hyprpanel.sh/g' "$CONFIG_FILE"
+        echo -e "${GREEN}Updated keybinds for hyprpanel${NC}"
+    fi
+}
+
+update_custom() {
+    local CUSTOM_CONFIG_FILE="$HOME/.config/hyprcustom/custom.conf"
+    
+    # Check if custom config file exists
+    if [ ! -f "$CUSTOM_CONFIG_FILE" ]; then
+        print_error "Custom config file not found: $CUSTOM_CONFIG_FILE"
+        return 1
+    fi
+    
+    # Optional: Create backup (uncomment if needed)
+    # cp "$CUSTOM_CONFIG_FILE" "${CUSTOM_CONFIG_FILE}.backup.$(date +%Y%m%d_%H%M%S)"
+    # echo -e "${GREEN}Custom config backup created${NC}"
+    
+    if [ "$PANEL_CHOICE" = "waybar" ]; then
+        # Replace bar-0 with waybar in layer rules
+        sed -i '18s/exec-once = systemctl --user start hyprpanel/exec-once = waybar \&/g' "$CUSTOM_CONFIG_FILE"
+        sed -i '22s/exec-once = systemctl --user start hyprpanel-idle-monitor/exec-once = systemctl --user start waybar-idle-monitor/g' "$CUSTOM_CONFIG_FILE"
+        sed -i 's/#exec-once = swww-daemon &/exec-once = swww-daemon \&/g' "$CUSTOM_CONFIG_FILE"
+        sed -i 's/#exec-once = mako &/exec-once = mako \&/g' "$CUSTOM_CONFIG_FILE"
+        sed -i 's/#exec-once = systemctl --user start waypaper-watcher/exec-once = systemctl --user start waypaper-watcher/g' "$CUSTOM_CONFIG_FILE"
+        sed -i 's/layerrule = blur,bar-0/layerrule = blur,waybar/g' "$CUSTOM_CONFIG_FILE"
+        sed -i 's/layerrule = ignorezero,bar-0/layerrule = ignorezero,waybar/g' "$CUSTOM_CONFIG_FILE"
+        echo -e "${GREEN}Updated custom config layer rules for waybar${NC}"
+    else
+        # Replace bar-0 with hyprpanel in layer rules
+        sed -i '18s/exec-once = waybar \&/exec-once = systemctl --user start hyprpanel/g' "$CUSTOM_CONFIG_FILE"
+        sed -i '22s/exec-once = systemctl --user start waybar-idle-monitor/exec-once = systemctl --user start hyprpanel-idle-monitor/g' "$CUSTOM_CONFIG_FILE"
+        sed -i 's/exec-once = swww-daemon &/#exec-once = swww-daemon \&/g' "$CUSTOM_CONFIG_FILE"
+        sed -i 's/exec-once = mako &/#exec-once = mako \&/g' "$CUSTOM_CONFIG_FILE"
+        sed -i 's/exec-once = systemctl --user start waypaper-watcher/#exec-once = systemctl --user start waypaper-watcher/g' "$CUSTOM_CONFIG_FILE"
+        sed -i 's/layerrule = blur,waybar/layerrule = blur,bar-0/g' "$CUSTOM_CONFIG_FILE"
+        sed -i 's/layerrule = ignorezero,waybar/layerrule = ignorezero,bar-0/g' "$CUSTOM_CONFIG_FILE"
+        echo -e "${GREEN}Updated custom config layer rules for hyprpanel${NC}"
+    fi
 }
 
 setup_gjs() {
@@ -6164,6 +6263,12 @@ main() {
 
     # Setup default "custom.conf" file
     setup_custom_config
+
+    # Update keybinds based on choice
+    update_keybinds
+    
+    # Update custom config based on choice
+    update_custom
 
     # Setup GJS
     setup_gjs
