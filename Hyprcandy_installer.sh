@@ -284,8 +284,8 @@ build_package_list() {
         "nwg-look"
         
         # System utilities
-        "network-manager-applet"
-        "blueman"
+        "bluez"
+        "bluez-utils"
         "nwg-displays"
         "nwg-dock-hyprland"
         "wlogout"
@@ -3202,10 +3202,10 @@ exec-once = hypridle &
 exec-once = wl-paste --watch cliphist store
 # Restart xdg
 exec-once = ~/.config/hpr/scripts/xdg.sh
-# Start networkmanager
-exec-once = nm-applet &
 # Restore wallaper
 exec-once = bash ~/.config/hypr/scripts/wallpaper-restore.sh
+# Launch newtwork tray applet
+#exec-once = nm-applet &
 # Pyprland
 #exec-once = /usr/bin/pypr &
 
@@ -3705,10 +3705,10 @@ exec-once = hypridle &
 exec-once = wl-paste --watch cliphist store
 # Restart xdg
 exec-once = ~/.config/hpr/scripts/xdg.sh
-# Start networkmanager
-exec-once = nm-applet &
 # Restore wallaper
 exec-once = bash ~/.config/hypr/scripts/wallpaper-restore.sh
+# Launch newtwork tray applet
+#exec-once = nm-applet &
 # Pyprland
 #exec-once = /usr/bin/pypr &
 
@@ -6436,3 +6436,4 @@ main() {
 
 # Run main function
 main "$@"
+
