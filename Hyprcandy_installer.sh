@@ -2081,6 +2081,7 @@ EOF
 chmod +x "$HOME/.config/hyprcandy/hooks/clear_swww.sh"
 fi
 
+if [ "$PANEL_CHOICE" = "waybar" ]; then
 # ═══════════════════════════════════════════════════════════════
 #                  Background Update Script
 # ═══════════════════════════════════════════════════════════════
@@ -2171,6 +2172,97 @@ else
     echo "⚠️  $COLORS_CSS or $MAKO_CONFIG not found, skipping mako color update"
 fi
 EOF
+
+else
+
+cat > "$HOME/.config/hyprcandy/hooks/update_background.sh" << 'EOF'
+#!/bin/bash
+set +e
+# Define colors file path
+COLORS_FILE="$HOME/.config/hyprcandy/nwg_dock_colors.conf"
+
+# Update local background.png
+if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
+    wallust run ~/.config/background &
+    magick "$HOME/.config/background[0]" "$HOME/.config/background.png"
+   
+    # Check if colors have changed and launch dock if different
+    colors_file="$HOME/.config/nwg-dock-hyprland/colors.css"
+    
+    # Get current colors from CSS file
+    get_current_colors() {
+        if [ -f "$colors_file" ]; then
+            grep -E "@define-color (blur_background8|primary)" "$colors_file"
+        fi
+    }
+    
+    # Get stored colors from our tracking file
+    get_stored_colors() {
+        if [ -f "$COLORS_FILE" ]; then
+            cat "$COLORS_FILE"
+        fi
+    }
+    
+    # Compare colors and launch dock if different
+    if [ -f "$colors_file" ]; then
+        current_colors=$(get_current_colors)
+        stored_colors=$(get_stored_colors)
+        
+        if [ "$current_colors" != "$stored_colors" ]; then
+            # Colors have changed, reload dock
+            pkill -f mwg-dock-hyprland
+            sleep 0.3
+            "$HOME/.config/nwg-dock-hyprland/launch.sh" >/dev/null 2>&1 &
+            # Update stored colors file with new colors
+            mkdir -p "$(dirname "$COLORS_FILE")"
+            echo "$current_colors" > "$COLORS_FILE"
+            echo "🎨 Updated dock colors and launched dock"
+        else
+            echo "🎨 Colors unchanged, skipping dock launch"
+        fi
+    else
+        # Fallback if colors.css doesn't exist
+        "$HOME/.config/nwg-dock-hyprland/launch.sh" >/dev/null 2>&1 &
+        echo "🎨 Colors file not found, launched dock anyway"
+    fi
+fi
+
+sleep 1
+
+# Update SDDM background with sudo and reload the dock
+if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
+    sudo magick "$HOME/.config/background[0]" "/usr/share/sddm/themes/sugar-candy/Backgrounds/Mountain.jpg"
+    sleep 1
+fi
+
+# Update mako config colors from nwg-dock-hyprland/colors.css
+MAKO_CONFIG="$HOME/.config/mako/config"
+COLORS_CSS="$HOME/.config/nwg-dock-hyprland/colors.css"
+
+if [ -f "$COLORS_CSS" ] && [ -f "$MAKO_CONFIG" ]; then
+    # Extract hex values from colors.css, removing trailing semicolons and newlines
+    ON_PRIMARY_FIXED_VARIANT=$(grep -E "@define-color[[:space:]]+on_primary_fixed_variant" "$COLORS_CSS" | awk '{print $3}' | tr -d ';' | tr -d '\n')
+    PRIMARY_FIXED_DIM=$(grep -E "@define-color[[:space:]]+primary_fixed_dim" "$COLORS_CSS" | awk '{print $3}' | tr -d ';' | tr -d '\n')
+    SCIM=$(grep -E "@define-color[[:space:]]+scrim" "$COLORS_CSS" | awk '{print $3}' | tr -d ';' | tr -d '\n')
+
+    # Only proceed if both colors are found
+    if [[ $ON_PRIMARY_FIXED_VARIANT =~ ^#([A-Fa-f0-9]{6})$ ]] && [[ $PRIMARY_FIXED_DIM =~ ^#([A-Fa-f0-9]{6})$ ]]; then
+        # Update all background-color, progress-color, and border-color lines in mako config
+        sed -i "s|^background-color=#.*|background-color=$ON_PRIMARY_FIXED_VARIANT|g" "$MAKO_CONFIG"
+        sed -i "s|^progress-color=#.*|progress-color=$SCIM|g" "$MAKO_CONFIG"
+        sed -i "s|^border-color=#.*|border-color=$PRIMARY_FIXED_DIM|g" "$MAKO_CONFIG"
+        pkill -f mako
+        sleep 1
+        mako &
+        echo "🎨 Updated ALL mako config colors: background-color=$ON_PRIMARY_FIXED_VARIANT, progress-color=$SCIM, border-color=$PRIMARY_FIXED_DIM"
+    else
+        echo "⚠️  Could not extract required color values from $COLORS_CSS"
+    fi
+else
+    echo "⚠️  $COLORS_CSS or $MAKO_CONFIG not found, skipping mako color update"
+fi
+EOF
+fi
 
 chmod +x "$HOME/.config/hyprcandy/hooks/update_background.sh"
 
