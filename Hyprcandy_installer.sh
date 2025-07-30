@@ -4319,11 +4319,11 @@ bind = ALT, 2, exec, ~/.config/hyprcandy/hooks/restart_waybar.sh #Restart or rel
 
 #### Dock keybinds ####
 
-bind = ALT , 3, exec, ~/.config/hyprcandy/hooks/nwg_dock_presets.sh hidden #Hide/kill dock
-bind = ALT , 4, exec, ~/.config/nwg-dock-hyprland/launch.sh #Bottom dock and quick-reload dock
-bind = ALT , 5, exec, nwg-dock-hyprland -p top -lp start -i 22 -w 10 -mt 6 -ml 10 -mr 10 -x -r -s "style.css" -c "rofi -show drun" #Top dock
-bind = ALT , 6, exec, nwg-dock-hyprland -p left -lp start -i 22 -w 10 -ml 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" #Left dock
-bind = ALT , 7, exec, nwg-dock-hyprland -p right -lp start -i 22 -w 10 -mr 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" #Right dock
+bind = ALT, 3, exec, ~/.config/hyprcandy/hooks/nwg_dock_presets.sh hidden #Hide/kill dock
+bind = ALT, 4, exec, ~/.config/nwg-dock-hyprland/launch.sh #Bottom dock and quick-reload dock
+bind = ALT, 5, exec, nwg-dock-hyprland -p top -lp start -i 22 -w 10 -mt 6 -ml 10 -mr 10 -x -r -s "style.css" -c "rofi -show drun" #Top dock
+bind = ALT, 6, exec, nwg-dock-hyprland -p left -lp start -i 22 -w 10 -ml 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" #Left dock
+bind = ALT, 7, exec, nwg-dock-hyprland -p right -lp start -i 22 -w 10 -mr 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" #Right dock
 bind = ALT, 8, exec, ~/.config/hyprcandy/hooks/nwg_dock_status_display.sh #Dock status display
 
 #### Status display ####
@@ -4540,11 +4540,11 @@ bind = ALT, 2, exec, ~/.config/hyprcandy/hooks/restart_hyprpanel.sh #Restart or 
 
 #### Dock keybinds ####
 
-bind = ALT , 3, exec, ~/.config/hyprcandy/hooks/nwg_dock_presets.sh hidden #Hide/kill dock
-bind = ALT , 4, exec, ~/.config/nwg-dock-hyprland/launch.sh #Bottom dock and quick-reload dock
-bind = ALT , 5, exec, nwg-dock-hyprland -p top -lp start -i 22 -w 10 -mt 6 -ml 10 -mr 10 -x -r -s "style.css" -c "rofi -show drun" #Top dock
-bind = ALT , 6, exec, nwg-dock-hyprland -p left -lp start -i 22 -w 10 -ml 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" #Left dock
-bind = ALT , 7, exec, nwg-dock-hyprland -p right -lp start -i 22 -w 10 -mr 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" #Right dock
+bind = ALT, 3, exec, ~/.config/hyprcandy/hooks/nwg_dock_presets.sh hidden #Hide/kill dock
+bind = ALT, 4, exec, ~/.config/nwg-dock-hyprland/launch.sh #Bottom dock and quick-reload dock
+bind = ALT, 5, exec, nwg-dock-hyprland -p top -lp start -i 22 -w 10 -mt 6 -ml 10 -mr 10 -x -r -s "style.css" -c "rofi -show drun" #Top dock
+bind = ALT, 6, exec, nwg-dock-hyprland -p left -lp start -i 22 -w 10 -ml 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" #Left dock
+bind = ALT, 7, exec, nwg-dock-hyprland -p right -lp start -i 22 -w 10 -mr 6 -mt 10 -mb 10 -x -r -s "style.css" -c "rofi -show drun" #Right dock
 bind = ALT, 8, exec, ~/.config/hyprcandy/hooks/nwg_dock_status_display.sh #Dock status display
 
 #### Status display ####
@@ -6436,4 +6436,3 @@ main() {
 
 # Run main function
 main "$@"
-
