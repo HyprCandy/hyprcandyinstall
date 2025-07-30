@@ -3307,7 +3307,7 @@ general {
     allow_tearing = true
 }
 
-group:groupbar:col.active =  $on_primary_fixed_variant $primary_fixed_dim $primary_fixed_dim $on_primary_fixed_variant 90deg
+group:groupbar:col.active =  $primary_fixed_dim
 group:groupbar:col.inactive = $on_primary_fixed_variant
 
 dwindle {
@@ -3810,7 +3810,7 @@ general {
     allow_tearing = true
 }
 
-group:groupbar:col.active =  $on_primary_fixed_variant $primary_fixed_dim $primary_fixed_dim $on_primary_fixed_variant 90deg
+group:groupbar:col.active =  $primary_fixed_dim
 group:groupbar:col.inactive = $on_primary_fixed_variant
 
 dwindle {
