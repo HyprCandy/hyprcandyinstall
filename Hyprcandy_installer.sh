@@ -132,7 +132,7 @@ choose_panel() {
 
 choose_browser() {
     echo -e "${CYAN}Choose your browser:${NC}"
-    echo "1) Brave (Seemless integration with Ultracandy GTK and Qt theme through its Appearance settings, fast, secure and privacy-focused browser)"
+    echo "1) Brave (Seemless integration with HyprCandy GTK and Qt theme through its Appearance settings, fast, secure and privacy-focused browser)"
     echo "2) Firefox (Themed through python-pywalfox by running pywalfox update in the terminal, open-source browser with a focus on privacy)"
     echo "3) Zen Browser (Themed through zen mods and slightly through python-pywalfox by running pywalfox update in the terminal, open-source browser with a focus on privacy)"
     echo "4) Librewolf (Open-source browser with a focus on privacy, highly customizable manually)"
@@ -286,6 +286,7 @@ build_package_list() {
         # System utilities
         "bluez"
         "bluez-utils"
+        "blueman"
         "nwg-displays"
         "nwg-dock-hyprland"
         "wlogout"
@@ -981,7 +982,7 @@ setup_hyprcandy() {
     config_dirs=(".face.icon" ".config" ".icons" ".hyprcandy-zsh.zsh")
 
     # Add files/folders to exclude from deletion
-    preserve_items=("Candy" ".git")
+    preserve_items=("GJS" "Candy" ".git")
 
     if [ ${#config_dirs[@]} -eq 0 ]; then
         echo "❌ No configuration directories specified."
@@ -4801,13 +4802,13 @@ update_custom() {
 
 setup_gjs() {
 # Create the GJS directory and files if they don't already exist
-if [ ! -d "$HOME/.ultracandy/GJS/src" ]; then
-    mkdir -p "$HOME/.ultracandy/GJS/src"
+if [ ! -d "$HOME/.hyprcandy/GJS/src" ]; then
+    mkdir -p "$HOME/.hyprcandy/GJS/src"
     echo "📁 Created the GJS directory"
 fi
 
 # Add GJS files
-cat > "$HOME/.ultracandy/GJS/toggle-main.js" << 'EOF'
+cat > "$HOME/.hyprcandy/GJS/toggle-main.js" << 'EOF'
 #!/usr/bin/env gjs
 
 imports.gi.versions.Gtk = '4.0';
@@ -4873,7 +4874,7 @@ function main() {
 main();  
 EOF
 
-cat > "$HOME/.ultracandy/GJS/weather-main.js" << 'EOF'
+cat > "$HOME/.hyprcandy/GJS/weather-main.js" << 'EOF'
 #!/usr/bin/env gjs
 
 imports.gi.versions.Gtk = '4.0';
@@ -4939,7 +4940,7 @@ function main() {
 main(); 
 EOF
 
-cat > "$HOME/.ultracandy/GJS/src/mediaMenu.js" << 'EOF'
+cat > "$HOME/.hyprcandy/GJS/src/mediaMenu.js" << 'EOF'
 imports.gi.versions.Gtk = '4.0';
 imports.gi.versions.Gio = '2.0';
 imports.gi.versions.GLib = '2.0';
@@ -5766,7 +5767,7 @@ var exports = {
 }; 
 EOF
 
-cat > "$HOME/.ultracandy/GJS/src/weather.js" << 'EOF'
+cat > "$HOME/.hyprcandy/GJS/src/weather.js" << 'EOF'
 imports.gi.versions.Gtk = '4.0';
 imports.gi.versions.Gio = '2.0';
 imports.gi.versions.GLib = '2.0';
@@ -6322,7 +6323,7 @@ main() {
     build_package_list
     
     # Ask for confirmation
-    echo -e "${YELLOW}This will install ${#packages[@]} packages and setup UltraCandy configuration. Continue? (n/Y)${NC}"
+    echo -e "${YELLOW}This will install ${#packages[@]} packages and setup HyprCandy configuration. Continue? (n/Y)${NC}"
     read -r response
     case "$response" in
         [nN][oO]|[nN])
@@ -6436,3 +6437,4 @@ main() {
 
 # Run main function
 main "$@"
+
