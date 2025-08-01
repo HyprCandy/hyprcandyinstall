@@ -110,11 +110,11 @@ choose_panel() {
     echo "   • Fast live wallpaper application through caching and easier background setup"
     echo ""
     echo -e "${GREEN}2) Hyprpanel${NC}"
+    echo "   • Recommended on HyprCandy and for users who don't mind an always-on panel"
     echo "   • Easy to theme through its interface"
     echo "   • Has an autohide feature when only one window is open"
     echo "   • Much slower to relaunch after manually killing (when multiple windows are open)"
-    echo "   • Recommended for users who don't mind an always-on panel"
-    echo "   • Longer process to set backgrounds and slower for live backgrounds"
+    echo "   • Heavier on ram usafe and longer process to set backgrounds and slower for live backgrounds"
     echo ""
     
     read -rp "Enter 1 or 2: " panel_choice
