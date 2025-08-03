@@ -6401,12 +6401,11 @@ main() {
     echo
     echo -e "${PURPLE}🖼️ Wallpaper Setup (Hyprpanel):${NC}"
     print_status "• Through Hyprpanel's configuration interface in the ${CYAN}Theming${NC} section do the following:"
-    print_status "• Under ${YELLOW}General Settings${NC} choose a wallaper to apply where it says None"
-    print_status "• Find default wallpapers check the ${CYAN}~/Pictures/HyprCandy${NC} or ${CYAN}HyprCandy${NC} folder"
+    print_status "• Under ${YELLOW}General Settings${NC} choose a wallaper to apply where it says 'None'"
+    print_status "• Find default wallpapers check the ${CYAN}~/Pictures/Candy${NC}"
     print_status "• Under ${YELLOW}Matugen Settings${NC} toggle the button to enable matugen color application"
     print_status "• If the wallpaper doesn't apply through the configuration interface, then toggle the button to apply wallpapers"
     print_status "• Ths will quickly reset swww and apply the background"
-    print_status "• Remember to reload the dock with ${CYAN}SHIFT + K${NC} to update its colors"
     echo
     echo -e "${PURPLE}🎨 Font, Icon And Cursor Theming:${NC}"
     print_status "• Open the application-finder with SUPER + A and search for ${YELLOW}GTK Settings${NC} application"
