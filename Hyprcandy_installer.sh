@@ -294,7 +294,6 @@ build_package_list() {
         "pacman-contrib"
         
         # Application launchers and menus
-        "rofi-lbonn-wayland-git"
         "rofi-emoji"
         "rofi-nerdy"
         
@@ -508,6 +507,9 @@ install_packages() {
         print_status "You can try installing failed packages manually:"
         echo "$AUR_HELPER -S ${failed[*]}"
     fi
+
+    # Installed seperately without "--noconfirm" incase of conflicting "rofi" package
+    $AUR_HELPER -S rofi-lbonn-wayland-git
 }
 
 # Function to setup Fish shell configuration
@@ -6253,9 +6255,9 @@ setup_keyboard_layout() {
         print_error "Please run setup_custom_config() first"
     fi
 
-pgrep -x swww-daemon > /dev/null 2>&1 || swww-daemon &>/dev/null
+pgrep -x swww-daemon > /dev/null 2>&1 || swww-daemon &
 sleep 1
-swww img "$HOME/.config/background.png"
+swww img "$HOME/.config/background"
 
 # Update SDDM background with sudo
 if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
