@@ -73,7 +73,7 @@ print_error() {
 # Function to choose display manager
 choose_display_manager() {
     print_status "For old users remove rofi-wayland through 'sudo pacman -Rnsd rofi-wayland' then clear cache through 'sudo pacman -Scc'"
-    print_status "Choose your display manager:"
+    echo -e "${CYAN}Choose your display manager:${NC}"
     echo "1) SDDM with Sugar Candy theme (HyprCandy automatic background set according to applied wallpaper)"
     echo "2) GDM with GDM settings app (GNOME Display Manager and customization app)"
     echo
@@ -102,7 +102,7 @@ choose_display_manager() {
 }
 
 choose_panel() {
-    echo -e "${CYAN}Choose your panel:${NC}"
+    echo -e "${CYAN}Choose your panel: you can also rerun the script to switch from either or regenerate HyprCandy's default panel setup:${NC}"
     echo -e "${GREEN}1) Waybar${NC}"
     echo "   • Light with fast startup/reload for a 'taskbar' like experience"
     echo "   • Highly customizable manually"
@@ -110,11 +110,11 @@ choose_panel() {
     echo "   • Fast live wallpaper application through caching and easier background setup"
     echo ""
     echo -e "${GREEN}2) Hyprpanel${NC}"
-    echo "   • Recommended on HyprCandy and for users who don't mind an always-on panel"
     echo "   • Easy to theme through its interface"
     echo "   • Has an autohide feature when only one window is open"
     echo "   • Much slower to relaunch after manually killing (when multiple windows are open)"
-    echo "   • Heavier on ram usafe and longer process to set backgrounds and slower for live backgrounds"
+    echo "   • Recommended for users who don't mind an always-on panel"
+    echo "   • Longer process to set backgrounds and slower for live backgrounds"
     echo ""
     
     read -rp "Enter 1 or 2: " panel_choice
@@ -151,7 +151,7 @@ choose_browser() {
 
 # Function to choose shell
 choose_shell() {
-    print_status "Choose your shell: you can also rerun the script to switch from either or regenerate HyprCandy's default shell setup"
+    echo -e "${CYAN}Choose your shell: you can also rerun the script to switch from either or regenerate HyprCandy's default shell setup:${NC}"
     echo "1) Fish - A modern shell with builtin fzf search, intelligent autosuggestions and syntax highlighting (Fisher plugins + Starship prompt)"
     echo "2) Zsh - Powerful shell with extensive customization (Zsh plugins + Oh My Zsh + Starship prompt)"
     echo
@@ -927,6 +927,30 @@ setup_hyprcandy() {
         return 1
     fi
     
+    # Backup previous default config folder if it exists
+    PREVIOUS_CONFIG_FOLDER="$HOME/.config/hypr"
+    
+    if [ ! -d "$PREVIOUS_CONFIG_FOLDER" ]; then
+        print_error "Default config folder not found: $PREVIOUS_CONFIG_FOLDER"
+        echo -e "${RED}Skipping default config backup${NC}"
+    else
+        cp -r "$PREVIOUS_CONFIG_FOLDER" "${PREVIOUS_CONFIG_FOLDER}.backup.$(date +%Y%m%d_%H%M%S)"
+        echo -e "${GREEN}Previous default config folder backup created${NC}"
+    fi
+    sleep 1
+    
+    # Backup previous custom config folder if it exists
+    PREVIOUS_CUSTOM_CONFIG_FOLDER="$HOME/.config/hyprcustom"
+    
+    if [ ! -d "$PREVIOUS_CUSTOM_CONFIG_FOLDER" ]; then
+        print_error "Custom config folder not found: $PREVIOUS_CUSTOM_CONFIG_FOLDER"
+        echo -e "${RED}Skipping custom config backup${NC}"
+    else
+        cp -r "$PREVIOUS_CUSTOM_CONFIG_FOLDER" "${PREVIOUS_CUSTOM_CONFIG_FOLDER}.backup.$(date +%Y%m%d_%H%M%S)"
+        echo -e "${GREEN}Previous custom config folder backup created${NC}"
+    fi
+    sleep 1
+
     # In case of updates, remove existing .hyprcandy folder before cloning
     if [ -d "$HOME/.hyprcandy" ]; then
         echo "🗑️  Removing existing .hyprcandy folder to clone updated dotfiles..."
@@ -6401,11 +6425,12 @@ main() {
     echo
     echo -e "${PURPLE}🖼️ Wallpaper Setup (Hyprpanel):${NC}"
     print_status "• Through Hyprpanel's configuration interface in the ${CYAN}Theming${NC} section do the following:"
-    print_status "• Under ${YELLOW}General Settings${NC} choose a wallaper to apply where it says 'None'"
-    print_status "• Find default wallpapers check the ${CYAN}~/Pictures/Candy${NC}"
+    print_status "• Under ${YELLOW}General Settings${NC} choose a wallaper to apply where it says None"
+    print_status "• Find default wallpapers check the ${CYAN}~/Pictures/HyprCandy${NC} or ${CYAN}HyprCandy${NC} folder"
     print_status "• Under ${YELLOW}Matugen Settings${NC} toggle the button to enable matugen color application"
     print_status "• If the wallpaper doesn't apply through the configuration interface, then toggle the button to apply wallpapers"
     print_status "• Ths will quickly reset swww and apply the background"
+    print_status "• Remember to reload the dock with ${CYAN}SHIFT + K${NC} to update its colors"
     echo
     echo -e "${PURPLE}🎨 Font, Icon And Cursor Theming:${NC}"
     print_status "• Open the application-finder with SUPER + A and search for ${YELLOW}GTK Settings${NC} application"
