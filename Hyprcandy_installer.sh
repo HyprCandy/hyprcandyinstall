@@ -6280,6 +6280,7 @@ systemctl --user stop hyprpanel.service hyprpanel-idle-monitor.service waybar-id
             echo "ℹ️  Hyprland is not currently running. Configuration will be applied on next start and Hyprland login."
         fi
     else
+        hyprctl reload
         echo "⚠️  'hyprctl' not found. Skipping Hyprland reload. Run 'hyprctl reload' on next start and Hyprland login."
     fi
 
@@ -6463,4 +6464,3 @@ main() {
 
 # Run main function
 main "$@"
-
