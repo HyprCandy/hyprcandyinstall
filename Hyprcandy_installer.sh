@@ -3327,7 +3327,7 @@ general {
     gaps_out = 6	
     gaps_workspaces = 50    # Gaps between workspaces
     border_size = 3
-    col.active_border = $primary_fixed_dim $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $primary_fixed_dim 90deg
+    col.active_border = $primary_fixed_dim $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $primary_fixed_dim 90deg
     col.inactive_border = $on_primary_fixed_variant
     layout = dwindle
     resize_on_border = true
@@ -3487,7 +3487,7 @@ windowrule = animation slide right, class:^(kitty|Alacritty)$
 windowrule = noblur, class:^(org.mozilla.firefox)$
 # Decorations related to floating windows on workspaces 1 to 10
 ##windowrule = bordersize 2, floating:1, onworkspace:w[fv1-10]
-windowrule = bordercolor $primary_fixed_dim $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $primary_fixed_dim 90deg, floating:1, onworkspace:w[fv1-10]
+windowrule = bordercolor $primary_fixed_dim $on_primary_fixed_variant 90deg, floating:1, onworkspace:w[fv1-10]
 ##windowrule = rounding 8, floating:1, onworkspace:w[fv1-10]
 # Decorations related to tiling windows on workspaces 1 to 10
 ##windowrule = bordersize 3, floating:0, onworkspace:f[1-10]
@@ -3830,7 +3830,7 @@ general {
     gaps_out = 6	
     gaps_workspaces = 50    # Gaps between workspaces
     border_size = 3
-    col.active_border = $primary_fixed_dim $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $primary_fixed_dim 90deg
+    col.active_border = $primary_fixed_dim $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $primary_fixed_dim 90deg
     col.inactive_border = $on_primary_fixed_variant
     layout = dwindle
     resize_on_border = true
@@ -3990,7 +3990,7 @@ windowrule = animation slide right, class:^(kitty|Alacritty)$
 windowrule = noblur, class:^(org.mozilla.firefox)$
 # Decorations related to floating windows on workspaces 1 to 10
 ##windowrule = bordersize 2, floating:1, onworkspace:w[fv1-10]
-windowrule = bordercolor $primary_fixed_dim $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $primary_fixed_dim 90deg, floating:1, onworkspace:w[fv1-10]
+windowrule = bordercolor $primary_fixed_dim $on_primary_fixed_variant 90deg, floating:1, onworkspace:w[fv1-10]
 ##windowrule = rounding 8, floating:1, onworkspace:w[fv1-10]
 # Decorations related to tiling windows on workspaces 1 to 10
 ##windowrule = bordersize 3, floating:0, onworkspace:f[1-10]
@@ -4206,9 +4206,9 @@ general {
 background {
     monitor =
     path = ~/.config/background.png
-    blur_passes = 3
-    blur_sizes = 1
-    vibrancy = 0.1696s
+    blur_passes = 2
+    blur_sizes = 0
+    vibrancy = 0.1696
     noise = 0.01
     contrast = 0.8916
 }
@@ -4276,7 +4276,7 @@ label {
 
 image {
     monitor =
-    path = .face.icon
+    path = ~/.config/background.png #.face.icon
     size = 160 # lesser side if not 1:1 ratio
     rounding = 75 # negative values mean circle
     border_size = 4
