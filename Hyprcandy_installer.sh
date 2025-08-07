@@ -1532,8 +1532,8 @@ case "$1" in
         ;;
     "hidden")
         pkill -f nwg-dock-hyprland
-        echo "🫥 Dock hidden"
-        notify-send "Dock Hidden" "nwg-dock-hyprland stopped" -t 2000
+        #echo "🫥 Dock hidden"
+        #notify-send "Dock Hidden" "nwg-dock-hyprland stopped" -t 2000
         exit 0
         ;;
     *)
