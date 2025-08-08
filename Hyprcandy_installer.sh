@@ -4206,7 +4206,7 @@ general {
 background {
     monitor =
     path = ~/.config/background.png
-    blur_passes = 2
+    blur_passes = 3
     blur_sizes = 0
     vibrancy = 0.1696
     noise = 0.01
