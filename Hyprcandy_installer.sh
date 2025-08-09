@@ -384,6 +384,7 @@ build_package_list() {
         # Fun stuff
         "cmatrix"
         "pipes.sh"
+        "asciiquarium"
         
         # Configuration management
         "stow"
@@ -696,6 +697,7 @@ alias weather="curl wttr.in"
 # Fun stuff
 alias matrix="cmatrix -a -b -r"
 alias pipes="pipes.sh"
+alias sea="asciiquarium"
 
 # Start HyprCandy fastfetch
 fastfetch
@@ -880,6 +882,7 @@ alias weather="curl wttr.in"
 # Fun stuff
 alias matrix="cmatrix -a -b -r"
 alias pipes="pipes.sh"
+alias sea="asciiquarium"
 
 # Start HyprCandy fastfetch
 fastfetch
@@ -1532,8 +1535,8 @@ case "$1" in
         ;;
     "hidden")
         pkill -f nwg-dock-hyprland
-        #echo "🫥 Dock hidden"
-        #notify-send "Dock Hidden" "nwg-dock-hyprland stopped" -t 2000
+        echo "🫥 Dock hidden"
+        notify-send "Dock Hidden" "nwg-dock-hyprland stopped" -t 2000
         exit 0
         ;;
     *)
