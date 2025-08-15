@@ -4969,6 +4969,1027 @@ function main() {
 main(); 
 EOF
 
+if [ "$PANEL_CHOICE" = "waybar" ]; then
+cat > "$HOME/.hyprcandy/GJS/src/mediaMenu.js" << 'EOF'
+imports.gi.versions.Gtk = '4.0';
+imports.gi.versions.Gio = '2.0';
+imports.gi.versions.GLib = '2.0';
+imports.gi.versions.Gdk = '4.0';
+imports.gi.versions.Soup = '3.0';
+imports.gi.versions.GdkPixbuf = '2.0';
+const { Gtk, Gio, GLib, Gdk, Soup, GdkPixbuf } = imports.gi;
+
+function createTogglesBox() {
+// --- Hyprsunset state persistence setup ---
+const hyprsunsetStateDir = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcandy']);
+const hyprsunsetStateFile = GLib.build_filenamev([hyprsunsetStateDir, 'hyprsunset.state']);
+// Ensure directory exists
+try { GLib.mkdir_with_parents(hyprsunsetStateDir, 0o755); } catch (e) {}
+function loadHyprsunsetState() {
+    try {
+        let [ok, contents] = GLib.file_get_contents(hyprsunsetStateFile);
+        if (ok && contents) {
+            let state = imports.byteArray.toString(contents).trim();
+            return state === 'enabled';
+        }
+    } catch (e) {}
+    return false;
+}
+function saveHyprsunsetState(enabled) {
+    try {
+        GLib.file_set_contents(hyprsunsetStateFile, enabled ? 'enabled' : 'disabled');
+    } catch (e) {}
+}
+
+// Main horizontal layout: left (hyprsunset, hyprpicker, toggles), right (presets, weather)
+const mainRow = new Gtk.Box({
+    orientation: Gtk.Orientation.HORIZONTAL,
+    spacing: 32,
+    halign: Gtk.Align.CENTER,
+    valign: Gtk.Align.CENTER,
+    margin_top: 16,
+    margin_bottom: 16,
+    margin_start: 16,
+    margin_end: 16
+});
+mainRow.add_css_class('candy-utils-frame');
+
+// Left: Hyprsunset, Hyprpicker, Toggles
+const leftBox = new Gtk.Box({
+    orientation: Gtk.Orientation.VERTICAL,
+    spacing: 16,
+    halign: Gtk.Align.CENTER,
+    valign: Gtk.Align.CENTER
+});
+// Hyprsunset controls
+const hyprsunsetBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER });
+let hyprsunsetEnabled = loadHyprsunsetState();
+const hyprsunsetBtn = new Gtk.Button({ label: hyprsunsetEnabled ? 'Hyprsunset 󰌵' : 'Hyprsunset 󰹏' });
+if (hyprsunsetEnabled) hyprsunsetBtn.add_css_class('neon-highlight');
+hyprsunsetBtn.connect('clicked', () => {
+    if (!hyprsunsetEnabled) {
+        GLib.spawn_command_line_async("bash -c 'hyprsunset &'");
+        hyprsunsetBtn.set_label('Hyprsunset 󰌵');
+        hyprsunsetBtn.add_css_class('neon-highlight');
+        hyprsunsetEnabled = true;
+    } else {
+        GLib.spawn_command_line_async('pkill hyprsunset');
+        hyprsunsetBtn.set_label('Hyprsunset 󰹏');
+        hyprsunsetBtn.remove_css_class('neon-highlight');
+        hyprsunsetEnabled = false;
+    }
+    saveHyprsunsetState(hyprsunsetEnabled);
+});
+const gammaDecBtn = new Gtk.Button({ label: 'Gamma -10%' });
+gammaDecBtn.connect('clicked', () => {
+    GLib.spawn_command_line_async('hyprctl hyprsunset gamma -10');
+});
+const gammaIncBtn = new Gtk.Button({ label: 'Gamma +10%' });
+gammaIncBtn.connect('clicked', () => {
+    GLib.spawn_command_line_async('hyprctl hyprsunset gamma +10');
+});
+hyprsunsetBox.append(hyprsunsetBtn);
+hyprsunsetBox.append(gammaDecBtn);
+hyprsunsetBox.append(gammaIncBtn);
+//leftBox.append(hyprsunsetBox);
+
+// Hyprpicker button
+const hyprpickerBtn = new Gtk.Button({ label: 'Launch Hyprpicker' });
+hyprpickerBtn.connect('clicked', () => {
+    GLib.spawn_command_line_async('hyprpicker');
+});
+//leftBox.append(hyprpickerBtn);
+
+// --- Xray Toggle Button ---
+const xrayStateFile = GLib.build_filenamev([hyprsunsetStateDir, 'xray.state']);
+function loadXrayState() {
+    try {
+        let [ok, contents] = GLib.file_get_contents(xrayStateFile);
+        if (ok && contents) {
+            let state = imports.byteArray.toString(contents).trim();
+            return state === 'enabled';
+        }
+    } catch (e) {}
+    return false;
+}
+function saveXrayState(enabled) {
+    try {
+        GLib.file_set_contents(xrayStateFile, enabled ? 'enabled' : 'disabled');
+    } catch (e) {}
+}
+function toggleXray(enabled) {
+    const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
+    const newValue = enabled ? 'true' : 'false';
+    GLib.spawn_command_line_async(`sed -i 's/xray = .*/xray = ${newValue}/' "${configFile}"`);
+    GLib.spawn_command_line_async('hyprctl reload');
+}
+
+let xrayEnabled = loadXrayState();
+const xrayBtn = new Gtk.Button({ label: xrayEnabled ? 'Xray Enabled ' : 'Xray Disabled ' });
+if (xrayEnabled) xrayBtn.add_css_class('neon-highlight');
+xrayBtn.connect('clicked', () => {
+    xrayEnabled = !xrayEnabled;
+    toggleXray(xrayEnabled);
+    if (xrayEnabled) {
+        xrayBtn.set_label('Xray Enabled ');
+        xrayBtn.add_css_class('neon-highlight');
+    } else {
+        xrayBtn.set_label('Xray Disabled ');
+        xrayBtn.remove_css_class('neon-highlight');
+    }
+    saveXrayState(xrayEnabled);
+});
+leftBox.append(xrayBtn);
+
+// --- Opacity Toggle Button ---
+const opacityStateFile = GLib.build_filenamev([hyprsunsetStateDir, 'opacity.state']);
+function loadOpacityState() {
+    try {
+        let [ok, contents] = GLib.file_get_contents(opacityStateFile);
+        if (ok && contents) {
+            let state = imports.byteArray.toString(contents).trim();
+            return state === 'enabled';
+        }
+    } catch (e) {}
+    return false;
+}
+function saveOpacityState(enabled) {
+    try {
+        GLib.file_set_contents(opacityStateFile, enabled ? 'enabled' : 'disabled');
+    } catch (e) {}
+}
+
+let opacityEnabled = loadOpacityState();
+const opacityBtn = new Gtk.Button({ label: opacityEnabled ? 'Opacity ' : 'Opacity ' });
+if (opacityEnabled) opacityBtn.add_css_class('neon-highlight');
+opacityBtn.connect('clicked', () => {
+    opacityEnabled = !opacityEnabled;
+    if (opacityEnabled) {
+        opacityBtn.set_label('Opacity ');
+        opacityBtn.add_css_class('neon-highlight');
+        GLib.spawn_command_line_async('bash -c "$HOME/.config/hypr/scripts/window-opacity.sh"');
+    } else {
+        opacityBtn.set_label('Opacity ');
+        opacityBtn.remove_css_class('neon-highlight');
+        GLib.spawn_command_line_async('bash -c "$HOME/.config/hypr/scripts/window-opacity.sh"');
+    }
+    saveOpacityState(opacityEnabled);
+});
+
+// --- Active Opacity Controls ---
+function activeOpacityRow(label, configKey) {
+    const row = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER, valign: Gtk.Align.CENTER });
+    const lbl = new Gtk.Label({ label, halign: Gtk.Align.END, xalign: 1 });
+    lbl.set_size_request(110, -1);
+    const decBtn = new Gtk.Button({ label: '-' });
+    decBtn.set_size_request(32, 32);
+    const incBtn = new Gtk.Button({ label: '+' });
+    incBtn.set_size_request(32, 32);
+    
+    function updateActiveOpacity(increment) {
+        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
+        // Read current value
+        try {
+            let [ok, contents] = GLib.file_get_contents(configFile);
+            if (ok && contents) {
+                let content = imports.byteArray.toString(contents);
+                let regex = new RegExp(`active_opacity = ([0-9.]+)`);
+                let match = content.match(regex);
+                if (match) {
+                    let currentValue = parseFloat(match[1]);
+                    let newValue = Math.max(0.0, Math.min(1.0, currentValue + increment));
+                    let newValueStr = newValue.toFixed(2);
+                    GLib.spawn_command_line_async(`sed -i 's/active_opacity = .*/active_opacity = ${newValueStr}/' "${configFile}"`);
+                    GLib.spawn_command_line_async('hyprctl reload');
+                    GLib.spawn_command_line_async(`notify-send "Opacity" "Scale: ${newValueStr}" -t 2000`);
+                }
+            }
+        } catch (e) {}
+    }
+    
+    decBtn.connect('clicked', () => {
+        updateActiveOpacity(-0.05);
+    });
+    incBtn.connect('clicked', () => {
+        updateActiveOpacity(0.05);
+    });
+    
+    row.append(lbl);
+    row.append(decBtn);
+    row.append(incBtn);
+    leftBox.append(row);
+}
+
+// --- Blur Controls ---
+function addBlurSizeRow(label, configKey, increment = 1) {
+    const row = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER, valign: Gtk.Align.CENTER });
+    const lbl = new Gtk.Label({ label, halign: Gtk.Align.END, xalign: 1 });
+    lbl.set_size_request(110, -1);
+    const decBtn = new Gtk.Button({ label: '-' });
+    decBtn.set_size_request(32, 32);
+    const incBtn = new Gtk.Button({ label: '+' });
+    incBtn.set_size_request(32, 32);
+    
+    function updateBlurSize(increment) {
+        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
+        // Read current value
+        try {
+            let [ok, contents] = GLib.file_get_contents(configFile);
+            if (ok && contents) {
+                let content = imports.byteArray.toString(contents);
+                // Look for size = X inside the blur block
+                let blurSection = content.match(/blur \{[\s\S]*?\}/);
+                if (blurSection) {
+                    let sizeMatch = blurSection[0].match(/size = ([0-9]+)/);
+                    if (sizeMatch) {
+                        let currentValue = parseInt(sizeMatch[1]);
+                        let newValue = Math.max(0, currentValue + increment);
+                        // Use a simpler sed command that targets the specific line
+                        GLib.spawn_command_line_async(`sed -i '/blur {/,/}/{s/size = ${currentValue}/size = ${newValue}/}' '${configFile}'`);
+                        GLib.spawn_command_line_async('hyprctl reload');
+                        GLib.spawn_command_line_async(`notify-send "Blur Size" "Size: ${newValue}" -t 2000`);
+                    }
+                }
+            }
+        } catch (e) {
+            print('Error updating blur size: ' + e.message);
+        }
+    }
+    
+    decBtn.connect('clicked', () => {
+        updateBlurSize(-increment);
+    });
+    incBtn.connect('clicked', () => {
+        updateBlurSize(increment);
+    });
+    
+    row.append(lbl);
+    row.append(decBtn);
+    row.append(incBtn);
+    leftBox.append(row);
+}
+
+function addBlurPassRow(label, configKey, increment = 1) {
+    const row = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER, valign: Gtk.Align.CENTER });
+    const lbl = new Gtk.Label({ label, halign: Gtk.Align.END, xalign: 1 });
+    lbl.set_size_request(110, -1);
+    const decBtn = new Gtk.Button({ label: '-' });
+    decBtn.set_size_request(32, 32);
+    const incBtn = new Gtk.Button({ label: '+' });
+    incBtn.set_size_request(32, 32);
+    
+    function updateBlurPass(increment) {
+        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
+        // Read current value
+        try {
+            let [ok, contents] = GLib.file_get_contents(configFile);
+            if (ok && contents) {
+                let content = imports.byteArray.toString(contents);
+                // Look for passes = X inside the blur block
+                let blurSection = content.match(/blur \{[\s\S]*?\}/);
+                if (blurSection) {
+                    let passesMatch = blurSection[0].match(/passes = ([0-9]+)/);
+                    if (passesMatch) {
+                        let currentValue = parseInt(passesMatch[1]);
+                        let newValue = Math.max(0, currentValue + increment);
+                        // Use a simpler sed command that targets the specific line
+                        GLib.spawn_command_line_async(`sed -i 's/passes = ${currentValue}/passes = ${newValue}/' '${configFile}'`);
+                        GLib.spawn_command_line_async('hyprctl reload');
+                        GLib.spawn_command_line_async(`notify-send "Blur Pass" "Passes: ${newValue}" -t 2000`);
+                    }
+                }
+            }
+        } catch (e) {
+            print('Error updating blur passes: ' + e.message);
+        }
+    }
+    
+    decBtn.connect('clicked', () => {
+        updateBlurPass(-increment);
+    });
+    incBtn.connect('clicked', () => {
+        updateBlurPass(increment);
+    });
+    
+    row.append(lbl);
+    row.append(decBtn);
+    row.append(incBtn);
+    leftBox.append(row);
+}
+
+// --- Rofi Controls ---
+function addRofiBorderRow(label, increment = 1) {
+    const row = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER, valign: Gtk.Align.CENTER });
+    const lbl = new Gtk.Label({ label, halign: Gtk.Align.END, xalign: 1 });
+    lbl.set_size_request(110, -1);
+    const decBtn = new Gtk.Button({ label: '-' });
+    decBtn.set_size_request(32, 32);
+    const incBtn = new Gtk.Button({ label: '+' });
+    incBtn.set_size_request(32, 32);
+    
+    function updateRofiBorder(increment) {
+        const rofiBorderFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcandy', 'settings', 'rofi-border.rasi']);
+        try {
+            let [ok, contents] = GLib.file_get_contents(rofiBorderFile);
+            if (ok && contents) {
+                let content = imports.byteArray.toString(contents);
+                let borderMatch = content.match(/border-width: ([0-9]+)px/);
+                if (borderMatch) {
+                    let currentValue = parseInt(borderMatch[1]);
+                    let newValue = Math.max(0, currentValue + increment);
+                    GLib.spawn_command_line_async(`sed -i 's/border-width: ${currentValue}px/border-width: ${newValue}px/' '${rofiBorderFile}'`);
+                    GLib.spawn_command_line_async(`notify-send "Rofi Border" "Border: ${newValue}px" -t 2000`);
+                }
+            }
+        } catch (e) {
+            print('Error updating rofi border: ' + e.message);
+        }
+    }
+    
+    decBtn.connect('clicked', () => {
+        updateRofiBorder(-increment);
+    });
+    incBtn.connect('clicked', () => {
+        updateRofiBorder(increment);
+    });
+    
+    row.append(lbl);
+    row.append(decBtn);
+    row.append(incBtn);
+    leftBox.append(row);
+}
+
+function addRofiRadiusRow(label, increment = 0.1) {
+    const row = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER, valign: Gtk.Align.CENTER });
+    const lbl = new Gtk.Label({ label, halign: Gtk.Align.END, xalign: 1 });
+    lbl.set_size_request(110, -1);
+    const decBtn = new Gtk.Button({ label: '-' });
+    decBtn.set_size_request(32, 32);
+    const incBtn = new Gtk.Button({ label: '+' });
+    incBtn.set_size_request(32, 32);
+    
+    function updateRofiRadius(increment) {
+        const rofiRadiusFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcandy', 'settings', 'rofi-border-radius.rasi']);
+        try {
+            let [ok, contents] = GLib.file_get_contents(rofiRadiusFile);
+            if (ok && contents) {
+                let content = imports.byteArray.toString(contents);
+                let radiusMatch = content.match(/border-radius: ([0-9.]+)em/);
+                if (radiusMatch) {
+                    let currentValue = parseFloat(radiusMatch[1]);
+                    let newValue = Math.max(0, Math.min(5, currentValue + increment));
+                    let newValueStr = newValue.toFixed(1);
+                    GLib.spawn_command_line_async(`sed -i 's/border-radius: ${radiusMatch[1]}em/border-radius: ${newValueStr}em/' '${rofiRadiusFile}'`);
+                    GLib.spawn_command_line_async(`notify-send "Rofi Radius" "Radius: ${newValueStr}em" -t 2000`);
+                }
+            }
+        } catch (e) {
+            print('Error updating rofi radius: ' + e.message);
+        }
+    }
+    
+    decBtn.connect('clicked', () => {
+        updateRofiRadius(-increment);
+    });
+    incBtn.connect('clicked', () => {
+        updateRofiRadius(increment);
+    });
+    
+    row.append(lbl);
+    row.append(decBtn);
+    row.append(incBtn);
+    leftBox.append(row);
+}
+
+// Move presets and weather to left box after opacity button
+leftBox.append(opacityBtn);
+
+// Preset buttons
+const presetBox = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL, spacing: 4, halign: Gtk.Align.CENTER });
+
+    // --- Waybar Islands|Bar Toggle Button ---
+    const waybarStateFile = GLib.build_filenamev([hyprsunsetStateDir, 'waybar-islands.state']);
+    function loadWaybarState() {
+        try {
+            let [ok, contents] = GLib.file_get_contents(waybarStateFile);
+            if (ok && contents) {
+                let state = imports.byteArray.toString(contents).trim();
+                return state === 'islands';
+            }
+        } catch (e) {}
+        return false; // Default to bar mode
+    }
+    function saveWaybarState(isIslands) {
+        try {
+            GLib.file_set_contents(waybarStateFile, isIslands ? 'islands' : 'bar');
+        } catch (e) {}
+    }
+    function toggleWaybarMode(isIslands) {
+        const waybarStyleFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'waybar', 'style.css']);
+        const waybarBorderSizeStateFile = GLib.build_filenamev([hyprsunsetStateDir, 'waybar_border_size.state']);
+        
+        // Get current border size from state file, default to 2 if not found
+        let currentBorderSize = 2;
+        try {
+            let [ok, contents] = GLib.file_get_contents(waybarBorderSizeStateFile);
+            if (ok && contents) {
+                let sizeStr = imports.byteArray.toString(contents).trim();
+                let size = parseInt(sizeStr);
+                if (!isNaN(size)) {
+                    currentBorderSize = size;
+                }
+            }
+        } catch (e) {
+            // Use default value if state file doesn't exist or can't be read
+        }
+        
+        if (isIslands) {
+            // Change to islands mode: no background, no border
+            GLib.spawn_command_line_async(`sed -i '25s/background: @blur_background;/background: none;/' '${waybarStyleFile}'`);
+            GLib.spawn_command_line_async(`sed -i '29s/border: ${currentBorderSize}px solid @on_primary_fixed_variant;/border: 0px solid @on_primary_fixed_variant;/' '${waybarStyleFile}'`);
+        } else {
+            // Change to bar mode: restore background and border
+            GLib.spawn_command_line_async(`sed -i '25s/background: none;/background: @blur_background;/' '${waybarStyleFile}'`);
+            GLib.spawn_command_line_async(`sed -i '29s/border: 0px solid @on_primary_fixed_variant;/border: ${currentBorderSize}px solid @on_primary_fixed_variant;/' '${waybarStyleFile}'`);
+        }
+        // Reload waybar
+        //GLib.spawn_command_line_async('killall waybar');
+        //GLib.spawn_command_line_async('bash -c "waybar &"');
+    }
+    
+    let waybarIslandsEnabled = loadWaybarState();
+    const waybarToggleBtn = new Gtk.Button({ label: waybarIslandsEnabled ? 'Waybar Islands' : 'Waybar Bar' });
+    if (waybarIslandsEnabled) waybarToggleBtn.add_css_class('neon-highlight');
+    waybarToggleBtn.connect('clicked', () => {
+        waybarIslandsEnabled = !waybarIslandsEnabled;
+        toggleWaybarMode(waybarIslandsEnabled);
+        if (waybarIslandsEnabled) {
+            waybarToggleBtn.set_label('Waybar Islands');
+            waybarToggleBtn.add_css_class('neon-highlight');
+        } else {
+            waybarToggleBtn.set_label('Waybar Bar');
+            waybarToggleBtn.remove_css_class('neon-highlight');
+        }
+        saveWaybarState(waybarIslandsEnabled);
+    });
+    presetBox.append(waybarToggleBtn);
+
+// Add 'New Start Icon' button before Dock presets
+const newStartIconBtn = new Gtk.Button({ label: 'New Start Icon' });
+newStartIconBtn.connect('clicked', () => {
+    GLib.spawn_command_line_async(`${GLib.get_home_dir()}/.config/hyprcandy/hooks/change_start_button_icon.sh`);
+});
+presetBox.append(newStartIconBtn);
+const dockPresets = ['minimal', 'balanced', 'prominent', 'hidden'];
+dockPresets.forEach(preset => {
+    let btn = new Gtk.Button({ label: `Dock: ${preset.charAt(0).toUpperCase() + preset.slice(1)}` });
+    btn.connect('clicked', () => {
+        GLib.spawn_command_line_async(`bash -c '$HOME/.config/hyprcandy/hooks/nwg_dock_presets.sh ${preset}'`);
+    });
+    presetBox.append(btn);
+});
+const hyprPresets = ['minimal', 'balanced', 'spacious', 'zero'];
+hyprPresets.forEach(preset => {
+    let btn = new Gtk.Button({ label: `Hypr: ${preset.charAt(0).toUpperCase() + preset.slice(1)}` });
+    btn.connect('clicked', () => {
+        GLib.spawn_command_line_async(`bash -c '$HOME/.config/hyprcandy/hooks/hyprland_gap_presets.sh ${preset}'`);
+    });
+    presetBox.append(btn);
+});
+leftBox.append(presetBox);
+
+mainRow.append(leftBox);
+
+// --- Theme Box (Matugen Schemes) ---
+const themeBox = new Gtk.Box({
+    orientation: Gtk.Orientation.VERTICAL,
+    spacing: 4,
+    halign: Gtk.Align.CENTER,
+    valign: Gtk.Align.CENTER
+});
+
+// Matugen state persistence setup
+const matugenStateFile = GLib.build_filenamev([hyprsunsetStateDir, 'matugen-state']);
+function loadMatugenState() {
+    try {
+        let [ok, contents] = GLib.file_get_contents(matugenStateFile);
+        if (ok && contents) {
+            let state = imports.byteArray.toString(contents).trim();
+            return state || 'scheme-content'; // Default to content if empty
+        }
+    } catch (e) {}
+    return 'scheme-content'; // Default fallback
+}
+function saveMatugenState(scheme) {
+    try {
+        GLib.file_set_contents(matugenStateFile, scheme);
+    } catch (e) {}
+}
+
+let currentMatugenScheme = loadMatugenState();
+
+// Matugen scheme buttons
+const matugenSchemes = [
+    'Content',
+    'Expressive', 
+    'Fidelity',
+    'Fruit-salad',
+    'Monochrome',
+    'Neutral',
+    'Rainbow',
+    'Tonal-spot'
+];
+
+function updateMatugenScheme(schemeName) {
+    const waypaperIntegrationFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcandy', 'hooks', 'waypaper_integration.sh']);
+    const gtk3File = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'gtk-3.0', 'gtk.css']);
+    const gtk4File = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'gtk-4.0', 'gtk.css']);
+    
+    // Convert scheme name to matugen format
+    const schemeMap = {
+        'Content': 'scheme-content',
+        'Expressive': 'scheme-expressive',
+        'Fidelity': 'scheme-fidelity',
+        'Fruit-salad': 'scheme-fruit-salad',
+        'Monochrome': 'scheme-monochrome',
+        'Neutral': 'scheme-neutral',
+        'Rainbow': 'scheme-rainbow',
+        'Tonal-spot': 'scheme-tonal-spot'
+    };
+    
+    const matugenScheme = schemeMap[schemeName];
+    if (!matugenScheme) return;
+    
+    // Update the waypaper_integration.sh file
+    GLib.spawn_command_line_async(`sed -i 's/--type scheme-[^ ]*/--type ${matugenScheme}/' '${waypaperIntegrationFile}'`);
+    
+    // Handle monochrome vs other schemes for GTK CSS
+    if (schemeName === 'Monochrome') {
+        // Replace @on_secondary with @on_primary_fixed_variant for monochrome
+        GLib.spawn_command_line_async(`sed -i 's/@on_secondary/@on_primary_fixed_variant/g' '${gtk3File}'`);
+        GLib.spawn_command_line_async(`sed -i 's/@on_secondary/@on_primary_fixed_variant/g' '${gtk4File}'`);
+    } else {
+        // Replace @on_primary_fixed_variant with @on_secondary for other schemes
+        GLib.spawn_command_line_async(`sed -i 's/@on_primary_fixed_variant/@on_secondary/g' '${gtk3File}'`);
+        GLib.spawn_command_line_async(`sed -i 's/@on_primary_fixed_variant/@on_secondary/g' '${gtk4File}'`);
+    }
+    
+    // Save the new state
+    saveMatugenState(matugenScheme);
+    currentMatugenScheme = matugenScheme;
+    
+    // Update button states
+    updateMatugenButtonStates();
+}
+
+function updateMatugenButtonStates() {
+    // Update all button states based on current scheme
+    for (let i = 0; i < matugenButtons.length; i++) {
+        const btn = matugenButtons[i];
+        const schemeName = matugenSchemes[i];
+        const schemeMap = {
+            'Content': 'scheme-content',
+            'Expressive': 'scheme-expressive',
+            'Fidelity': 'scheme-fidelity',
+            'Fruit-salad': 'scheme-fruit-salad',
+            'Monochrome': 'scheme-monochrome',
+            'Neutral': 'scheme-neutral',
+            'Rainbow': 'scheme-rainbow',
+            'Tonal-spot': 'scheme-tonal-spot'
+        };
+        
+        if (currentMatugenScheme === schemeMap[schemeName]) {
+            btn.add_css_class('neon-highlight');
+        } else {
+            btn.remove_css_class('neon-highlight');
+        }
+    }
+}
+
+const matugenButtons = [];
+matugenSchemes.forEach(schemeName => {
+    const btn = new Gtk.Button({ label: schemeName });
+    btn.connect('clicked', () => {
+        updateMatugenScheme(schemeName);
+    });
+    matugenButtons.push(btn);
+    themeBox.append(btn);
+});
+
+// Set initial button states
+updateMatugenButtonStates();
+
+//mainRow.append(themeBox);
+
+// Right: All toggles
+const rightBox = new Gtk.Box({
+    orientation: Gtk.Orientation.VERTICAL,
+    spacing: 16,
+    halign: Gtk.Align.CENTER,
+    valign: Gtk.Align.CENTER
+});
+
+// Create new toggles box for right side
+const rightTogglesBox = new Gtk.Box({
+    orientation: Gtk.Orientation.VERTICAL,
+    spacing: 10,
+    halign: Gtk.Align.CENTER,
+    valign: Gtk.Align.CENTER
+});
+
+// Move all toggle functions to append to rightTogglesBox instead of togglesBox
+function addToggleRowRight(label, incScript, decScript) {
+    const row = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER, valign: Gtk.Align.CENTER });
+    const lbl = new Gtk.Label({ label, halign: Gtk.Align.END, xalign: 1 });
+    lbl.set_size_request(110, -1);
+    const decBtn = new Gtk.Button({ label: '-' });
+    decBtn.set_size_request(32, 32);
+    const incBtn = new Gtk.Button({ label: '+' });
+    incBtn.set_size_request(32, 32);
+    decBtn.connect('clicked', () => {
+        GLib.spawn_command_line_async(`bash -c '$HOME/.config/hyprcandy/hooks/${decScript}'`);
+    });
+    incBtn.connect('clicked', () => {
+        GLib.spawn_command_line_async(`bash -c '$HOME/.config/hyprcandy/hooks/${incScript}'`);
+    });
+    row.append(lbl);
+    row.append(decBtn);
+    row.append(incBtn);
+    rightTogglesBox.append(row);
+}
+
+function activeOpacityRowRight(label, configKey) {
+    const row = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER, valign: Gtk.Align.CENTER });
+    const lbl = new Gtk.Label({ label, halign: Gtk.Align.END, xalign: 1 });
+    lbl.set_size_request(110, -1);
+    const decBtn = new Gtk.Button({ label: '-' });
+    decBtn.set_size_request(32, 32);
+    const incBtn = new Gtk.Button({ label: '+' });
+    incBtn.set_size_request(32, 32);
+    
+    function updateActiveOpacity(increment) {
+        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
+        // Read current value
+        try {
+            let [ok, contents] = GLib.file_get_contents(configFile);
+            if (ok && contents) {
+                let content = imports.byteArray.toString(contents);
+                let regex = new RegExp(`active_opacity = ([0-9.]+)`);
+                let match = content.match(regex);
+                if (match) {
+                    let currentValue = parseFloat(match[1]);
+                    let newValue = Math.max(0.0, Math.min(1.0, currentValue + increment));
+                    let newValueStr = newValue.toFixed(2);
+                    GLib.spawn_command_line_async(`sed -i 's/active_opacity = .*/active_opacity = ${newValueStr}/' "${configFile}"`);
+                    GLib.spawn_command_line_async('hyprctl reload');
+                    GLib.spawn_command_line_async(`notify-send "Opacity" "Scale: ${newValueStr}" -t 2000`);
+                }
+            }
+        } catch (e) {}
+    }
+    
+    decBtn.connect('clicked', () => {
+        updateActiveOpacity(-0.05);
+    });
+    incBtn.connect('clicked', () => {
+        updateActiveOpacity(0.05);
+    });
+    
+    row.append(lbl);
+    row.append(decBtn);
+    row.append(incBtn);
+    rightTogglesBox.append(row);
+}
+
+function addBlurSizeRowRight(label, configKey, increment = 1) {
+    const row = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER, valign: Gtk.Align.CENTER });
+    const lbl = new Gtk.Label({ label, halign: Gtk.Align.END, xalign: 1 });
+    lbl.set_size_request(110, -1);
+    const decBtn = new Gtk.Button({ label: '-' });
+    decBtn.set_size_request(32, 32);
+    const incBtn = new Gtk.Button({ label: '+' });
+    incBtn.set_size_request(32, 32);
+    
+    function updateBlurSize(increment) {
+        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
+        // Read current value
+        try {
+            let [ok, contents] = GLib.file_get_contents(configFile);
+            if (ok && contents) {
+                let content = imports.byteArray.toString(contents);
+                // Look for size = X inside the blur block
+                let blurSection = content.match(/blur \{[\s\S]*?\}/);
+                if (blurSection) {
+                    let sizeMatch = blurSection[0].match(/size = ([0-9]+)/);
+                    if (sizeMatch) {
+                        let currentValue = parseInt(sizeMatch[1]);
+                        let newValue = Math.max(0, currentValue + increment);
+                        // Use a simpler sed command that targets the specific line
+                        GLib.spawn_command_line_async(`sed -i '/blur {/,/}/{s/size = ${currentValue}/size = ${newValue}/}' '${configFile}'`);
+                        GLib.spawn_command_line_async('hyprctl reload');
+                        GLib.spawn_command_line_async(`notify-send "Blur Size" "Size: ${newValue}" -t 2000`);
+                    }
+                }
+            }
+        } catch (e) {
+            print('Error updating blur size: ' + e.message);
+        }
+    }
+    
+    decBtn.connect('clicked', () => {
+        updateBlurSize(-increment);
+    });
+    incBtn.connect('clicked', () => {
+        updateBlurSize(increment);
+    });
+    
+    row.append(lbl);
+    row.append(decBtn);
+    row.append(incBtn);
+    rightTogglesBox.append(row);
+}
+
+function addBlurPassRowRight(label, configKey, increment = 1) {
+    const row = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER, valign: Gtk.Align.CENTER });
+    const lbl = new Gtk.Label({ label, halign: Gtk.Align.END, xalign: 1 });
+    lbl.set_size_request(110, -1);
+    const decBtn = new Gtk.Button({ label: '-' });
+    decBtn.set_size_request(32, 32);
+    const incBtn = new Gtk.Button({ label: '+' });
+    incBtn.set_size_request(32, 32);
+    
+    function updateBlurPass(increment) {
+        const configFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcustom', 'custom.conf']);
+        // Read current value
+        try {
+            let [ok, contents] = GLib.file_get_contents(configFile);
+            if (ok && contents) {
+                let content = imports.byteArray.toString(contents);
+                // Look for passes = X inside the blur block
+                let blurSection = content.match(/blur \{[\s\S]*?\}/);
+                if (blurSection) {
+                    let passesMatch = blurSection[0].match(/passes = ([0-9]+)/);
+                    if (passesMatch) {
+                        let currentValue = parseInt(passesMatch[1]);
+                        let newValue = Math.max(0, currentValue + increment);
+                        // Use a simpler sed command that targets the specific line
+                        GLib.spawn_command_line_async(`sed -i 's/passes = ${currentValue}/passes = ${newValue}/' '${configFile}'`);
+                        GLib.spawn_command_line_async('hyprctl reload');
+                        GLib.spawn_command_line_async(`notify-send "Blur Pass" "Passes: ${newValue}" -t 2000`);
+                    }
+                }
+            }
+        } catch (e) {
+            print('Error updating blur passes: ' + e.message);
+        }
+    }
+    
+    decBtn.connect('clicked', () => {
+        updateBlurPass(-increment);
+    });
+    incBtn.connect('clicked', () => {
+        updateBlurPass(increment);
+    });
+    
+    row.append(lbl);
+    row.append(decBtn);
+    row.append(incBtn);
+    rightTogglesBox.append(row);
+}
+
+function addRofiBorderRowRight(label, increment = 1) {
+    const row = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER, valign: Gtk.Align.CENTER });
+    const lbl = new Gtk.Label({ label, halign: Gtk.Align.END, xalign: 1 });
+    lbl.set_size_request(110, -1);
+    const decBtn = new Gtk.Button({ label: '-' });
+    decBtn.set_size_request(32, 32);
+    const incBtn = new Gtk.Button({ label: '+' });
+    incBtn.set_size_request(32, 32);
+    
+    function updateRofiBorder(increment) {
+        const rofiBorderFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcandy', 'settings', 'rofi-border.rasi']);
+        try {
+            let [ok, contents] = GLib.file_get_contents(rofiBorderFile);
+            if (ok && contents) {
+                let content = imports.byteArray.toString(contents);
+                let borderMatch = content.match(/border-width: ([0-9]+)px/);
+                if (borderMatch) {
+                    let currentValue = parseInt(borderMatch[1]);
+                    let newValue = Math.max(0, currentValue + increment);
+                    GLib.spawn_command_line_async(`sed -i 's/border-width: ${currentValue}px/border-width: ${newValue}px/' '${rofiBorderFile}'`);
+                    GLib.spawn_command_line_async(`notify-send "Rofi Border" "Border: ${newValue}px" -t 2000`);
+                }
+            }
+        } catch (e) {
+            print('Error updating rofi border: ' + e.message);
+        }
+    }
+    
+    decBtn.connect('clicked', () => {
+        updateRofiBorder(-increment);
+    });
+    incBtn.connect('clicked', () => {
+        updateRofiBorder(increment);
+    });
+    
+    row.append(lbl);
+    row.append(decBtn);
+    row.append(incBtn);
+    rightTogglesBox.append(row);
+}
+
+function addRofiRadiusRowRight(label, increment = 0.1) {
+    const row = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER, valign: Gtk.Align.CENTER });
+    const lbl = new Gtk.Label({ label, halign: Gtk.Align.END, xalign: 1 });
+    lbl.set_size_request(110, -1);
+    const decBtn = new Gtk.Button({ label: '-' });
+    decBtn.set_size_request(32, 32);
+    const incBtn = new Gtk.Button({ label: '+' });
+    incBtn.set_size_request(32, 32);
+    
+    function updateRofiRadius(increment) {
+        const rofiRadiusFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'hyprcandy', 'settings', 'rofi-border-radius.rasi']);
+        try {
+            let [ok, contents] = GLib.file_get_contents(rofiRadiusFile);
+            if (ok && contents) {
+                let content = imports.byteArray.toString(contents);
+                let radiusMatch = content.match(/border-radius: ([0-9.]+)em/);
+                if (radiusMatch) {
+                    let currentValue = parseFloat(radiusMatch[1]);
+                    let newValue = Math.max(0, Math.min(5, currentValue + increment));
+                    let newValueStr = newValue.toFixed(1);
+                    GLib.spawn_command_line_async(`sed -i 's/border-radius: ${radiusMatch[1]}em/border-radius: ${newValueStr}em/' '${rofiRadiusFile}'`);
+                    GLib.spawn_command_line_async(`notify-send "Rofi Radius" "Radius: ${newValueStr}em" -t 2000`);
+                }
+            }
+        } catch (e) {
+            print('Error updating rofi radius: ' + e.message);
+        }
+    }
+    
+    decBtn.connect('clicked', () => {
+        updateRofiRadius(-increment);
+    });
+    incBtn.connect('clicked', () => {
+        updateRofiRadius(increment);
+    });
+    
+    row.append(lbl);
+    row.append(decBtn);
+    row.append(incBtn);
+    rightTogglesBox.append(row);
+}
+
+// Add all toggles to the right box
+addToggleRowRight('Dock Icon Size', 'nwg_dock_icon_size_increase.sh', 'nwg_dock_icon_size_decrease.sh');
+addToggleRowRight('Dock Radius', 'nwg_dock_border_radius_increase.sh', 'nwg_dock_border_radius_decrease.sh');
+addToggleRowRight('Dock Width', 'nwg_dock_border_width_increase.sh', 'nwg_dock_border_width_decrease.sh');
+addToggleRowRight('Rounding', 'hyprland_rounding_increase.sh', 'hyprland_rounding_decrease.sh');
+addToggleRowRight('Gaps OUT', 'hyprland_gaps_out_increase.sh', 'hyprland_gaps_out_decrease.sh');
+addToggleRowRight('Gaps IN', 'hyprland_gaps_in_increase.sh', 'hyprland_gaps_in_decrease.sh');
+addToggleRowRight('Border', 'hyprland_border_increase.sh', 'hyprland_border_decrease.sh');
+addBlurSizeRowRight('Blur Size', 'size', 1);
+addBlurPassRowRight('Blur Pass', 'passes', 1);
+addRofiBorderRowRight('Rofi Border', 1);
+addRofiRadiusRowRight('Rofi Radius', 0.1);
+activeOpacityRowRight('Opacity Scale', 'active_opacity');
+
+    // --- Waybar Padding Control ---
+    function addWaybarPaddingRow(label, increment = 0.5) {
+        const row = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER, valign: Gtk.Align.CENTER });
+        const lbl = new Gtk.Label({ label, halign: Gtk.Align.END, xalign: 1 });
+        lbl.set_size_request(110, -1);
+        const decBtn = new Gtk.Button({ label: '-' });
+        decBtn.set_size_request(32, 32);
+        const incBtn = new Gtk.Button({ label: '+' });
+        incBtn.set_size_request(32, 32);
+        
+        function updateWaybarPadding(increment) {
+            const waybarStyleFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'waybar', 'style.css']);
+            const waybarPaddingStateFile = GLib.build_filenamev([hyprsunsetStateDir, 'waybar_padding.state']);
+            
+            try {
+                // Read current padding value from CSS file
+                let [ok, contents] = GLib.file_get_contents(waybarStyleFile);
+                if (ok && contents) {
+                    let content = imports.byteArray.toString(contents);
+                    let paddingMatch = content.match(/padding: ([0-9.]+)px;/);
+                    if (paddingMatch) {
+                        let currentValue = parseFloat(paddingMatch[1]);
+                        let newValue = Math.max(0, currentValue + increment);
+                        let newValueStr = newValue.toFixed(1);
+                        
+                        // Update CSS file
+                        GLib.spawn_command_line_async(`sed -i '28s/padding: ${paddingMatch[1]}px;/padding: ${newValueStr}px;/' '${waybarStyleFile}'`);
+                        
+                        // Update state file
+                        GLib.file_set_contents(waybarPaddingStateFile, newValueStr);
+                        
+                        // Reload waybar
+                        //GLib.spawn_command_line_async('killall waybar');
+                        //GLib.spawn_command_line_async('bash -c "waybar &"');
+                        
+                        // Send notification
+                        GLib.spawn_command_line_async(`notify-send "Waybar" "Padding: ${newValueStr}px" -t 2000`);
+                    }
+                }
+            } catch (e) {
+                print('Error updating waybar padding: ' + e.message);
+            }
+        }
+        
+        decBtn.connect('clicked', () => {
+            updateWaybarPadding(-increment);
+        });
+        incBtn.connect('clicked', () => {
+            updateWaybarPadding(increment);
+        });
+        
+        row.append(lbl);
+        row.append(decBtn);
+        row.append(incBtn);
+        rightTogglesBox.append(row);
+    }
+    
+    addWaybarPaddingRow('Waybar Padding', 0.5);
+    
+    // --- Waybar Border Size Control ---
+    function addWaybarBorderSizeRow(label, increment = 1) {
+        const row = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8, halign: Gtk.Align.CENTER, valign: Gtk.Align.CENTER });
+        const lbl = new Gtk.Label({ label, halign: Gtk.Align.END, xalign: 1 });
+        lbl.set_size_request(110, -1);
+        const decBtn = new Gtk.Button({ label: '-' });
+        decBtn.set_size_request(32, 32);
+        const incBtn = new Gtk.Button({ label: '+' });
+        incBtn.set_size_request(32, 32);
+        
+        function updateWaybarBorderSize(increment) {
+            const waybarStyleFile = GLib.build_filenamev([GLib.get_home_dir(), '.config', 'waybar', 'style.css']);
+            const waybarBorderSizeStateFile = GLib.build_filenamev([hyprsunsetStateDir, 'waybar_border_size.state']);
+            
+            try {
+                // Read current border size value from CSS file
+                let [ok, contents] = GLib.file_get_contents(waybarStyleFile);
+                if (ok && contents) {
+                    let content = imports.byteArray.toString(contents);
+                    
+                    // Look specifically for the border in the window#waybar > box section
+                    let borderMatch = content.match(/window#waybar > box\s*\{[\s\S]*?border:\s*([0-9]+)px\s*solid\s*@on_primary_fixed_variant;[\s\S]*?\}/);
+                    
+                    if (!borderMatch) {
+                        // Fallback: try to find any border with @on_primary_fixed_variant
+                        borderMatch = content.match(/border:\s*([0-9]+)px\s*solid\s*@on_primary_fixed_variant;/);
+                    }
+                    
+                    if (borderMatch) {
+                        let currentValue = parseInt(borderMatch[1]);
+                        let newValue = Math.max(0, currentValue + increment);
+                        
+                        // Update CSS file using the exact current value
+                        GLib.spawn_command_line_async(`sed -i '29s/border: ${currentValue}px solid @on_primary_fixed_variant;/border: ${newValue}px solid @on_primary_fixed_variant;/' '${waybarStyleFile}'`);
+                        
+                        // Update state file
+                        GLib.file_set_contents(waybarBorderSizeStateFile, newValue.toString());
+                        
+                        // Send notification
+                        GLib.spawn_command_line_async(`notify-send "Waybar" "Border Size: ${newValue}px" -t 2000`);
+                    } else {
+                        print('Could not find border pattern in CSS file');
+                    }
+                }
+            } catch (e) {
+                print('Error updating waybar border size: ' + e.message);
+            }
+        }
+        
+        decBtn.connect('clicked', () => {
+            updateWaybarBorderSize(-increment);
+        });
+        incBtn.connect('clicked', () => {
+            updateWaybarBorderSize(increment);
+        });
+        
+        row.append(lbl);
+        row.append(decBtn);
+        row.append(incBtn);
+        rightTogglesBox.append(row);
+    }
+    
+    addWaybarBorderSizeRow('Waybar Border', 1);
+
+rightBox.append(rightTogglesBox);
+mainRow.append(rightBox);
+return mainRow;
+}
+
+// Export both functions
+var exports = {
+    createTogglesBox
+};
+EOF
+
+else
+
 cat > "$HOME/.hyprcandy/GJS/src/mediaMenu.js" << 'EOF'
 imports.gi.versions.Gtk = '4.0';
 imports.gi.versions.Gio = '2.0';
@@ -5795,6 +6816,7 @@ var exports = {
     createTogglesBox
 }; 
 EOF
+fi
 
 cat > "$HOME/.hyprcandy/GJS/src/weather.js" << 'EOF'
 imports.gi.versions.Gtk = '4.0';
