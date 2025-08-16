@@ -3326,11 +3326,11 @@ input {
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 general {
-    gaps_in = 4
-    gaps_out = 6	
+    gaps_in = 6
+    gaps_out = 10	
     gaps_workspaces = 50    # Gaps between workspaces
     border_size = 3
-    col.active_border = $primary_fixed_dim $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $primary_fixed_dim 90deg
+    col.active_border = $primary_fixed_dim #$on_primary_fixed_variant 90deg
     col.inactive_border = $on_primary_fixed_variant
     layout = dwindle
     resize_on_border = true
@@ -3382,8 +3382,8 @@ decoration {
 
     blur {
     enabled = true
-    size = 4
-    passes = 2
+    size = 6
+    passes = 3
     new_optimizations = on
     ignore_opacity = true
     xray = false
@@ -3490,7 +3490,7 @@ windowrule = animation slide right, class:^(kitty|Alacritty)$
 windowrule = noblur, class:^(org.mozilla.firefox)$
 # Decorations related to floating windows on workspaces 1 to 10
 ##windowrule = bordersize 2, floating:1, onworkspace:w[fv1-10]
-windowrule = bordercolor $primary_fixed_dim $on_primary_fixed_variant 90deg, floating:1, onworkspace:w[fv1-10]
+windowrule = bordercolor $primary_fixed_dim, floating:1, onworkspace:w[fv1-10] #$on_primary_fixed_variant 90deg
 ##windowrule = rounding 8, floating:1, onworkspace:w[fv1-10]
 # Decorations related to tiling windows on workspaces 1 to 10
 ##windowrule = bordersize 3, floating:0, onworkspace:f[1-10]
@@ -3829,11 +3829,11 @@ input {
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 general {
-    gaps_in = 4
-    gaps_out = 6	
+    gaps_in = 6
+    gaps_out = 10	
     gaps_workspaces = 50    # Gaps between workspaces
     border_size = 3
-    col.active_border = $primary_fixed_dim $on_primary_fixed_variant $on_primary_fixed_variant $on_primary_fixed_variant $primary_fixed_dim 90deg
+    col.active_border = $primary_fixed_dim #$on_primary_fixed_variant 90deg
     col.inactive_border = $on_primary_fixed_variant
     layout = dwindle
     resize_on_border = true
@@ -3885,8 +3885,8 @@ decoration {
 
     blur {
     enabled = true
-    size = 4
-    passes = 2
+    size = 6
+    passes = 3
     new_optimizations = on
     ignore_opacity = true
     xray = false
@@ -3993,7 +3993,7 @@ windowrule = animation slide right, class:^(kitty|Alacritty)$
 windowrule = noblur, class:^(org.mozilla.firefox)$
 # Decorations related to floating windows on workspaces 1 to 10
 ##windowrule = bordersize 2, floating:1, onworkspace:w[fv1-10]
-windowrule = bordercolor $primary_fixed_dim $on_primary_fixed_variant 90deg, floating:1, onworkspace:w[fv1-10]
+windowrule = bordercolor $primary_fixed_dim, floating:1, onworkspace:w[fv1-10] #$on_primary_fixed_variant 90deg
 ##windowrule = rounding 8, floating:1, onworkspace:w[fv1-10]
 # Decorations related to tiling windows on workspaces 1 to 10
 ##windowrule = bordersize 3, floating:0, onworkspace:f[1-10]
