@@ -264,6 +264,7 @@ build_package_list() {
         "hyprsysteminfo"
         "hyprutils"
         "hyprwayland-scanner"
+        "xdg-desktop-portal-hyprland"
         
         # GNOME components (always include gnome-control-center and gnome-tweaks)
         "gnome-control-center"
