@@ -4237,7 +4237,7 @@ input-field {
     dots_rounding = -1 # -1 default circle, -2 follow input-field rounding
     outer_color = $primary_fixed_dim $source_color 90deg
     inner_color = $inverse_primary
-    font_color = $source_color
+    font_color = $primary_fixed_dim
     font_family = C059 Bold Italic
     fade_on_empty = false
     fade_timeout = 1000 # Milliseconds before fade_on_empty is triggered.
@@ -4278,7 +4278,7 @@ label {
     monitor =
     #clock
     text = cmd[update:1000] echo "$TIME"
-    color = $source_color
+    color = $primary_fixed_dim
     font_size = 55
     font_family = C059 Bold Italic
     position = 0, -75
