@@ -3236,8 +3236,8 @@ exec-once = wl-paste --watch cliphist store
 exec-once = ~/.config/hpr/scripts/xdg.sh
 # Restore wallaper
 exec-once = bash ~/.config/hypr/scripts/wallpaper-restore.sh
-# Launch newtwork tray applet
-#exec-once = nm-applet &
+# Restart wallaper service
+exec-once = systemctl --user restart background-watcher
 # Pyprland
 #exec-once = /usr/bin/pypr &
 
@@ -3739,8 +3739,8 @@ exec-once = wl-paste --watch cliphist store
 exec-once = ~/.config/hpr/scripts/xdg.sh
 # Restore wallaper
 exec-once = bash ~/.config/hypr/scripts/wallpaper-restore.sh
-# Launch newtwork tray applet
-#exec-once = nm-applet &
+# Restart wallaper service
+exec-once = systemctl --user restart background-watcher
 # Pyprland
 #exec-once = /usr/bin/pypr &
 
@@ -4339,7 +4339,7 @@ bind = $mainMod, W, exec, warp-terminal
 bind = $mainMod, C, exec, DRI_PRIME=1 $EDITOR #Editor
 bind = $mainMod, B, exec, DRI_PRIME=1 xdg-open "http://" #Launch your default browser
 bind = $mainMod, Q, exec, kitty #Launch normal kitty instances
-#bind = $mainMod, Return, exec, DRI_PRIME=1 pypr toggle term #Launch a kitty scratchpad through pyprland
+bind = $mainMod, Return, exec, DRI_PRIME=1 pypr toggle term #Launch a kitty scratchpad through pyprland
 bind = $mainMod, O, exec, DRI_PRIME=1 /usr/bin/octopi #Launch octopi application finder
 bind = $mainMod, E, exec, DRI_PRIME=1 nautilus #pypr toggle filemanager #Launch the filemanager 
 bind = $mainMod CTRL, C, exec, DRI_PRIME=1 gnome-calculator #Launch the calculator
@@ -4560,7 +4560,7 @@ bind = $mainMod, W, exec, warp-terminal
 bind = $mainMod, C, exec, DRI_PRIME=1 $EDITOR #Editor
 bind = $mainMod, B, exec, DRI_PRIME=1 xdg-open "http://" #Launch your default browser
 bind = $mainMod, Q, exec, kitty #Launch normal kitty instances
-#bind = $mainMod, Return, exec, DRI_PRIME=1 pypr toggle term #Launch a kitty scratchpad through pyprland
+bind = $mainMod, Return, exec, DRI_PRIME=1 pypr toggle term #Launch a kitty scratchpad through pyprland
 bind = $mainMod, O, exec, DRI_PRIME=1 /usr/bin/octopi #Launch octopi application finder
 bind = $mainMod, E, exec, DRI_PRIME=1 nautilus #pypr toggle filemanager #Launch the filemanager 
 bind = $mainMod CTRL, C, exec, DRI_PRIME=1 gnome-calculator #Launch the calculator
