@@ -4235,21 +4235,21 @@ input-field {
     dots_spacing = 0.15 # Scale of dots' absolute size, 0.0 - 1.0
     dots_center = true
     dots_rounding = -1 # -1 default circle, -2 follow input-field rounding
-    outer_color = $inverse_primary
-    inner_color = $background
-    font_color = $inverse_primary
+    outer_color = $primary_fixed_dim $source_color 90deg
+    inner_color = $inverse_primary
+    font_color = $source_color
     font_family = C059 Bold Italic
     fade_on_empty = false
     fade_timeout = 1000 # Milliseconds before fade_on_empty is triggered.
     placeholder_text = <i><span> Password</span></i># Text rendered in the input box when it's empty. # foreground="$inverse_primary ##ffffff99
     hide_input = false
     rounding = 40 # -1 means complete rounding (circle/oval)
-    check_color = $primary
+    check_color = $rimary
     fail_color = $error # if authentication failed, changes outer_color and fail message color
     fail_text = <i>$FAIL <b>($ATTEMPTS)</b></i> # can be set to empty
     fail_transition = 300 # transition time in ms between normal outer_color and fail_color
     capslock_color = $primary_fixed_dim
-    numlock_color = $source_color
+    numlock_color = $primary_fixed_dim $source_color 90deg
     #bothlock_color = -1 # when both locks are active. -1 means don't change outer color (same for above)
     invert_numlock = false # change color if numlock is off
     swap_font_color = false # see below
@@ -4278,7 +4278,7 @@ label {
     monitor =
     #clock
     text = cmd[update:1000] echo "$TIME"
-    color = $inverse_primary
+    color = $source_color
     font_size = 55
     font_family = C059 Bold Italic
     position = 0, -75
@@ -4307,7 +4307,7 @@ image {
     size = 160  lesser side if not 1:1 ratio
     rounding = -1 # negative values mean circle
     border_size = 4
-    border_color = $inverse_primary
+    border_color = $primary_fixed_dim $source_color 90deg
     rotate = 0 # degrees, counter-clockwise
     reload_time = -1 # seconds between reloading, 0 to reload with SIGUSR2
 #    reload_cmd =  # command to get new path. if empty, old path will be used. don't run "follow" commands like tail -F
