@@ -2151,9 +2151,9 @@ if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
         
         if [ "$current_colors" != "$stored_colors" ]; then
             # Colors have changed, reload dock
-            pkill -f mwg-dock-hyprland
-            sleep 0.3
-            "$HOME/.config/nwg-dock-hyprland/launch.sh" >/dev/null 2>&1 &
+            #pkill -f mwg-dock-hyprland
+            #sleep 0.3
+            #"$HOME/.config/nwg-dock-hyprland/launch.sh" >/dev/null 2>&1 &
             # Update stored colors file with new colors
             mkdir -p "$(dirname "$COLORS_FILE")"
             echo "$current_colors" > "$COLORS_FILE"
@@ -2241,9 +2241,9 @@ if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
         
         if [ "$current_colors" != "$stored_colors" ]; then
             # Colors have changed, reload dock
-            pkill -f mwg-dock-hyprland
-            sleep 0.3
-            "$HOME/.config/nwg-dock-hyprland/launch.sh" >/dev/null 2>&1 &
+            #pkill -f mwg-dock-hyprland
+            #sleep 0.3
+            #"$HOME/.config/nwg-dock-hyprland/launch.sh" >/dev/null 2>&1 &
             # Update stored colors file with new colors
             mkdir -p "$(dirname "$COLORS_FILE")"
             echo "$current_colors" > "$COLORS_FILE"
@@ -2334,6 +2334,7 @@ monitor_matugen() {
     
     echo "✅ Matugen finished, executing hooks"
     execute_hooks
+    bash "$HOME/.config/nwg-dock-hyprland/launch.sh" > /dev/null 2>&1 &
 }
 
 # ⏳ Wait for background file to exist
@@ -5407,11 +5408,11 @@ const presetBox = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL, spacing: 
         if (isIslands) {
             // Change to islands mode: no background, no border
             GLib.spawn_command_line_async(`sed -i '25s/background: @blur_background;/background: none;/' '${waybarStyleFile}'`);
-            GLib.spawn_command_line_async(`sed -i '29s/border: ${currentBorderSize}px solid @on_primary_fixed_variant;/border: 0px solid @on_primary_fixed_variant;/' '${waybarStyleFile}'`);
+            GLib.spawn_command_line_async(`sed -i '29s/border: ${currentBorderSize}px solid @inverse_primary;/border: 0px solid @inverse_primary;/' '${waybarStyleFile}'`);
         } else {
             // Change to bar mode: restore background and border
             GLib.spawn_command_line_async(`sed -i '25s/background: none;/background: @blur_background;/' '${waybarStyleFile}'`);
-            GLib.spawn_command_line_async(`sed -i '29s/border: 0px solid @on_primary_fixed_variant;/border: ${currentBorderSize}px solid @on_primary_fixed_variant;/' '${waybarStyleFile}'`);
+            GLib.spawn_command_line_async(`sed -i '29s/border: 0px solid @inverse_primary;/border: ${currentBorderSize}px solid @inverse_primary;/' '${waybarStyleFile}'`);
         }
         // Reload waybar
         //GLib.spawn_command_line_async('killall waybar');
@@ -5935,11 +5936,11 @@ activeOpacityRowRight('Opacity Scale', 'active_opacity');
                     let content = imports.byteArray.toString(contents);
                     
                     // Look specifically for the border in the window#waybar > box section
-                    let borderMatch = content.match(/window#waybar > box\s*\{[\s\S]*?border:\s*([0-9]+)px\s*solid\s*@on_primary_fixed_variant;[\s\S]*?\}/);
+                    let borderMatch = content.match(/window#waybar > box\s*\{[\s\S]*?border:\s*([0-9]+)px\s*solid\s*@inverse_primary;[\s\S]*?\}/);
                     
                     if (!borderMatch) {
-                        // Fallback: try to find any border with @on_primary_fixed_variant
-                        borderMatch = content.match(/border:\s*([0-9]+)px\s*solid\s*@on_primary_fixed_variant;/);
+                        // Fallback: try to find any border with @inverse_primary
+                        borderMatch = content.match(/border:\s*([0-9]+)px\s*solid\s*@inverse_primary;/);
                     }
                     
                     if (borderMatch) {
@@ -5947,7 +5948,7 @@ activeOpacityRowRight('Opacity Scale', 'active_opacity');
                         let newValue = Math.max(0, currentValue + increment);
                         
                         // Update CSS file using the exact current value
-                        GLib.spawn_command_line_async(`sed -i '29s/border: ${currentValue}px solid @on_primary_fixed_variant;/border: ${newValue}px solid @on_primary_fixed_variant;/' '${waybarStyleFile}'`);
+                        GLib.spawn_command_line_async(`sed -i '29s/border: ${currentValue}px solid @inverse_primary;/border: ${newValue}px solid @inverse_primary;/' '${waybarStyleFile}'`);
                         
                         // Update state file
                         GLib.file_set_contents(waybarBorderSizeStateFile, newValue.toString());
