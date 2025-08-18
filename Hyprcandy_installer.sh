@@ -4208,6 +4208,15 @@ general {
     hide_cursor = true
 }
 
+auth {
+    fingerprint {
+        enabled = true
+        ready_message = Scan fingerprint to unlock
+        present_message = Scanning...
+        retry_delay = 250 # in milliseconds
+    }
+}
+
 background {
     monitor =
     path = ~/.config/background.png
@@ -4226,26 +4235,27 @@ input-field {
     dots_spacing = 0.15 # Scale of dots' absolute size, 0.0 - 1.0
     dots_center = true
     dots_rounding = -1 # -1 default circle, -2 follow input-field rounding
-    outer_color = $source_color
+    outer_color = $inverse_primary
     inner_color = $background
-    font_color = $source_color
+    font_color = $inverse_primary
+    font_family = C059 Bold Italic
     fade_on_empty = false
     fade_timeout = 1000 # Milliseconds before fade_on_empty is triggered.
-    placeholder_text = <i><span> Password</span></i># Text rendered in the input box when it's empty. # foreground="$source_color" ##ffffff99
+    placeholder_text = <i><span> Password</span></i># Text rendered in the input box when it's empty. # foreground="$inverse_primary ##ffffff99
     hide_input = false
     rounding = 40 # -1 means complete rounding (circle/oval)
     check_color = $primary
     fail_color = $error # if authentication failed, changes outer_color and fail message color
     fail_text = <i>$FAIL <b>($ATTEMPTS)</b></i> # can be set to empty
     fail_transition = 300 # transition time in ms between normal outer_color and fail_color
-    capslock_color = -1
-    numlock_color = -1
-    bothlock_color = -1 # when both locks are active. -1 means don't change outer color (same for above)
+    capslock_color = $primary_fixed_dim
+    numlock_color = $source_color
+    #bothlock_color = -1 # when both locks are active. -1 means don't change outer color (same for above)
     invert_numlock = false # change color if numlock is off
     swap_font_color = false # see below
-    position = 0, -80
+    position = 0, 35
     halign = center
-    valign = center
+    valign = bottom
     shadow_passes = 10
     shadow_size = 20
     shadow_color = $shadow
@@ -4254,25 +4264,37 @@ input-field {
 
 label {
     monitor =
+    #date
+    text = cmd[update:60000] date +"%A, %d %B %Y"
+    color = $primary_fixed_dim
+    font_size = 20
+    font_family = C059 Bold
+    position = 0, -35
+    halign = center
+    valign = top
+}
+
+label {
+    monitor =
     #clock
     text = cmd[update:1000] echo "$TIME"
-    color = $secondary
+    color = $inverse_primary
     font_size = 55
-    font_family = Fira Semibold
-    position = 0, 70
+    font_family = C059 Bold Italic
+    position = 0, -75
     halign = center
-    valign = bottom
+    valign = top
     shadow_passes = 5
     shadow_size = 10
 }
 
 label {
     monitor =
-    text = ✝    👑    ✝ #  $USER
-    color = $secondary
+    text = ✝      $USER    ✝ #  $USER
+    color = $primary_fixed_dim
     font_size = 20
-    font_family = Fira Semibold
-    position = 0, 360
+    font_family = C059 Bold
+    position = 0, 100
     halign = center
     valign = bottom
     shadow_passes = 5
@@ -4282,20 +4304,16 @@ label {
 image {
     monitor =
     path = ~/.config/background.png #.face.icon
-    size = 160 # lesser side if not 1:1 ratio
-    rounding = 75 # negative values mean circle
+    size = 160  lesser side if not 1:1 ratio
+    rounding = -1 # negative values mean circle
     border_size = 4
-    border_color = $source_color
+    border_color = $inverse_primary
     rotate = 0 # degrees, counter-clockwise
     reload_time = -1 # seconds between reloading, 0 to reload with SIGUSR2
 #    reload_cmd =  # command to get new path. if empty, old path will be used. don't run "follow" commands like tail -F
-    position = 0, -100
+    position = 0, 0
     halign = center
-    valign = top
-    shadow_passes = 10
-    shadow_size = 20
-    shadow_color = $shadow
-    shadow_boost = 1.6
+    valign = center
 }
 EOF
 
