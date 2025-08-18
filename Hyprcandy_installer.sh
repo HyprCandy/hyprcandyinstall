@@ -3331,15 +3331,15 @@ general {
     gaps_out = 10	
     gaps_workspaces = 50    # Gaps between workspaces
     border_size = 3
-    col.active_border = $primary_fixed_dim #$on_primary_fixed_variant 90deg
-    col.inactive_border = $on_primary_fixed_variant
+    col.active_border = $primary_fixed_dim #$on_primary_fixed_variant $primary_fixed_dim 90deg
+    col.inactive_border = $inverse_primary
     layout = dwindle
     resize_on_border = true
     allow_tearing = true
 }
 
 group:groupbar:col.active =  $primary_fixed_dim
-group:groupbar:col.inactive = $on_primary_fixed_variant
+group:groupbar:col.inactive = $inverse_primary
 
 dwindle {
     pseudotile = true
@@ -3834,15 +3834,15 @@ general {
     gaps_out = 10	
     gaps_workspaces = 50    # Gaps between workspaces
     border_size = 3
-    col.active_border = $primary_fixed_dim #$on_primary_fixed_variant 90deg
-    col.inactive_border = $on_primary_fixed_variant
+    col.active_border = $primary_fixed_dim #$on_primary_fixed_variant $primary_fixed_dim 90deg
+    col.inactive_border = $inverse_primary
     layout = dwindle
     resize_on_border = true
     allow_tearing = true
 }
 
 group:groupbar:col.active =  $primary_fixed_dim
-group:groupbar:col.inactive = $on_primary_fixed_variant
+group:groupbar:col.inactive = $inverse_primary
 
 dwindle {
     pseudotile = true
@@ -5844,7 +5844,7 @@ function addRofiRadiusRowRight(label, increment = 0.1) {
 // Add all toggles to the right box
 addToggleRowRight('Dock Icon Size', 'nwg_dock_icon_size_increase.sh', 'nwg_dock_icon_size_decrease.sh');
 addToggleRowRight('Dock Radius', 'nwg_dock_border_radius_increase.sh', 'nwg_dock_border_radius_decrease.sh');
-addToggleRowRight('Dock Width', 'nwg_dock_border_width_increase.sh', 'nwg_dock_border_width_decrease.sh');
+addToggleRowRight('Dock Border', 'nwg_dock_border_width_increase.sh', 'nwg_dock_border_width_decrease.sh');
 addToggleRowRight('Rounding', 'hyprland_rounding_increase.sh', 'hyprland_rounding_decrease.sh');
 addToggleRowRight('Gaps OUT', 'hyprland_gaps_out_increase.sh', 'hyprland_gaps_out_decrease.sh');
 addToggleRowRight('Gaps IN', 'hyprland_gaps_in_increase.sh', 'hyprland_gaps_in_decrease.sh');
@@ -6796,7 +6796,7 @@ function addRofiRadiusRowRight(label, increment = 0.1) {
 // Add all toggles to the right box
 addToggleRowRight('Dock Icon Size', 'nwg_dock_icon_size_increase.sh', 'nwg_dock_icon_size_decrease.sh');
 addToggleRowRight('Dock Radius', 'nwg_dock_border_radius_increase.sh', 'nwg_dock_border_radius_decrease.sh');
-addToggleRowRight('Dock Width', 'nwg_dock_border_width_increase.sh', 'nwg_dock_border_width_decrease.sh');
+addToggleRowRight('Dock Border', 'nwg_dock_border_width_increase.sh', 'nwg_dock_border_width_decrease.sh');
 addToggleRowRight('Rounding', 'hyprland_rounding_increase.sh', 'hyprland_rounding_decrease.sh');
 addToggleRowRight('Gaps OUT', 'hyprland_gaps_out_increase.sh', 'hyprland_gaps_out_decrease.sh');
 addToggleRowRight('Gaps IN', 'hyprland_gaps_in_increase.sh', 'hyprland_gaps_in_decrease.sh');
