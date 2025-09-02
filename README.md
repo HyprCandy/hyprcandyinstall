@@ -1,14 +1,16 @@
-![2025-06-19T17:33:32,983422067+03:00](https://github.com/user-attachments/assets/671960f9-e5ec-42cd-a3ce-87c072ead1eb)
-
+<img width="467" height="347" alt="screenshot_19082025_014516" src="https://github.com/user-attachments/assets/b2b6b96d-fb26-426b-bbdb-c7815561eefe" />
+[Changed to install UltraCandy]
 ➡ ❣️ If you like my project, your [support](https://ko-fi.com/ianmking) will mean a lot ⬅
+
+I recommend running the script from Hyprland but it will also work from other DEs or the TTY.
 
 Needed packages: git, hyprland, kitty
 
-Then from base Hyprland or Gnome which is the only recommended secondary DE for this setup run:
+Run:
 ```shell
-git clone https://github.com/HyprCandy/hyprcandyinstall.git && cd hyprcandyinstall
+git clone https://github.com/HyprCandy/ultracandyinstall.git && cd ultracandyinstall
 ```
 followed by:
 ```shell
-bash Hyprcandy_installer.sh
+bash UltraCandy_installer.sh
 ```
