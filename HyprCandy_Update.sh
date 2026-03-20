@@ -49,7 +49,7 @@ show_ascii_art() {
     echo
     # Decorative line with gradient
     echo -e "${PURPLE}════════════════════${MAGENTA}════════════════════${CYAN}════════════════════${YELLOW}═════════${NC}"
-    echo -e "${WHITE}                    HyprCandy Update!${NC}"
+    echo -e "${WHITE}                              HyprCandy Update!${NC}"
     echo -e "${PURPLE}════════════════════${MAGENTA}════════════════════${CYAN}════════════════════${YELLOW}═════════${NC}"
     echo
 }
@@ -939,7 +939,7 @@ EOF
 }
     
 # Function to automatically setup Hyprcandy configuration
-setup_ultracandy() {
+setup_hyprcandy() {
 
     print_status "Setting up HyprCandy configuration..."
     # Prevent notification daemon conflicts
@@ -1013,9 +1013,9 @@ setup_ultracandy() {
     fi
 
     # Clone HyprCandy repository
-    ultracandy_dir="$HOME/.hyprcandy"
-    echo "🌐 Cloning HyprCandy repository ..." #into $ultracandy_dir
-    git clone https://github.com/HyprCandy/HyprCandy.git "$ultracandy_dir"
+    hyprcandy_dir="$HOME/.hyprcandy"
+    echo "🌐 Cloning HyprCandy repository ..." #into $hyprcandy_dir
+    git clone https://github.com/HyprCandy/Hyprcandy.git "$hyprcandy_dir"
     echo "✅ Cloning complete"
     
     # Clone overview repository
@@ -1058,7 +1058,7 @@ setup_ultracandy() {
     cd "$HOME"
     
     # Change to the HyprCandy dotfiles directory
-    cd "$ultracandy_dir" || { echo "❌ Error: Could not find HyprCandy directory"; exit 1; }
+    cd "$hyprcandy_dir" || { echo "❌ Error: Could not find HyprCandy directory"; exit 1; }
 
     # Define only the configs to be stowed
     config_dirs=(".face.icon" ".config" ".icons" ".hyprcandy-zsh.zsh")
@@ -3513,15 +3513,15 @@ chmod +x "$HOME/.config/waybar/scripts/toggle-weather-format.sh"
     # 📁 Copy Candy folder to ~/Pictures
     echo
     echo "📁 Attempting to copy 'Candy' images folder to ~/Pictures..."
-    if [ -d "$ultracandy_dir/Candy" ]; then
+    if [ -d "$hyprcandy_dir/Candy" ]; then
         if [ -d "$HOME/Pictures" ]; then
-            cp -r "$ultracandy_dir/Candy" "$HOME/Pictures/"
+            cp -r "$hyprcandy_dir/Candy" "$HOME/Pictures/"
             echo "✅ 'Candy' copied successfully to ~/Pictures"
         else
             echo "⚠️  Skipped copy: '$HOME/Pictures' directory does not exist."
         fi
     else
-        echo "⚠️  'Candy' folder not found in $ultracandy_dir"
+        echo "⚠️  'Candy' folder not found in $hyprcandy_dir"
     fi
 
     # Change Start Button Icon
@@ -13235,7 +13235,7 @@ main() {
     
     # Automatically setup HyprCandy configuration
     print_status "Proceeding with HyprCandy configuration setup..."
-    setup_ultracandy
+    setup_hyprcandy
 
     # Setup default "custom.conf" file
     setup_custom_config
