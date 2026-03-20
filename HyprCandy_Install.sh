@@ -976,7 +976,7 @@ setup_hyprcandy() {
     # Clone HyprCandy repository
     hyprcandy_dir="$HOME/.hyprcaandy"
     echo "🌐 Cloning HyprCandy repository ..." #into $hyprcandy_dir
-    git clone https://github.com/HyprCandy/HyprCandy.git "$hyprcandy_dir"
+    git clone https://github.com/HyprCandy/Hyprcandy.git "$hyprcandy_dir"
     echo "✅ Cloninig complete"
     
     # Clone overview repository
