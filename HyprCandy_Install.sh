@@ -965,6 +965,7 @@ setup_hyprcandy() {
     else
         echo "✅ Seems to be a fresh install."
         rm -rf "$HOME/.hyprcandy"
+        rm -rf "$HOME/.ultracandy"
         sleep 2
     fi
 
