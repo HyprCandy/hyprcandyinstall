@@ -260,7 +260,6 @@ build_package_list() {
         "hyprpicker"
         "hyprpolkitagent"
         "hyprsunset"
-        "hyprsysteminfo"
         "hyprutils"
         "hyprwayland-scanner"
         
