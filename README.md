@@ -10,9 +10,9 @@ Needed packages: git, hyprland, kitty
 
 Run:
 ```shell
-git clone https://github.com/HyprCandy/hyprcandyinstall.git && cd hyprcandyinstall
+git clone --depth 1 https://github.com/HyprCandy/hyprcandyinstall.git && cd hyprcandyinstall
 ```
 followed by:
 ```shell
-bash HyprCandy_installer.sh
+bash HyprCandy_Install.sh
 ```
