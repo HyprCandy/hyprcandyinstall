@@ -290,7 +290,6 @@ build_package_list() {
         
         # System utilities
         "blueman"
-        "r-quick-share"
         "nwg-displays"
         "wlogout"
         "uwsm"
@@ -375,9 +374,6 @@ build_package_list() {
         
         # Cursor themes
         "bibata-cursor-theme-bin"
-        
-        # Entertainment
-        "spotify"
         
         # System info
         "fastfetch"
