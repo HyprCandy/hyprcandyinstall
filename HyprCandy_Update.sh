@@ -328,7 +328,7 @@ build_package_list() {
         "rofi-nerdy"
         
         # Wallpaper and screenshot tools
-        "awww"
+        "awww-bin"
         "grimblast-git"
         "wob"
         "wf-recorder"
@@ -959,11 +959,11 @@ setup_hyprcandy() {
     if [ "$PANEL_CHOICE" = "waybar" ]; then
         print_status "Ensuring necessary packages are installed"
         echo
-        $AUR_HELPER --noconfirm -S waybar waypaper-git awww swaync bibata-cursor-theme-bin quickshell
+        $AUR_HELPER --noconfirm -S waybar waypaper-git awww-bin swaync bibata-cursor-theme-bin quickshell
     else
         print_status "Ensuring necessary packages are installed"
         echo
-        $AUR_HELPER --noconfirm -S ags-hyprpanel-git waypaper-git awww mako bibata-cursor-theme-bin quickshell
+        $AUR_HELPER --noconfirm -S ags-hyprpanel-git waypaper-git awww-bin mako bibata-cursor-theme-bin quickshell
     fi
 
     print_status "Setting up hyprexpo-plus and hyprbars plugins with configs in hyprviz.conf" 
