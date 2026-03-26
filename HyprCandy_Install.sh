@@ -302,7 +302,7 @@ build_package_list() {
         "rofi-nerdy"
         
         # Wallpaper and screenshot tools
-        "awww"
+        "awww-bin"
         "grimblast-git"
         "wob"
         "wf-recorder"
